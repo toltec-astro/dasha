@@ -1,6 +1,6 @@
 from .backend.db_config import *  # noqa: F401, F403
 
-TITLE = "DASHPAGES"
+TITLE = "DashA"
 
 # The value of this parameter will be propagated into both
 # `app.scripts.config.serve_locally` and `app.css.config.serve_locally`
