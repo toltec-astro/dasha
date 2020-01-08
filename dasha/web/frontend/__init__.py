@@ -2,7 +2,7 @@
 
 from dash import Dash
 from .utils import get_dash_args_from_flask_config
-from tolteca.utils.log import timeit
+from ...utils.log import timeit
 import flask
 
 

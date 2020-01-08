@@ -106,7 +106,7 @@ release = package.__version__
 
 
 html_theme_options = {
-    'logotext1': 'Dashpages',  # white,  semi-bold
+    'logotext1': 'DashA',  # white,  semi-bold
     'logotext2': '',  # orange, light
     'logotext3': ':docs'   # white,  light
     }

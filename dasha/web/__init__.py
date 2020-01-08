@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 
-from ..site import site_from_env
+from .. import site_from_env
+
+
+__all__ = ['site', 'create_app']
 
 
 site = site_from_env()

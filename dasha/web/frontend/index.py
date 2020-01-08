@@ -3,26 +3,22 @@ import dash_html_components as html
 from .utils import get_query_params, get_url
 from .common import fa
 from . import get_current_dash_app
-from tolteca.utils.log import get_logger
-from .common import SimplePage
+from ...utils.log import get_logger
 from dash.dependencies import Input, State, Output, ClientsideFunction
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 from .utils import odict_from_list
-
+from .. import site
+from .templates import create_page_from_dict
 
 app = get_current_dash_app()
 logger = get_logger()
 
 
 include_pages = odict_from_list([
-    SimplePage(p, module_prefix='.pages.', route_prefix='')
-    for p in (
-        'toltecdb',
-        'thermometry',
-        'kscope',
-        )
+    create_page_from_dict(config, route_prefix='')
+    for config in getattr(site, 'pages', list())
     ], key=lambda v: v.pathname)
 
 

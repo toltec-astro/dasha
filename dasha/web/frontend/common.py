@@ -18,8 +18,11 @@ def fa(className):
 
 class SimplePage(object):
 
-    def __init__(self, label, module_prefix='.', route_prefix=''):
+    def __init__(
+            self, label, module=None,
+            module_prefix='.', route_prefix=''):
         self._label = label
+        self._module = module
         self._module_prefix = module_prefix
         self._route_prefix = route_prefix
 
@@ -29,6 +32,9 @@ class SimplePage(object):
 
     @cached_property
     def page(self):
+        if self._module is not None:
+            return self._module
+        # load from module prefix
         return timeit(f"load page {self.pathname}")(
                 importlib.import_module)(
                     f'{self._module_prefix}{self._label}',

@@ -3,9 +3,9 @@ include CHANGES.rst
 
 include ah_bootstrap.py
 include setup.cfg
-include dashpages/tests/coveragerc
+include dasha/tests/coveragerc
 
-recursive-include dashpages *.pyx *.c *.pxd
+recursive-include dasha *.pyx *.c *.pxd
 recursive-include docs *
 recursive-include licenses *
 recursive-include cextern *

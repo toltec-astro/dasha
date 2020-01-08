@@ -5,7 +5,7 @@ A multi-page dash app with a set of plug-and-play page templates
     :target: http://www.astropy.org
     :alt: Powered by Astropy Badge
 
-Dashpages is a multi-page dash app that comes with a set of plug-and-play page
+DashA is a multi-page dash app that comes with a set of plug-and-play page
 templates
 
 
@@ -22,7 +22,7 @@ more information.
 Contributing
 ------------
 
-We love contributions! Dashpages is open source,
+We love contributions! DashA is open source,
 built on open source, and we'd love to have you hang out in our community.
 
 **Imposter syndrome disclaimer**: We want your help. No, really.
@@ -48,5 +48,5 @@ the errors and assumptions that seasoned contributors have glossed over.
 Note: This disclaimer was originally written by
 `Adrienne Lowe <https://github.com/adriennefriend>`_ for a
 `PyCon talk <https://www.youtube.com/watch?v=6Uj746j9Heo>`_, and was adapted by
-Dashpages based on its use in the README file for the
+DashA based on its use in the README file for the
 `MetPy project <https://github.com/Unidata/MetPy>`_.
