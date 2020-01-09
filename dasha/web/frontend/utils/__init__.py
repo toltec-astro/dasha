@@ -11,9 +11,15 @@ import numpy as np
 
 
 def tz_off_from_ut(tz):
+    if tz == 'UTC':
+        return np.timedelta64(0, 'h')
     tz_now = datetime.datetime.now(pytz.timezone(tz))
-    offset_hours = int(tz_now.utcoffset().total_seconds() / 3600)
+    offset_hours = int(tz_now.utcoffset().total_seconds() / 3600.)
     return np.timedelta64(offset_hours, 'h')
+
+
+def tz_offset(tz1, tz2):
+    return tz_off_from_ut(tz1) - tz_off_from_ut(tz2)
 
 
 def get_query_params(search):

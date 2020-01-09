@@ -104,3 +104,9 @@ def get_callable(name):
     module, func = name.split("::")
     module = importlib.import_module(module)
     return getattr(module, func)
+
+
+def dict_from_module(m, **kwargs):
+    result = {k: getattr(m, k) for k in m.__all__}
+    result.update(**kwargs)
+    return result
