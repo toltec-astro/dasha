@@ -307,7 +307,7 @@ class LiveNcFileView(SimplePageTemplate):
                     ])
             ctrl_kwargs[self._controls[ctrl]['kwarg_key']] = False
         controls = make_controls_row(controls)
-        controls = html.Div(controls_grid, className='my-4')
+        controls = html.Div(controls_grid, className='my-2')
 
         # outputs
         output_kwargs = dict()
