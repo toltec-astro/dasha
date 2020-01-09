@@ -236,8 +236,10 @@ class LiveNcFileView(SimplePageTemplate):
         controls_grid = []
 
         def make_controls_row(controls):
-            controls_grid.append(dbc.Row(controls, className='px-2'))
-            return list()
+            if len(controls) > 0:
+                controls_grid.append(dbc.Row(controls, className='px-2'))
+                return list()
+            return controls
         controls = []
         ctrl_kwargs = dict()
         if 'toggle-collate' in ctrls:
@@ -305,7 +307,7 @@ class LiveNcFileView(SimplePageTemplate):
                     ])
             ctrl_kwargs[self._controls[ctrl]['kwarg_key']] = False
         controls = make_controls_row(controls)
-        controls = html.Div(controls_grid)
+        controls = html.Div(controls_grid, className='my-4')
 
         # outputs
         output_kwargs = dict()
