@@ -6,7 +6,7 @@ import dash_bootstrap_components as dbc
 import dash_table
 import dash_html_components as html
 from dash.development.base_component import Component
-from tolteca.utils.log import timeit, get_logger
+from ...utils.log import timeit, get_logger
 from cached_property import cached_property
 import importlib
 # from .utils import get_url

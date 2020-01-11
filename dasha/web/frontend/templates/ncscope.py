@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
-from tolteca.utils.nc import ncopen, ncinfo, ncstr
-from tolteca.utils.log import get_logger
+from ....utils.nc import ncopen, ncinfo, ncstr
+from ....utils.log import get_logger
 from contextlib import ExitStack
 from pathlib import Path
 from functools import lru_cache

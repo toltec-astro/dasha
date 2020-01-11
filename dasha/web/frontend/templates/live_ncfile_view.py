@@ -5,7 +5,7 @@ import dash_core_components as dcc
 import dash_daq as daq
 import dash_html_components as html
 from dash.dependencies import Input, Output, State, ClientsideFunction
-from tolteca.utils.log import get_logger
+from ....utils.log import get_logger
 from .. import get_current_dash_app
 from plotly.subplots import make_subplots
 from ..utils import tz_offset
