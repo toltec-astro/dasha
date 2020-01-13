@@ -17,7 +17,7 @@ logger = get_logger()
 
 
 include_pages = odict_from_list([
-    create_page_from_dict(config, route_prefix='')
+    create_page_from_dict(config, route_prefix=app.config.get("requests_pathname_prefix", "").rstrip('/'))
     for config in getattr(site, 'pages', list())
     ], key=lambda v: v.pathname)
 
@@ -100,11 +100,19 @@ layout = html.Div([
             Input("url-location", "search"),
         ])
 def render_page_content(pathname, search):
-    print(pathname)
     if pathname is None:
         raise PreventUpdate(
                 "ignoring first Location.pathname callback")
+    logger.debug(f"render page pathname={pathname}")
     try:
+        rprefix = app.config['requests_pathname_prefix']
+        if rprefix is not None:
+            import re
+            if pathname == rprefix.rstrip("/"):
+                pathname = '/'
+            elif pathname.startswith(rprefix):
+                pathname = re.sub(rprefix, '/', pathname, 1)
+
         layout = include_pages[normalize_pathname(pathname)].get_layout(
                 **get_query_params(search))
         return layout
