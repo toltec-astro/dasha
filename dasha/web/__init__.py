@@ -1,37 +1,41 @@
 #! /usr/bin/env python
 
-from .. import site_from_env
+import os
+from .. import SiteRuntime
+from ..utils.log import get_logger, timeit, logit
 
 
 __all__ = ['site', 'create_app']
 
 
-site = site_from_env()
+# enable logging for development env
+if os.environ.get('FLASK_ENV', 'development'):
+    from ..utils.click_log import init as init_log
+    init_log('DEBUG')
 
 
+site = SiteRuntime.from_env()
+
+
+@timeit
 def create_app():
+    """The web entry point."""
 
-    from . import config
+    logger = get_logger()
 
-    if hasattr(site, 'create_server'):
-        server = site.create_server(config)
+    from ..defaults import config as config_default
+
+    # create server
+    server = site.create_server(config_default)
+
+    # init extensions
+    if callable(site.extensions):
+        exts = site.extensions()
     else:
-        import flask
-        server = flask.Flask(__package__)
-        server.config.from_object(config)
-        server.config.from_object(site)
-        from ..utils.click_log import init as init_log
-        init_log(level='DEBUG' if server.debug else 'INFO')
+        exts = site.extensions
 
-    if hasattr(site, 'backend'):
-        site.backend.init_app(server)
-    else:
-        from . import backend
-        backend.init_app(server)
+    for ext in exts:
+        with logit(logger.debug, f"init {ext.__name__}"):
+            ext.init_app(server)
 
-    if hasattr(site, 'frontend'):
-        site.frontend.init_app(server)
-    else:
-        from . import frontend
-        frontend.init_app(server)
     return server

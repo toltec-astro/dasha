@@ -11,10 +11,15 @@ from astropy.utils.console import human_time
 from . import deepmerge
 
 
-def init_logging(overrides=None):
-    """Initialize logging facilities
+def init_logging(config=None):
+    """Initialize logging facilities with some sensible defaults.
+
+    Parameters
+    ----------
+    config: dict
+        Override the defaults with entries defined in this dict.
     """
-    config = {
+    _config = {
         'version': 1,
         'disable_existing_loggers': False,
         'formatters': {
@@ -52,12 +57,15 @@ def init_logging(overrides=None):
             },
         }
     }
-    if overrides:
-        deepmerge(config, overrides)
-    logging.config.dictConfig(config)
+    if config:
+        deepmerge(_config, config)
+    logging.config.dictConfig(_config)
 
 
 def get_logger(name=None):
+    """Return a logger named `name` if specified, otherwise use the name
+       of the calling context.
+    """
     if name is None:
         name = inspect.stack()[1][3]
         # code = inspect.currentframe().f_back.f_code
@@ -67,6 +75,15 @@ def get_logger(name=None):
 
 
 def timeit(arg):
+    """Decorator that logs the execution time of the decorated item.
+
+    Parameters
+    ----------
+    arg: class, function, or str
+        If `arg` type is `str`, it is used in the generated message
+        in places of the name of the decorated class or function.
+    """
+
     def format_time(time):
         if time < 15:
             return f"{time * 1e3:.0f}ms"
@@ -94,12 +111,24 @@ def timeit(arg):
 
 
 class logit(ContextDecorator):
-    def __init__(self, func, msg):
-        self.func = func
+    """Decorator that logs the execution of the decorated item."""
+
+    def __init__(self, log, msg):
+        """Initialize the decorator.
+
+        Prameters
+        ---------
+        log: callable
+            The logging function to use.
+
+        msg: str
+            The message body to use.
+        """
+        self.log = log
         self.msg = msg
 
     def __enter__(self):
-        self.func(f"{self.msg} ...")
+        self.log(f"{self.msg} ...")
 
     def __exit__(self, *args):
-        self.func(f'{self.msg} done')
+        self.log(f'{self.msg} done')

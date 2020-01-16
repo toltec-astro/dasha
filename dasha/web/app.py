@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-"""Flask entry point."""
+"""Flask script entry point."""
 
 if __package__:
     from . import create_app  # noqa: F401

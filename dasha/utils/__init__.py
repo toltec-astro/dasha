@@ -8,12 +8,11 @@ from contextlib import ContextDecorator
 import os
 
 
-def get_pkg_data_path():
-    return Path(__file__).parent.parent.joinpath("data")
-
-
 def rgetattr(obj, attr, *args):
-    """Get attribute recursively."""
+    """Get attribute recursively.
+
+     Nested attribute is specified as `a.b`.
+     """
     def _getattr(obj, attr):
         return getattr(obj, attr, *args)
     return functools.reduce(_getattr, [obj] + attr.split('.'))
@@ -23,13 +22,19 @@ def rgetattr(obj, attr, *args):
 def deepmerge(d, u):
     """Do a deep merge of one dict into another.
 
-    This will update d with values in u, but will not delete keys in d
-    not found in u at some arbitrary depth of d. That is, u is deeply
-    merged into d.
+    This will update `d` with items in `u`, but will not delete keys in `d`
+    not found in `u` at some arbitrary depth of `d`, that is, `u` is deeply
+    merged into `d`.
 
     Parameters
     ----------
     d, u: dict
+
+
+    Returns
+    -------
+    None
+        Dict `d` is updated in place.
     """
 
     stack = [(d, u)]
@@ -106,7 +111,54 @@ def get_callable(name):
     return getattr(module, func)
 
 
-def dict_from_module(m, **kwargs):
-    result = {k: getattr(m, k) for k in m.__all__}
+def patch(obj, name, pass_patched=False):
+    """Return a decorator that replace attribute with decorated
+    item.
+    """
+    patched_attr_name = f'__patched_attr_{name}'
+    if hasattr(obj, patched_attr_name):
+        raise RuntimeError(f"attr {name} of obj {obj} is already patched")
+    old_func = getattr(obj, name)
+    print(f"patch {obj} {name}")
+
+    def decorator(func):
+        if pass_patched:
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                return func(old_func, *args, **kwargs)
+            new_func = wrapper
+        new_func = func
+        setattr(obj, patched_attr_name, old_func)
+        setattr(obj, name, new_func)
+        return new_func
+    return decorator
+
+
+def dict_from_object(obj, keys=None, **kwargs):
+    """Return a dict from object `obj`.
+
+    Parameter `keys` is used to specify what attributes to include
+    in the output. If `keys` is None, the `__all__` list is used if
+    present, otherwise use all attributes that does not starts with
+    ``_``. If `keys` is callable,
+    it is called with `obj` to get a list of keys.
+
+    Parameters
+    ----------
+    filter_: list, callable, or None
+        Specify the output keys.
+    **kwargs:
+        Items will be used to override the entries in obj.
+    """
+    if keys is None:
+        if hasattr(obj, '__all__'):
+            keys = obj.__all__
+        else:
+            keys = filter(lambda k: not k.startswith('_'), dir(obj))
+    else:
+        if callable(keys):
+            keys = keys(obj)
+
+    result = {k: getattr(obj, k) for k in keys}
     result.update(**kwargs)
     return result
