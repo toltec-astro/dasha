@@ -4,9 +4,9 @@ import wrapt
 
 
 class ExtensionProxy(wrapt.ObjectProxy):
-    """This class provide lazy initialization of extension object.
+    """This class provide lazy initialization of extension.
 
-    For usage, see `db.py`.
+    For example of usage, see `db.py`.
     """
 
     def __init__(self, cls, ext):
@@ -28,6 +28,10 @@ class ExtensionProxy(wrapt.ObjectProxy):
         self._self_ext = ext
         self._self_initialized = False
         super().__init__(None)
+
+    @property
+    def _extension(self):
+        return self._self_ext
 
     def __getattr__(self, name, *args):
         if not self._self_initialized:

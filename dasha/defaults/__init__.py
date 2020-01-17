@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-"""This module implements a default site."""
+"""This module provides default implementations of a site."""
 
 
 def create_server(config):
@@ -16,7 +16,7 @@ def _extensions():
     """Return a list of extension modules."""
     import importlib
 
-    _exts = ['cache', 'db', 'dash']
+    _exts = ['dasha', ]
     return (
             importlib.import_module(
                 f'..web.extensions.{e}', package=__package__)

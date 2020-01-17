@@ -13,4 +13,6 @@ def init(cls):
     return cls()
 
 
-init_app = cache.init_app
+def init_app(server):
+    ext = cache._extension
+    return cache.init_app(server, config=ext.config)
