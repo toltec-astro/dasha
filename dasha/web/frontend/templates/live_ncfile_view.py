@@ -14,6 +14,7 @@ from . import SimplePageTemplate
 from ....utils import deepmerge
 from ....utils.fmt import pformat_dict
 from .ncscope import NcScope
+from .csvscope import CsvScope
 import numpy as np
 from copy import deepcopy
 
@@ -155,7 +156,11 @@ class LiveNcFileView(SimplePageTemplate):
             return src['traces'](src)
 
         # generic nc file trace
-        ns = NcScope.from_link(src['runtime_link'])
+        filename = src['runtime_link']
+        if filename.endswith('.nc'):
+            ns = NcScope.from_link(filename)
+        elif filename.endswith('.csv'):
+            ns = CsvScope.from_link(filename)
         ns.sync()
         result = []
         for i, trace in enumerate(src['traces']):
