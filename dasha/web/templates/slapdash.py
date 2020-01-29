@@ -3,34 +3,26 @@
 
 """This is a template that mimics slapdash style."""
 
-from . import Template
+from . import ComponentTemplate
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 
 
-class SlapDash(Template):
+class SlapDash(ComponentTemplate):
 
-    _make_availabel_factories = [
-            html.Div,
-            html.P,
-            ]
-
-    def __init__(self, config, parent=None):
-        super().__init__(parent=parent)
-        self._config = config
+    _component_cls = dbc.Container
 
     @property
     def layout(self):
-        title = self._config['TITLE']
+        title = self.TITLE
 
-        container = self.make_component(html.Div)
+        header = self.child(dbc.Row)
+        body = self.child(dbc.Row)
+        footer = self.child(dbc.Row)
 
-        header = container.make_component(html.H1, f'Hello, {title}!')
-        body = container.make_component(html.H2, f'some text goes here')
+        header.child(html.H1, f'Hello, {title}!')
+        footer.child(html.H2, f'some text goes here')
 
-        container.children = [header, body]
-        container.children.extend([html.H3(i) for i in range(100)])
-        return container.layout
+        body.children = tuple(html.H3(i) for i in range(100))
 
-    @classmethod
-    def from_dict(cls, config):
-        return cls(config)
+        return super().layout

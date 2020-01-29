@@ -6,7 +6,11 @@ from flask_caching import Cache
 import sys
 from . import ExtensionProxy
 
+
 cache = ExtensionProxy(Cache, sys.modules[__name__])
+
+
+config = {}
 
 
 def init(cls):

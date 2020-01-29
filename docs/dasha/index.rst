@@ -11,8 +11,8 @@ Reference/API
 
 .. automodapi:: dasha.web
 
-.. automodapi:: dasha.web.backend
+.. automodapi:: dasha.web.extensions
 
-.. automodapi:: dasha.web.frontend
+.. automodapi:: dasha.web.templates
 
 .. automodapi:: dasha.utils

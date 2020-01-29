@@ -1,35 +1,32 @@
 #! /usr/bin/env python
 
+"""This module defines DashA web server globals."""
+
 import os
+from tollan.utils.log import get_logger, timeit, logit, init_log
+from tollan.utils.fmt import pformat_dict
+from tollan.utils.env import env_registry
 from .. import SiteRuntime
-from ..utils.env import EnvRegistry
-from ..utils.log import get_logger, timeit, logit
-from ..utils.fmt import pformat_dict
 
 
-__all__ = ['site', 'env_registry', 'create_app']
+__all__ = ['site', 'create_app']
 
 
-logger = get_logger()
-
-
-# enable logging for development env
+# enable logging if flask development is set
 if os.environ.get('FLASK_ENV', 'development'):
-    from ..utils.click_log import init as init_log
-    init_log('DEBUG')
+    init_log(level='DEBUG')
 
 
-env_registry = EnvRegistry.create()
-"""Used to hold all recognized environment variables."""
-
-site = SiteRuntime.from_env(env_registry=env_registry)
+site = SiteRuntime.from_env()
+"""Used to manage the site runtime configs."""
 
 
 @timeit
 def create_app():
-    server = site.create_server()
-    for ext in site.extentions:
-        with logit(logger.debug, f"init {ext.__name__}"):
+    logger = get_logger()
+    server = site.get_server()
+    for ext in site.get_extentions():
+        with logit(logger.debug, f"init app extension {ext.__name__}"):
             ext.init_app(server)
-    logger.debug(f"registered envs:{pformat_dict(env_registry)}")
+    logger.debug(f"registered env vars:{pformat_dict(env_registry)}")
     return server

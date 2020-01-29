@@ -25,5 +25,4 @@ if LooseVersion(sys.version) < LooseVersion(__minimum_python_version__):
                                  .format(__minimum_python_version__))
 
 if not _ASTROPY_SETUP_:   # noqa
-    from .core import *  # noqa: F401, F403
-    from . import utils  # noqa: F401
+    from .site_runtime import *  # noqa: F401, F403

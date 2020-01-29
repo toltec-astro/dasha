@@ -12,9 +12,7 @@ import sys
 db = ExtensionProxy(SQLAlchemy, sys.modules[__name__])
 
 
-config = {
-        "SQLALCHEMY_TRACK_MODIFICATIONS", False
-        }
+config = {}
 
 
 def init(cls):
@@ -22,8 +20,10 @@ def init(cls):
 
 
 def init_app(server):
-
-    server.config.update(config)
+    ext = db._extension
+    server.config.update(
+        SQLALCHEMY_TRACK_MODIFICATIONS=False)
+    server.config.update(ext.config)
     db.init_app(server)
 
     @server.teardown_appcontext

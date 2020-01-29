@@ -21,8 +21,10 @@ class ExtensionProxy(wrapt.ObjectProxy):
         ----------
         cls: type
             The extension class.
+
         ext: module
             A module in which the extension related code resides.
+
         """
         self._self_cls = cls
         self._self_ext = ext
