@@ -151,7 +151,6 @@ class LiveNcFileView(SimplePageTemplate):
             )
 
     def _get_traces(self, src):
-        # make deep copy be
         if callable(src['traces']):
             return src['traces'](src)
 
@@ -171,7 +170,7 @@ class LiveNcFileView(SimplePageTemplate):
                 ns_cls = CsvScope
             else:
                 ns_cls = NcScope
-            ns = ns_cls.from_link()
+            ns = ns_cls.from_link(runtime_link)
             if ns not in synced:
                 synced[ns] = ns.sync()
             # get slice
