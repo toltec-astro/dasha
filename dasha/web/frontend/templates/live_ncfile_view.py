@@ -155,14 +155,17 @@ class LiveNcFileView(SimplePageTemplate):
             return src['traces'](src)
 
         # generic nc file trace
-        ns = NcScope.from_link(src['runtime_link'])
-        ns.sync()
         result = []
+        synced = dict() 
         for i, trace in enumerate(src['traces']):
             # make a deepcopy because we will modify this dict
             trace = deepcopy(trace)
             trace.setdefault('name', f"trace {i}")
 
+            # load ncfile
+            ns = NcScope.from_link(trace.pop('runtime_link', src.get('runtime_link', None)))
+            if ns not in synced:
+                synced[ns] = ns.sync()
             # get slice
             x_slice = trace.pop('x_slice', None)
             y_slice = trace.pop('y_slice', None)
@@ -363,10 +366,12 @@ class LiveNcFileView(SimplePageTemplate):
 
         components = []
 
-        width = 12 / len(self.sources)
+        width = 12 // len(self.sources)
+        if width < 3:
+            width = 3
         for src in self.sources.values():
             components.append(dbc.Col(
-                self._get_layout(src), width=12, lg=width))
+                self._get_layout(src), md=12, lg=6, xl=width))
 
         return html.Div([dbc.Row(components)])
 

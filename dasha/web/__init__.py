@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 
 from .. import site_from_env
+from ..utils.log import get_logger
+from ..utils.fmt import pformat_dict
 
 
 __all__ = ['site', 'create_app']
@@ -10,6 +12,8 @@ site = site_from_env()
 
 
 def create_app():
+
+    logger = get_logger()
 
     from . import config
 
@@ -34,4 +38,6 @@ def create_app():
     else:
         from . import frontend
         frontend.init_app(server)
+
+    logger.debug(f"flask config:\n{pformat_dict(server.config)}")
     return server
