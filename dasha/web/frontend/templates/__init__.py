@@ -10,7 +10,7 @@ from ..common import SimplePage
 
 class SimplePageTemplate(object):
 
-    _template_params = list()
+    _template_params = ["label", "title_text"]
 
     logger = get_logger()
 
@@ -27,8 +27,11 @@ class SimplePageTemplate(object):
 
 
 def _get_template_cls(name):
-    module = importlib.import_module(
+    if isinstance(name, str):
+        module = importlib.import_module(
             f".{name}", package=__package__)
+    else:
+        module = name
     return module.template_cls
 
 
