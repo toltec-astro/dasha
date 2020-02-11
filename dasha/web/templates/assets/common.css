@@ -1,7 +1,7 @@
 /* Default link colours */
-/* a {color: #0275d8 !important} */
+a {color: #0275d8 !important}
 
-/* a:hover {color: #014c8c !important} */
+a:hover {color: #014c8c !important}
 
 .dash-spreadsheet-container
 {
@@ -10,3 +10,37 @@
     height: 80vh;
     float: right !important;
 }
+
+.dash-table-container .dash-spreadsheet-container div {
+    margin: 0px;
+    padding: 0px;
+}
+
+.daq-graduatedbar div
+{
+    height: 100% !important;
+}
+
+
+.daq-graduatedbar div
+{
+    height: 100% !important;
+}
+
+
+@media (min-width: 64em) {
+  .daq-graduatedbar {
+        margin-left: auto
+  }
+}
+
+
+.dash-spinner.dash-default-spinner {
+    margin: auto;
+    height: 30px;
+}
+
+.dash-default-spinner > div {
+    width: 3px !important;
+}
+

@@ -42,8 +42,18 @@ window.dash_clientside.tolteca = {
 
 // https://community.plot.ly/t/links-in-datatable-multipage-app/26081/6
 window.dash_clientside.ui = {
+    activateNavlink: function(pathname, navitems_, state) {
+
+        if (pathname === '/') {
+            pathname = state['navlink_default']
+        }
+        navitems = navitems_.map(a => ({...a}));
+        navitems.forEach(function(navitem) {
+            navitem.props.active = (pathname === navitem.props.href)
+        })
+        return navitems
+    },
     collapseWithClick: function(n, classname) {
-        console.log(n, classname)
         if (n) {
             if (classname && classname.includes(" collapsed")) {
                 return classname.replace(" collapsed", "")
@@ -73,4 +83,44 @@ window.dash_clientside.ui = {
         });
         return null;
     }
+}
+
+window.dash_clientside.datastore = {
+    getKey: function(data, key) {
+        console.log("get " + key + " from " + data)
+        return data[key]
+    },
+}
+
+
+window.dash_clientside.syncedlist = {
+    updateMeta: function(data, meta) {
+        console.log("update meta")
+        console.log(meta)
+        console.log(data)
+        if (data) {
+            return {
+                ...meta,
+                'size': data.length,
+                'pk_latest': data[0][meta.pk]
+                }
+        }
+        return meta
+    },
+    update: function(new_data, old_data, meta) {
+        console.log("update data")
+        console.log(new_data)
+        console.log(old_data)
+        console.log(meta)
+        if (!new_data || new_data.length == 0) {
+            // console.log("no update")
+            return old_data
+        }
+        // no old data
+        if (!old_data || old_data.length == 0) {
+            return new_data
+        }
+        // merge data
+        return new_data.concat(old_data)
+    },
 }

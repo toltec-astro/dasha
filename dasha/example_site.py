@@ -17,7 +17,8 @@ extensions = [
     {
         'module': 'dasha.web.extensions.dasha',
         'config': {
-            'template': 'simple',
+            # 'template': 'simple',
+            'template': 'slapdash',
             'TITLE': 'DashA',
             }
         },

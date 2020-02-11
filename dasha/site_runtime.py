@@ -7,7 +7,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from tollan.utils.log import get_logger
 from tollan.utils.fmt import pformat_dict
-from tollan.utils import dict_from_object, object_from_name
+from tollan.utils import dict_from_object, object_from_spec
 from tollan.utils.env import env_registry
 
 
@@ -95,7 +95,7 @@ class SiteRuntime(object):
     def get_server(self):
         _server = self.config['server']
         if isinstance(_server, str):
-            _server = object_from_name(_server)
+            _server = object_from_spec(_server)
         if callable(_server):
             return _server(self.config)
         return _server

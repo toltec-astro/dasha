@@ -23,14 +23,14 @@ class TestIdTree(object):
         for obj in self.objs:
             assert obj in self.ClassWithIdTree._idt_instances
 
-    def test_label(self):
-        assert self.objs[0].label == 'classwithidtree0'
-        assert self.objs[1].label == 'classwithidtree1'
+    def test_idbase(self):
+        assert self.objs[0].idbase == 'classwithidtree0'
+        assert self.objs[1].idbase == 'classwithidtree1'
 
     def test_id(self):
         for i in range(2):
             self.objs[i].parent = None
-            assert self.objs[i].id == self.objs[i].label == \
+            assert self.objs[i].id == self.objs[i].idbase == \
                 f'classwithidtree{i}'
         self.objs[1].parent = self.objs[0]
         assert self.objs[1].id == 'classwithidtree0-classwithidtree1'

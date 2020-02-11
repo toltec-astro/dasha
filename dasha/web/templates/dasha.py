@@ -52,6 +52,7 @@ class DashA(object):
 
         with server.app_context():
             server.dash_app = app
+            self.setup_layout(app)
             app.layout = self.layout
 
         return server
