@@ -6,6 +6,8 @@ from . import ExtensionProxy
 from ..templates import Template
 from ..templates.dasha import DashA
 import copy
+from tollan.utils.log import get_logger
+from tollan.utils.fmt import pformat_yaml
 
 
 def dasha_template(config):
@@ -45,7 +47,8 @@ def load_template(spec, cls_func=None):
     If `cls_func` is set, the template class will be passed to it as the
     sole parameter and the returned type will be used as the template class.
     """
-    print(spec)
+    logger = get_logger()
+    logger.debug(f"load template from spec:\n{pformat_yaml(spec)}")
     spec = copy.copy(spec)
     template_cls = Template._load_template_cls(spec.pop('template'))
 

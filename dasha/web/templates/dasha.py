@@ -21,7 +21,7 @@ class DashA(object):
                         "content": "width=device-width, initial-scale=1,"
                                    " shrink-to-fit=no"
                     }
-                ]
+                ],
             }
 
     @timeit
@@ -49,6 +49,11 @@ class DashA(object):
         serve_locally = config["SERVE_LOCALLY"]
         app.scripts.config.serve_locally = serve_locally
         app.css.config.serve_locally = serve_locally
+
+        # dev tools
+        # app.enable_dev_tools(debug=True),
+
+        self._template_registry.clear()
 
         with server.app_context():
             server.dash_app = app

@@ -20,7 +20,8 @@ def init(cls):
 
 def init_app(server):
     ext = cache._extension
-    return cache.init_app(server, config=ext.config)
+    cache.init_app(server, config=ext.config)
+    _cached_data_registry.clear()
 
 
 _cached_data_registry = Registry.create()
@@ -36,7 +37,7 @@ class CachedData(object):
     def __init__(self, label):
         _cached_data_registry.register(label, self)
         self._label = label
-        self.set(None)
+        # self.set(None)
 
     def set(self, value):
         self._cache.set(self._label, value)

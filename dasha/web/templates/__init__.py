@@ -126,17 +126,19 @@ class Template(IdTree):
         label = label.lower()
         # load module, first absolute, then relative to this
         module = None
+        errors = list()
         for mod_name, package in ((mod, None), (f'.{mod}', __package__)):
-            print(mod, package)
             try:
                 module = importlib.import_module(mod_name, package=package)
                 break
             except ModuleNotFoundError as e:
-                print(e)
+                errors.append((mod_name, package, e))
                 continue
         if module is None:
-            raise RuntimeError(
-                    f"not able to load template module from spec {spec}")
+            msg = f"not able to load template module from spec {spec}:\n"
+            for m, p, e in errors:
+                msg += f'({m}, {p}): {e}\n'
+            raise RuntimeError(msg.strip())
         # at this point the template class should already be
         # registered
         if label not in Template._template_registry:
@@ -220,21 +222,17 @@ class ComponentTemplate(Template):
     _component_cls = NotImplemented
 
     def __init_subclass__(cls):
-        print(f"component template init cls {cls}")
         super().__init_subclass__()
 
         def _get_component_prop_names(component_cls):
-            print(component_cls)
             if issubclass(component_cls, DashComponentBase):
                 return inspect.getfullargspec(component_cls.__init__).args[1:]
             return None
 
-        print(cls._component_cls)
         if cls._component_cls is not NotImplemented:
             prop_names = _get_component_prop_names(
                     cls._component_cls)
             cls._component_prop_names = prop_names
-            print(f"set component prop_names {cls._component_prop_names}")
 
     def __init__(self, *args, **kwargs):
         # put args in to kwargs
