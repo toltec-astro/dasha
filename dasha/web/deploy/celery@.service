@@ -1,0 +1,34 @@
+[Unit]
+Description=celery daemon %I
+After=network.target
+
+[Service]
+Type=forking
+# the specific user that our service will run as
+User=toltec
+Group=toltec
+# another option for an even more restricted service is
+# DynamicUser=yes
+# see http://0pointer.net/blog/dynamic-users-with-systemd.html
+
+EnvironmentFile=/home/toltec/zma/run/dasha/%i
+Environment='CELERY_CREATE_DIRS=1'
+RuntimeDirectory=celery
+LogsDirectory=celery
+WorkingDirectory=/home/toltec/zma/run
+ExecStart=/home/toltec/zma/venvs/toltec/bin/celery multi start worker \
+	-A dasha.web.celery_app \
+	--pidfile=/var/run/celery/%i.pid \
+	--logfile=/var/log/celery/%i.log \
+	--concurrency=2 --loglevel=info
+ExecStop=/home/toltec/zma/venvs/toltec/bin/celery multi stopwait worker \
+	-A dasha.web.celery_app \
+	--pidfile=/var/run/celery/%i.pid
+ExecReload=/home/toltec/zma/venvs/toltec/bin/celery multi restart worker \
+	-A dasha.web.celery_app \
+	--pidfile=/var/run/celery/%i.pid \
+	--logfile=/var/log/celery/%i.log \
+	--concurrency=2 --loglevel=info
+
+[Install]
+WantedBy=multi-user.target
