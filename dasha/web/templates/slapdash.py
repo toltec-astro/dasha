@@ -31,9 +31,9 @@ class SlapDashPageWrapper(ComponentTemplate):
     @property
     def _route_name(self):
         """This is the stem of the page url."""
-        return ensure_prefix(getattr(
+        return resolve_url(ensure_prefix(getattr(
                 self._template, 'route_name',
-                self._template.idbase), '/')
+                self._template.idbase), '/'))
 
     def _make_navlink(self, container):
         """This is the used as the navlist child"""
@@ -45,7 +45,7 @@ class SlapDashPageWrapper(ComponentTemplate):
                 dbc.NavLink,
                 children=title,
                 active=False,
-                href=resolve_url(self._route_name))
+                href=self._route_name)
 
     def setup_layout(self, app):
         self._template.setup_layout(app)
@@ -151,7 +151,7 @@ class SlapDash(ComponentTemplate):
         for page in self._pages:
             page['_view'] = self._make_page(page)
             page['_view']._make_navlink(self.navlist)
-        self.clientside_state.data['navlink_default'] = '/0'
+        self.clientside_state.data['navlink_default'] = self._pages[0]['_view']._route_name
         self.location = self.child(dcc.Location, refresh=False)
 
         footer = sidebar.child(
@@ -161,11 +161,13 @@ class SlapDash(ComponentTemplate):
         self._make_footer(footer)
 
     def _get_content_layout(self, pathname):
-        print(pathname)
-        print(self._page_registry.keys())
+        logger = get_logger()
         route_name = pathname
-        if route_name == '/':
-            route_name = next(self._page_registry.keys())
+        if route_name not in self._page_registry:
+            if route_name.rstrip('/') == resolve_url('').rstrip('/'):
+                route_name = next(iter(self._page_registry))
+                logger.debug(f"use default page {route_name}")
+        logger.debug(f"get layout for {route_name} from {self._page_registry.keys()}")
         return self._page_registry[route_name].layout
 
     def setup_layout(self, app):
@@ -212,12 +214,10 @@ class SlapDash(ComponentTemplate):
                     Input(self.location.id, "search"),
                 ])
         def render_page_content(pathname, search):
-            print(pathname, search)
             if pathname is None:
                 raise PreventUpdate(
                     "the first Location.pathname callback shall be ignored")
-            print(pathname)
-            return self._get_content_layout(pathname)
+            return self._get_content_layout(pathname.rstrip('/'))
 
         super().setup_layout(app)
 

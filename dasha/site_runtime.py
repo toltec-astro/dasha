@@ -6,7 +6,7 @@ import importlib
 from collections.abc import Mapping
 from pathlib import Path
 from tollan.utils.log import get_logger
-from tollan.utils.fmt import pformat_yaml
+from tollan.utils.fmt import pformat_dict
 from tollan.utils import dict_from_object, object_from_spec
 from tollan.utils.env import env_registry
 
@@ -66,7 +66,7 @@ class SiteRuntime(object):
 
         self._config = dict(server=server, extensions=extensions, **kwargs)
         self.logger.debug(
-                f"site runtime:\n{pformat_yaml(self._config)}")
+                f"site runtime:\n{pformat_dict(self._config)}")
 
     @property
     def config(self):

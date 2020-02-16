@@ -2,7 +2,7 @@
 
 """This file defines an example site."""
 
-server = 'dasha.site_runtime::DefaultSite.server'
+server = 'dasha.site_runtime:DefaultSite.server'
 extensions = [
     {
         'module': 'dasha.web.extensions.db',
@@ -17,9 +17,15 @@ extensions = [
     {
         'module': 'dasha.web.extensions.dasha',
         'config': {
-            # 'template': 'simple',
-            'template': 'slapdash',
+            'template': 'simple',
             'TITLE': 'DashA',
+            # 'template': 'slapdash',
+            # 'pages': [
+            #     {
+            #         'template': 'dashaexample',
+            #         'title_text': 'Example',
+            #         }
+            #     ],
             }
         },
     ]
