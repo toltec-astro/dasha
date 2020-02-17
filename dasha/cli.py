@@ -15,6 +15,9 @@ def load_env_helper():
     for path in args.env_files:
         with open(path, 'r') as fo:
             for ln in fo.readlines():
+                ln = ln.strip()
+                if ln.strip().startswith("#"):
+                    continue
                 k, v = map(str.strip, ln.split('=', 1))
                 envs[k] = v
     cmd = ' '.join(f'{k}="{v}"' for k, v in envs.items())
