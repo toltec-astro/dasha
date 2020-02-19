@@ -2,9 +2,9 @@
 import importlib
 from abc import abstractmethod
 from tollan.utils.registry import Registry
+from tollan.utils.log import get_logger
 import inspect
 
-import sys
 from anytree import NodeMixin
 from abc import ABCMeta
 from collections.abc import Iterable
@@ -76,17 +76,17 @@ class Template(IdTree):
     around a functional group of dash components and the
     callbacks.
 
-    One can do arbitrary nesting of the template through the `make_component`
+    One can do arbitrary nesting of the template through the `child`
     factory function, which setup the created instance as the child.
 
     The template instance serve as a lazy evaluation proxy around the wrapped
     Dash components. Modification to relevant Dash component properties
-    are registered as kwargs that will pass to the constructor at evaluation
-    time, which is when the `layout` property is queried.
+    are registered as kwargs that will pass to the actual component
+    constructor when the `layout` property is queried.
     """
 
     _template_registry = Registry.create()
-    """This keeps a record of loaded subclasses of this class."""
+    """This keeps a record of imported subclasses of this class."""
 
     _skip_template_register = False
     """If set to True, this class is skipped from registering
@@ -94,9 +94,22 @@ class Template(IdTree):
 
     def __init_subclass__(cls):
         if not cls._skip_template_register:
-            _template_registry_key = cls.__name__.lower()
-            # if _template_registry_key not in cls._template_registry:
-            cls._template_registry.register(_template_registry_key, cls)
+            cls._template_registry.register(
+                    cls._make_registry_key(cls), cls)
+
+    @staticmethod
+    def _make_registry_key(template_cls):
+        if hasattr(template_cls, '_template_registry_key'):
+            return template_cls._template_registry_key
+        return f"{template_cls.__module__}.{template_cls.__qualname__}"
+
+    @classmethod
+    def clear_registry(cls):
+        """Reset the template subclass registry.
+
+        This is useful to make fresh reload of the flask instance.
+        """
+        cls._template_registry.clear()
 
     @property
     @abstractmethod
@@ -104,90 +117,116 @@ class Template(IdTree):
         """Implement this to return a valid Dash layout object."""
         return NotImplemented
 
+    def before_setup_layout(self, app):
+        """Hook that run before the `setup_layout` function call."""
+        pass
+
+    def after_setup_layout(self, app):
+        """Hook that run after the `setup_layout` function call."""
+        pass
+
     @abstractmethod
     def setup_layout(self, app):
         """Implement this to declare layout components and their callbacks."""
+        self.before_setup_layout(app)
         for child in self.children:
             child.setup_layout(app)
+        self.after_setup_layout(app)
 
     @staticmethod
-    def _load_template_cls(spec):
-        """Return the template class specified as `spec`.
+    def from_spec(spec, **kwargs):
+        """Return a instance of some template from `spec`.
 
-        The full format of `spec` is `module::label`, where
-        ``::label`` can be omitted, in which case the label
-        is the last part of mod path, i.e., 'a.b' is the
-        same as 'a.b::b'.
+        `spec` can either be a instance of Template, or a dict
+        with `template` entry.
         """
-        sep = ':'
-        if sep not in spec:
-            spec = f"{spec}{sep}{spec.rsplit('.', 1)[-1]}"
-        mod, label = spec.split(sep)
-        label = label.lower()
-        # load module, first absolute, then relative to this
-        module = None
-        errors = list()
-        for mod_name, package in ((mod, None), (f'.{mod}', __package__)):
-            try:
-                module = importlib.import_module(mod_name, package=package)
-                break
-            except ModuleNotFoundError as e:
-                errors.append((mod_name, package, e))
-                continue
-        if module is None:
-            msg = f"not able to load template module from spec {spec}:\n"
-            for m, p, e in errors:
-                msg += f'({m}, {p}): {e}\n'
-            raise RuntimeError(msg.strip())
-        # at this point the template class should already be
-        # registered
-        if label not in Template._template_registry:
-            raise RuntimeError(
-                    f"not able to find template class from spec {spec}"
-                    )
-        return Template._template_registry[label]
-
-    @staticmethod
-    def from_dict(config, **kwargs):
-        template_cls = Template._load_template_cls(config['template'])
-        for k, v in config.items():
+        if isinstance(spec, Template):
+            return spec
+        template_cls = load_template_cls(spec['template'])
+        for k, v in spec.items():
             kwargs.setdefault(k, v)
         return template_cls(**kwargs)
 
-    def child(self, component, *args, **kwargs):
-        """Return a child template object.
+    def child(self, factory, *args, **kwargs):
+        """Return a child template object from `factory`.
 
         The actual creation of the object is delegated to the appropriate
-        subclass based on the component type.
+        subclass based on the factory type.
         """
 
-        if isinstance(component, Template):
+        if isinstance(factory, Template):
             if args or kwargs:
-                raise ValueError("args and kwargs shall not be specified")
-            component.parent = self
-            return component
+                raise ValueError(
+                    f"child args and kwargs shall not"
+                    f" be specified for {type(factory)}")
+            factory.parent = self
+            return factory
 
-        # dispatch to other subclasses
-        module = sys.modules[__name__]
-
-        if isinstance(component, DashComponentMeta):
-            # component cls
-            template_cls = module.ComponentTemplate.make_template_cls(
-                    component)
-        elif isinstance(component, DashComponentBase):
-            # component instance
+        if isinstance(factory, DashComponentMeta):
+            # dash component cls
+            template_cls = load_component_template(factory)
+        elif isinstance(factory, DashComponentBase):
+            # dash component instance
             if args or kwargs:
-                raise ValueError("args and kwargs shall not be specified")
-            args = (component, )
-            template_cls = module.ComponentWrapper
+                raise ValueError(
+                        f"child args and kwargs shall not be specified"
+                        f" for {type(factory)}")
+            args = (factory, )
+            template_cls = ComponentWrapper
         else:
             raise ValueError(
-                    f"unable to create component of type {type(component)}")
+                    f"unable to create child template"
+                    f" from type {type(factory)}")
         return template_cls(*args, **kwargs, parent=self)
+
+
+def load_template_cls(spec):
+    """Return the template class specified as `spec`.
+
+    The full format of `spec` is `module:class`, where
+    ``:class`` can be omitted, in which case the class
+    loaded is the last
+    attribute in `module` that is a subclass of `Template`.
+    """
+    logger = get_logger()
+
+    def is_template(m):
+        return inspect.isclass(m) and issubclass(m, Template) and \
+            not m._skip_template_register
+
+    if is_template(spec):
+        cls = spec
+    elif isinstance(spec, str):
+        sep = ':'
+        if sep not in spec:
+            spec = f'{spec}:'
+        mod, cls = spec.split(sep, 1)
+        module = importlib.import_module(mod)
+        if cls == '':
+            cls = list(filter(
+                    lambda m: m[1].__module__ == module.__name__,
+                    filter(
+                        lambda m: is_template(m[1]),
+                        inspect.getmembers(module))))
+            if not cls:
+                raise RuntimeError(
+                        f"module {module} does not define a valid template.")
+            cls = sorted(cls, key=lambda o: inspect.getsourcelines(o[1])[1])
+            cls = cls[-1][1]
+            logger.debug(f"resolved template {spec.rstrip('sep')} as {cls}")
+    else:
+        raise RuntimeError(f"unrecognized spec type {spec}")
+    key = Template._make_registry_key(cls)
+    if key not in Template._template_registry:
+        raise RuntimeError(
+                f"template class {cls} of {spec} is not registered")
+    return Template._template_registry[key]
 
 
 class ComponentWrapper(Template):
     """A class that wraps an existing Dash component."""
+
+    _skip_template_register = True
 
     def __init__(self, component, parent=None):
         self._component = component
@@ -220,19 +259,23 @@ class ComponentTemplate(Template):
     in multiple parts of a single page application."""
 
     _component_cls = NotImplemented
+    _skip_template_register = True
 
     def __init_subclass__(cls):
-        super().__init_subclass__()
 
         def _get_component_prop_names(component_cls):
             if issubclass(component_cls, DashComponentBase):
                 return inspect.getfullargspec(component_cls.__init__).args[1:]
             return None
 
-        if cls._component_cls is not NotImplemented:
+        if cls._component_cls is NotImplemented:
+            cls._skip_template_register = True
+        else:
+            cls._skip_template_register = False
             prop_names = _get_component_prop_names(
                     cls._component_cls)
             cls._component_prop_names = prop_names
+        super().__init_subclass__()
 
     def __init__(self, *args, **kwargs):
         # put args in to kwargs
@@ -301,18 +344,20 @@ class ComponentTemplate(Template):
             component_kwargs[prop_name] = prop_value
         return self._component_cls(**component_kwargs)
 
-    @classmethod
-    def make_template_cls(cls, component_cls):
-        # here we use the lru_cache to make sure the class is created once
-        registry_key = component_cls.__name__.lower()
-        if registry_key in cls._template_registry:
-            return cls._template_registry[registry_key]
-        return type(
-                f"{component_cls.__name__}",
-                (cls, ), dict(
-                    _component_cls=component_cls,
-                    _skip_template_register=False
-                    ))
+
+def load_component_template(component_cls):
+    # here we try get the created classes from the registry
+    registry_key = Template._make_registry_key(component_cls)
+    if registry_key in Template._template_registry:
+        return Template._template_registry[registry_key]
+
+    # create if not exists
+    return type(
+            f"{component_cls.__name__}",
+            (ComponentTemplate, ), dict(
+                _component_cls=component_cls,
+                _template_registry_key=registry_key,
+                ))
 
 
 class ComponentGroup(ComponentTemplate):

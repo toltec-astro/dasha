@@ -2,11 +2,12 @@
 
 import os
 import sys
+import inspect
 import importlib
 from collections.abc import Mapping
 from pathlib import Path
 from tollan.utils.log import get_logger
-from tollan.utils.fmt import pformat_dict
+from tollan.utils.fmt import pformat_yaml
 from tollan.utils import dict_from_object, object_from_spec
 from tollan.utils.env import env_registry
 
@@ -14,7 +15,7 @@ from tollan.utils.env import env_registry
 __all__ = ['SiteRuntime', ]
 
 
-class DefaultSite(object):
+class default_site(object):
     """Default implementation of a site."""
 
     logger = get_logger()
@@ -60,13 +61,18 @@ class SiteRuntime(object):
 
     def __init__(
             self,
-            server=DefaultSite.server,
-            extensions=DefaultSite.extensions,
+            server=default_site.server,
+            extensions=default_site.extensions,
             **kwargs):
 
         self._config = dict(server=server, extensions=extensions, **kwargs)
+
+        def pformat_config(config):
+            return pformat_yaml(
+                    {k: v for k, v in config.items()
+                        if not inspect.ismodule(v)})
         self.logger.debug(
-                f"site runtime:\n{pformat_dict(self._config)}")
+                f"site runtime:\n{pformat_config(self._config)}")
 
     @property
     def config(self):
@@ -160,4 +166,5 @@ class SiteRuntime(object):
             # try interpret as path
             path = Path(module_path).expanduser().resolve()
             sys.path.insert(0, path.parent.as_posix())
-            return cls.from_object(importlib.import_module(path.name))
+            logger.debug(f"import {path.stem} from {path.parent}")
+            return cls.from_object(importlib.import_module(path.stem))

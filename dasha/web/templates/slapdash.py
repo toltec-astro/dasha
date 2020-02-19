@@ -3,7 +3,7 @@
 
 """This is a template that mimics slapdash style."""
 
-from . import ComponentTemplate
+from . import ComponentTemplate, Template
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
@@ -13,7 +13,6 @@ from tollan.utils.log import get_logger
 from tollan.utils.registry import Registry
 from .utils import fa, resolve_url
 from .sysinfo import SysInfo
-from ..extensions.dasha import load_template
 
 
 from dash.dependencies import Input, State, Output, ClientsideFunction
@@ -104,7 +103,7 @@ class SlapDash(ComponentTemplate):
         container.child(SysInfo())
 
     def _make_page(self, spec):
-        page = SlapDashPageWrapper(template=load_template(spec))
+        page = SlapDashPageWrapper(template=Template.from_spec(spec))
         self._page_registry.register(page._route_name, page)
         return page
 
@@ -151,7 +150,8 @@ class SlapDash(ComponentTemplate):
         for page in self._pages:
             page['_view'] = self._make_page(page)
             page['_view']._make_navlink(self.navlist)
-        self.clientside_state.data['navlink_default'] = self._pages[0]['_view']._route_name
+        self.clientside_state.data['navlink_default'] = \
+            self._pages[0]['_view']._route_name
         self.location = self.child(dcc.Location, refresh=False)
 
         footer = sidebar.child(
@@ -167,7 +167,9 @@ class SlapDash(ComponentTemplate):
             if route_name.rstrip('/') == resolve_url('').rstrip('/'):
                 route_name = next(iter(self._page_registry))
                 logger.debug(f"use default page {route_name}")
-        logger.debug(f"get layout for {route_name} from {self._page_registry.keys()}")
+        logger.debug(
+                f"get layout for {route_name} from "
+                f"{self._page_registry.keys()}")
         return self._page_registry[route_name].layout
 
     def setup_layout(self, app):

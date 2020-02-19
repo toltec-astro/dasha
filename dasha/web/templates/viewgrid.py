@@ -12,7 +12,7 @@ class ViewGrid(ComponentTemplate):
     def setup_layout(self, app):
         row = self.child(dbc.Row)
         for view in self.views:
-            view = self.from_dict(view)
+            view = self.from_spec(view)
             if view._component_cls is dbc.Col:
                 row.child(view)
             else:

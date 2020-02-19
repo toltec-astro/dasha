@@ -1,8 +1,10 @@
 #! /usr/bin/env python
 
-"""This file defines an example site."""
+"""
+This file defines an example site that makes use of
+the `dasha.web.templates.slapdash` template.
+"""
 
-server = 'dasha.site_runtime:DefaultSite.server'
 extensions = [
     {
         'module': 'dasha.web.extensions.db',
