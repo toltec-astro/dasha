@@ -2,10 +2,10 @@
 
 
 """
-This file defines an example site that plays around with different Dash components.
+This file defines an example site that plays around with different Dash
+components.
 """
 
-from tollan.utils.env import env_registry
 from dasha.web.templates import ComponentTemplate
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -36,19 +36,22 @@ class nat(ComponentTemplate):
                 dbc.Label("n_intervals:", className='mr-2'))
         ticker = ticker_container.child(html.Div, 'N/A')
 
-        factor = body.child(dcc.Input, placeholder = "Enter a factor: ", type = 'number', value = 1)
-        
+        factor = body.child(
+                dcc.Input,
+                placeholder="Enter a factor: ",
+                type='number',
+                value=1)
+
         @app.callback(
-                    Output(ticker.id, 'children')
-                    ,
+                Output(ticker.id, 'children'),
                 [
                     Input(timer.id, 'n_intervals'),
                     Input(factor.id, 'value')
                     ]
                 )
         def update(n_intervals, value):
-            
             return str(n_intervals * value) + ' s'
+
 
 extensions = [
     {

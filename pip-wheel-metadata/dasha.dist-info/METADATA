@@ -1,3 +1,40 @@
+Metadata-Version: 2.1
+Name: dasha
+Version: 0.1.dev21+gad8d7e7.d20200228
+Summary: A multi-page dash app framework.
+Home-page: http://to.be.set
+Author: Zhiyuan Ma
+Author-email: zhiyuanma@umass.edu
+License: BSD 3-Clause
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Description-Content-Type: text/x-rst
+Requires-Dist: astropy
+Requires-Dist: pandas
+Requires-Dist: cached-property
+Requires-Dist: anytree
+Requires-Dist: python-dotenv
+Requires-Dist: flask
+Requires-Dist: dash
+Requires-Dist: dash-bootstrap-components
+Requires-Dist: dash-daq
+Requires-Dist: flask-sqlalchemy
+Requires-Dist: flask-caching
+Requires-Dist: flask-migrate
+Requires-Dist: celery[redis]
+Requires-Dist: celery-redbeat
+Requires-Dist: celery-once
+Requires-Dist: flask-celeryext
+Provides-Extra: docs
+Requires-Dist: sphinx-astropy ; extra == 'docs'
+Requires-Dist: mkdocs ; extra == 'docs'
+Requires-Dist: mkdocs-material ; extra == 'docs'
+Provides-Extra: mysql
+Requires-Dist: mysqlclient ; extra == 'mysql'
+Provides-Extra: test
+Requires-Dist: pytest-astropy ; extra == 'test'
+Requires-Dist: tox ; extra == 'test'
+
 A multi-page dash app framework.
 --------------------------------
 
@@ -50,3 +87,5 @@ Note: This disclaimer was originally written by
 `PyCon talk <https://www.youtube.com/watch?v=6Uj746j9Heo>`_, and was adapted by
 DashA based on its use in the README file for the
 `MetPy project <https://github.com/Unidata/MetPy>`_.
+
+

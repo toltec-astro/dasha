@@ -6,6 +6,7 @@
 __pycache__
 
 # temporary stuff
+site/
 web.old/
 
 # Ignore .c files by default to avoid including generated code. If you want to

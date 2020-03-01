@@ -254,7 +254,7 @@ class ComponentTemplate(Template):
     Instances of this class is typically created from calling the
     ``make_component`` class method of the `Template` class, allowing
     one to declare as tree of components with automatic unique ids. The
-    actual Dash components are only be created at the moment `layout`
+    actual Dash components are only be created at the moment the `layout`
     attribute is accessed. This makes the same template object re-usable
     in multiple parts of a single page application."""
 
@@ -316,6 +316,7 @@ class ComponentTemplate(Template):
 
     @IdTree.children.setter
     def children(self, children):
+        """Setter to ensure the children is also a `Template` instance."""
         # we make sure the value set here is wrapped as a template
         if not isinstance(children, Iterable) or isinstance(
                 children, (str, DashComponentBase)):

@@ -7,12 +7,12 @@ This is the documentation for DashA.
 Reference/API
 =============
 
-.. automodapi:: dasha.core
+.. automodapi:: dasha.site_runtime
 
 .. automodapi:: dasha.web
 
 .. automodapi:: dasha.web.extensions
 
-.. automodapi:: dasha.web.templates
+.. automodapi:: dasha.web.tasks
 
-.. automodapi:: dasha.utils
+.. automodapi:: dasha.web.templates
