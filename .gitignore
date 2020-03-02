@@ -6,6 +6,7 @@
 __pycache__
 
 # temporary stuff
+pip-wheel-metadata/
 site/
 web.old/
 
