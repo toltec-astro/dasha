@@ -1,0 +1,7 @@
+IdTreeABCMeta
+=============
+
+.. currentmodule:: dasha.web.templates
+
+.. autoclass:: IdTreeABCMeta
+   :show-inheritance:

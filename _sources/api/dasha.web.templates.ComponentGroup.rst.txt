@@ -1,0 +1,27 @@
+ComponentGroup
+==============
+
+.. currentmodule:: dasha.web.templates
+
+.. autoclass:: ComponentGroup
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ComponentGroup.layout
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ComponentGroup.setup_layout
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: layout
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: setup_layout

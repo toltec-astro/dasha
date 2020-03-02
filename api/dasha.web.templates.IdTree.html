@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>IdTree &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="IdTreeABCMeta" href="dasha.web.templates.IdTreeABCMeta.html" />
+    <link rel="prev" title="ComponentWrapper" href="dasha.web.templates.ComponentWrapper.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="dasha.web.templates.IdTreeABCMeta.html" title="IdTreeABCMeta">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="dasha.web.templates.ComponentWrapper.html" title="ComponentWrapper">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	 &#187;
+      </li>
+      <li><a href="../dasha/index.html" accesskey="U">DashA Documentation</a> &#187;</li>
+      
+      <li>IdTree</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="idtree">
+<h1>IdTree<a class="headerlink" href="#idtree" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="dasha.web.templates.IdTree">
+<em class="property">class </em><code class="sig-prename descclassname">dasha.web.templates.</code><code class="sig-name descname">IdTree</code><span class="sig-paren">(</span><em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#IdTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.IdTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">anytree.node.nodemixin.NodeMixin</span></code></p>
+<p>A mixin class that provides unique ids for class instances.</p>
+<p>A hierarchy of ids are managed in a tree-like data structure,
+enabled by the underlying <code class="xref py py-obj docutils literal notranslate"><span class="pre">NodeMixin</span></code> class. The id of each
+tree node is a compositions of the parent’s id and the label of
+this node.</p>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.templates.IdTree.id" title="dasha.web.templates.IdTree.id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.templates.IdTree.idbase" title="dasha.web.templates.IdTree.idbase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">idbase</span></code></a></p></td>
+<td><p>The base name of the generated id.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="dasha.web.templates.IdTree.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#dasha.web.templates.IdTree.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dasha.web.templates.IdTree.idbase">
+<code class="sig-name descname">idbase</code><a class="headerlink" href="#dasha.web.templates.IdTree.idbase" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base name of the generated id.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">IdTree</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/dasha.web.templates.IdTree.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
+    Last built 02 Mar 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>SiteRuntime &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="create_app" href="dasha.web.create_app.html" />
+    <link rel="prev" title="DashA Documentation" href="../dasha/index.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="dasha.web.create_app.html" title="create_app">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="../dasha/index.html" title="DashA Documentation">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	 &#187;
+      </li>
+      <li><a href="../dasha/index.html" accesskey="U">DashA Documentation</a> &#187;</li>
+      
+      <li>SiteRuntime</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="siteruntime">
+<h1>SiteRuntime<a class="headerlink" href="#siteruntime" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="dasha.site_runtime.SiteRuntime">
+<em class="property">class </em><code class="sig-prename descclassname">dasha.site_runtime.</code><code class="sig-name descname">SiteRuntime</code><span class="sig-paren">(</span><em class="sig-param">server=&lt;bound method default_site.server of &lt;class 'dasha.site_runtime.default_site'&gt;&gt;</em>, <em class="sig-param">extensions=&lt;generator object default_site.&lt;genexpr&gt;&gt;</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/site_runtime.html#SiteRuntime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.site_runtime.SiteRuntime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This class manages context of a DashA site.</p>
+<p>The site runtime provides method tha</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>server: `flask.Flask` or callable</strong></dt><dd><p>The server instance or a callable that returns it.</p>
+</dd>
+<dt><strong>extensions: list of dicts</strong></dt><dd><p>A list of server extension definition dicts.</p>
+</dd>
+<dt><strong>**kwargs:</strong></dt><dd><p>Additional configs that is passed to the server config dict.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.site_runtime.SiteRuntime.config" title="dasha.site_runtime.SiteRuntime.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.site_runtime.SiteRuntime.logger" title="dasha.site_runtime.SiteRuntime.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.site_runtime.SiteRuntime.from_env" title="dasha.site_runtime.SiteRuntime.from_env"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_env</span></code></a>([name, default])</p></td>
+<td><p>Create site runtime from environment variable.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.site_runtime.SiteRuntime.from_object" title="dasha.site_runtime.SiteRuntime.from_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_object</span></code></a>(obj, \*\*kwargs)</p></td>
+<td><p>Create <a class="reference internal" href="#dasha.site_runtime.SiteRuntime" title="dasha.site_runtime.SiteRuntime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SiteRuntime</span></code></a> object from a module.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.site_runtime.SiteRuntime.get_extentions" title="dasha.site_runtime.SiteRuntime.get_extentions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extentions</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.site_runtime.SiteRuntime.get_server" title="dasha.site_runtime.SiteRuntime.get_server"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_server</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="dasha.site_runtime.SiteRuntime.config">
+<code class="sig-name descname">config</code><a class="headerlink" href="#dasha.site_runtime.SiteRuntime.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dasha.site_runtime.SiteRuntime.logger">
+<code class="sig-name descname">logger</code><em class="property"> = &lt;Logger SiteRuntime (DEBUG)&gt;</em><a class="headerlink" href="#dasha.site_runtime.SiteRuntime.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="dasha.site_runtime.SiteRuntime.from_env">
+<em class="property">classmethod </em><code class="sig-name descname">from_env</code><span class="sig-paren">(</span><em class="sig-param">name='DASHA_SITE'</em>, <em class="sig-param">default='dasha.example_site'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/site_runtime.html#SiteRuntime.from_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.site_runtime.SiteRuntime.from_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create site runtime from environment variable.</p>
+<p>The value of environment variable <code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code> shall be an import path to a
+python module that defines necessary attributes to construct the site
+runtime instance. It can either be the qualified name of an installed
+python module, or the path to a directory contains <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> or a
+<code class="docutils literal notranslate"><span class="pre">.py</span></code> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of environment variable to use.</p>
+</dd>
+<dt><strong>default: str</strong></dt><dd><p>A default value in case <code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code> is not found.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>SiteRuntime</dt><dd><p>A <a class="reference internal" href="#dasha.site_runtime.SiteRuntime" title="dasha.site_runtime.SiteRuntime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SiteRuntime</span></code></a> instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="dasha.site_runtime.SiteRuntime.from_object">
+<em class="property">classmethod </em><code class="sig-name descname">from_object</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/site_runtime.html#SiteRuntime.from_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.site_runtime.SiteRuntime.from_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create <a class="reference internal" href="#dasha.site_runtime.SiteRuntime" title="dasha.site_runtime.SiteRuntime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SiteRuntime</span></code></a> object from a module.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="dasha.site_runtime.SiteRuntime.get_extentions">
+<code class="sig-name descname">get_extentions</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/site_runtime.html#SiteRuntime.get_extentions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.site_runtime.SiteRuntime.get_extentions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="dasha.site_runtime.SiteRuntime.get_server">
+<code class="sig-name descname">get_server</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/site_runtime.html#SiteRuntime.get_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.site_runtime.SiteRuntime.get_server" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">SiteRuntime</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/dasha.site_runtime.SiteRuntime.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
+    Last built 02 Mar 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+ComponentTemplate
+=================
+
+.. currentmodule:: dasha.web.templates
+
+.. autoclass:: ComponentTemplate
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ComponentTemplate.children
+      ~ComponentTemplate.id
+      ~ComponentTemplate.layout
+      ~ComponentTemplate.parent
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ComponentTemplate.setup_layout
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: children
+   .. autoattribute:: id
+   .. autoattribute:: layout
+   .. autoattribute:: parent
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: setup_layout

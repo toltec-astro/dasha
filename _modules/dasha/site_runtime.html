@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>dasha.site_runtime &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script type="text/javascript" src="../../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../index.html">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	 &#187;
+      </li>
+      <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dasha.site_runtime</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.log</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.fmt</span> <span class="kn">import</span> <span class="n">pformat_yaml</span>
+<span class="kn">from</span> <span class="nn">tollan.utils</span> <span class="kn">import</span> <span class="n">dict_from_object</span><span class="p">,</span> <span class="n">object_from_spec</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.env</span> <span class="kn">import</span> <span class="n">env_registry</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SiteRuntime&#39;</span><span class="p">,</span> <span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">default_site</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Default implementation of a site.&quot;&quot;&quot;</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">server</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a flask server.&quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">flask</span>
+        <span class="n">server</span> <span class="o">=</span> <span class="n">flask</span><span class="o">.</span><span class="n">Flask</span><span class="p">(</span><span class="n">__package__</span><span class="p">)</span>
+        <span class="n">server</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;create default server </span><span class="si">{server}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">server</span>
+
+    <span class="n">extensions</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;..web.extensions.</span><span class="si">{e}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">package</span><span class="o">=</span><span class="n">__package__</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;dasha&#39;</span><span class="p">,</span> <span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot;A set of default extensions.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="SiteRuntime"><a class="viewcode-back" href="../../api/dasha.site_runtime.SiteRuntime.html#dasha.site_runtime.SiteRuntime">[docs]</a><span class="k">class</span> <span class="nc">SiteRuntime</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class manages context of a DashA site.</span>
+
+<span class="sd">    The site runtime provides method tha</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    server: `flask.Flask` or callable</span>
+<span class="sd">        The server instance or a callable that returns it.</span>
+
+<span class="sd">    extensions: list of dicts</span>
+<span class="sd">        A list of server extension definition dicts.</span>
+
+<span class="sd">    **kwargs:</span>
+<span class="sd">        Additional configs that is passed to the server config dict.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_default_runtime_env_name</span> <span class="o">=</span> <span class="s1">&#39;DASHA_SITE&#39;</span>
+    <span class="n">_default_dasha_site</span> <span class="o">=</span> <span class="s1">&#39;dasha.example_site&#39;</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">server</span><span class="o">=</span><span class="n">default_site</span><span class="o">.</span><span class="n">server</span><span class="p">,</span>
+            <span class="n">extensions</span><span class="o">=</span><span class="n">default_site</span><span class="o">.</span><span class="n">extensions</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="n">extensions</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">pformat_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">pformat_yaml</span><span class="p">(</span>
+                    <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismodule</span><span class="p">(</span><span class="n">v</span><span class="p">)})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;site runtime:</span><span class="se">\n</span><span class="s2">{pformat_config(self._config)}&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_resolve_extension</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">_extension_from_dict</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+            <span class="n">module_key</span> <span class="o">=</span> <span class="s1">&#39;module&#39;</span>
+            <span class="k">if</span> <span class="n">module_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ext</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;invalid extension, </span><span class="si">{module_key}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">ext</span><span class="p">[</span><span class="n">module_key</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ext</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">module</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_extension_from_dict</span><span class="p">(</span><span class="n">ext</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ext</span>
+
+<div class="viewcode-block" id="SiteRuntime.get_extentions"><a class="viewcode-back" href="../../api/dasha.site_runtime.SiteRuntime.html#dasha.site_runtime.SiteRuntime.get_extentions">[docs]</a>    <span class="k">def</span> <span class="nf">get_extentions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resolve_extension</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;extensions&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="SiteRuntime.get_server"><a class="viewcode-back" href="../../api/dasha.site_runtime.SiteRuntime.html#dasha.site_runtime.SiteRuntime.get_server">[docs]</a>    <span class="k">def</span> <span class="nf">get_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_server</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;server&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_server</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">_server</span> <span class="o">=</span> <span class="n">object_from_spec</span><span class="p">(</span><span class="n">_server</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">_server</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_server</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_server</span></div>
+
+<div class="viewcode-block" id="SiteRuntime.from_object"><a class="viewcode-back" href="../../api/dasha.site_runtime.SiteRuntime.html#dasha.site_runtime.SiteRuntime.from_object">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_object</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create `SiteRuntime` object from a module.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">dict_from_object</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SiteRuntime.from_env"><a class="viewcode-back" href="../../api/dasha.site_runtime.SiteRuntime.html#dasha.site_runtime.SiteRuntime.from_env">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_env</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">_default_runtime_env_name</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="n">_default_dasha_site</span><span class="p">,</span>
+            <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create site runtime from environment variable.</span>
+
+<span class="sd">        The value of environment variable `name` shall be an import path to a</span>
+<span class="sd">        python module that defines necessary attributes to construct the site</span>
+<span class="sd">        runtime instance. It can either be the qualified name of an installed</span>
+<span class="sd">        python module, or the path to a directory contains ``__init__.py`` or a</span>
+<span class="sd">        ``.py`` file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of environment variable to use.</span>
+
+<span class="sd">        default: str</span>
+<span class="sd">            A default value in case `name` is not found.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SiteRuntime</span>
+<span class="sd">            A `SiteRuntime` instance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">()</span>
+
+        <span class="n">env_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;The import path or file system path of the site module.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">_error</span> <span class="o">=</span> <span class="s2">&quot;Unable to create site runtime: </span><span class="si">{reason}</span><span class="s2">&quot;</span>
+        <span class="n">module_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">module_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="n">_error</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">reason</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;environment variable </span><span class="si">{name}</span><span class="s1"> is not set, &#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;and a default module path is not specified.&#39;</span>
+                        <span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="n">module_path</span> <span class="o">==</span> <span class="n">default</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;environment variable </span><span class="si">{name}</span><span class="s2"> is not set,&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; use default </span><span class="si">{module_path}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># try interpret as path</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;import </span><span class="si">{path.stem}</span><span class="s2"> from </span><span class="si">{path.parent}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_object</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span><span class="p">))</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
+    Last built 02 Mar 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

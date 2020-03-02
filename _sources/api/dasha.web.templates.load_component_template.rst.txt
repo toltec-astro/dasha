@@ -1,0 +1,6 @@
+load_component_template
+=======================
+
+.. currentmodule:: dasha.web.templates
+
+.. autofunction:: load_component_template

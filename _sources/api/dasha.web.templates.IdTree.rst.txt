@@ -1,0 +1,19 @@
+IdTree
+======
+
+.. currentmodule:: dasha.web.templates
+
+.. autoclass:: IdTree
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~IdTree.id
+      ~IdTree.idbase
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: id
+   .. autoattribute:: idbase

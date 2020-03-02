@@ -1,0 +1,7 @@
+ExtensionProxy
+==============
+
+.. currentmodule:: dasha.web.extensions
+
+.. autoclass:: ExtensionProxy
+   :show-inheritance:

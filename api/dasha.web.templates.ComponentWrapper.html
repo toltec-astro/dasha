@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>ComponentWrapper &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="IdTree" href="dasha.web.templates.IdTree.html" />
+    <link rel="prev" title="ComponentTemplate" href="dasha.web.templates.ComponentTemplate.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="dasha.web.templates.IdTree.html" title="IdTree">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="dasha.web.templates.ComponentTemplate.html" title="ComponentTemplate">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	 &#187;
+      </li>
+      <li><a href="../dasha/index.html" accesskey="U">DashA Documentation</a> &#187;</li>
+      
+      <li>ComponentWrapper</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="componentwrapper">
+<h1>ComponentWrapper<a class="headerlink" href="#componentwrapper" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="dasha.web.templates.ComponentWrapper">
+<em class="property">class </em><code class="sig-prename descclassname">dasha.web.templates.</code><code class="sig-name descname">ComponentWrapper</code><span class="sig-paren">(</span><em class="sig-param">component</em>, <em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="dasha.web.templates.Template.html#dasha.web.templates.Template" title="dasha.web.templates.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">dasha.web.templates.Template</span></code></a></p>
+<p>A class that wraps an existing Dash component.</p>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentWrapper.id" title="dasha.web.templates.ComponentWrapper.id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentWrapper.idbase" title="dasha.web.templates.ComponentWrapper.idbase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">idbase</span></code></a></p></td>
+<td><p>The base name of the generated id.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentWrapper.layout" title="dasha.web.templates.ComponentWrapper.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a></p></td>
+<td><p>Implement this to return a valid Dash layout object.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentWrapper.setup_layout" title="dasha.web.templates.ComponentWrapper.setup_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_layout</span></code></a>(self, app)</p></td>
+<td><p>Implement this to declare layout components and their callbacks.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="dasha.web.templates.ComponentWrapper.id">
+<code class="sig-name descname">id</code><a class="headerlink" href="#dasha.web.templates.ComponentWrapper.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="dasha.web.templates.ComponentWrapper.idbase">
+<code class="sig-name descname">idbase</code><a class="headerlink" href="#dasha.web.templates.ComponentWrapper.idbase" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base name of the generated id.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="dasha.web.templates.ComponentWrapper.layout">
+<code class="sig-name descname">layout</code><a class="headerlink" href="#dasha.web.templates.ComponentWrapper.layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this to return a valid Dash layout object.</p>
+</dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="dasha.web.templates.ComponentWrapper.setup_layout">
+<code class="sig-name descname">setup_layout</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">app</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentWrapper.setup_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentWrapper.setup_layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this to declare layout components and their callbacks.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">ComponentWrapper</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/dasha.web.templates.ComponentWrapper.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
+    Last built 02 Mar 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

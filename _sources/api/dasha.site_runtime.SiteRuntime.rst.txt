@@ -1,0 +1,35 @@
+SiteRuntime
+===========
+
+.. currentmodule:: dasha.site_runtime
+
+.. autoclass:: SiteRuntime
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SiteRuntime.config
+      ~SiteRuntime.logger
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SiteRuntime.from_env
+      ~SiteRuntime.from_object
+      ~SiteRuntime.get_extentions
+      ~SiteRuntime.get_server
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: config
+   .. autoattribute:: logger
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: from_env
+   .. automethod:: from_object
+   .. automethod:: get_extentions
+   .. automethod:: get_server

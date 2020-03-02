@@ -1,0 +1,37 @@
+Template
+========
+
+.. currentmodule:: dasha.web.templates
+
+.. autoclass:: Template
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Template.layout
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Template.after_setup_layout
+      ~Template.before_setup_layout
+      ~Template.child
+      ~Template.clear_registry
+      ~Template.from_spec
+      ~Template.setup_layout
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: layout
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: after_setup_layout
+   .. automethod:: before_setup_layout
+   .. automethod:: child
+   .. automethod:: clear_registry
+   .. automethod:: from_spec
+   .. automethod:: setup_layout

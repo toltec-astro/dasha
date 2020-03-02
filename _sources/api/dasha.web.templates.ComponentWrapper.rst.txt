@@ -1,0 +1,31 @@
+ComponentWrapper
+================
+
+.. currentmodule:: dasha.web.templates
+
+.. autoclass:: ComponentWrapper
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ComponentWrapper.id
+      ~ComponentWrapper.idbase
+      ~ComponentWrapper.layout
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~ComponentWrapper.setup_layout
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: id
+   .. autoattribute:: idbase
+   .. autoattribute:: layout
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: setup_layout

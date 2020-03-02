@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>ComponentGroup &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ComponentTemplate" href="dasha.web.templates.ComponentTemplate.html" />
+    <link rel="prev" title="load_template_cls" href="dasha.web.templates.load_template_cls.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="dasha.web.templates.ComponentTemplate.html" title="ComponentTemplate">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="dasha.web.templates.load_template_cls.html" title="load_template_cls">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	 &#187;
+      </li>
+      <li><a href="../dasha/index.html" accesskey="U">DashA Documentation</a> &#187;</li>
+      
+      <li>ComponentGroup</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="componentgroup">
+<h1>ComponentGroup<a class="headerlink" href="#componentgroup" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="dasha.web.templates.ComponentGroup">
+<em class="property">class </em><code class="sig-prename descclassname">dasha.web.templates.</code><code class="sig-name descname">ComponentGroup</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="dasha.web.templates.ComponentTemplate.html#dasha.web.templates.ComponentTemplate" title="dasha.web.templates.ComponentTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">dasha.web.templates.ComponentTemplate</span></code></a></p>
+<p>This is a base class for managing a set of components as one unit.</p>
+<p>The elements in the group is defined in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">_component_group</span></code> class
+attribute. It is a list of dicts which shall contain the follows:</p>
+<ul class="simple">
+<li><p>key: The unique key of the component.</p></li>
+<li><dl class="simple">
+<dt>type: The type of the component. Choose from</dt><dd><p>“input”, “states”, “output”, “static”</p>
+</dd>
+</dl>
+</li>
+<li><p>prop: The property name to use for Input, Output, or State.</p></li>
+</ul>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentGroup.layout" title="dasha.web.templates.ComponentGroup.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a></p></td>
+<td><p>Implement this to return a valid Dash layout object.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentGroup.setup_layout" title="dasha.web.templates.ComponentGroup.setup_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_layout</span></code></a>(self, app)</p></td>
+<td><p>Implement this to declare layout components and their callbacks.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="dasha.web.templates.ComponentGroup.layout">
+<code class="sig-name descname">layout</code><a class="headerlink" href="#dasha.web.templates.ComponentGroup.layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this to return a valid Dash layout object.</p>
+</dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="dasha.web.templates.ComponentGroup.setup_layout">
+<code class="sig-name descname">setup_layout</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">app</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentGroup.setup_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentGroup.setup_layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this to declare layout components and their callbacks.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">ComponentGroup</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/dasha.web.templates.ComponentGroup.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
+    Last built 02 Mar 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>
