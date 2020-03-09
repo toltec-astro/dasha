@@ -75,3 +75,11 @@ def get_celery_tasks():
     if len(modules) == 1:
         return modules[0]
     return modules
+
+
+def schedule_task(task, **kwargs):
+    if not isinstance(task, str):
+        task = task.name
+    kwargs.setdefault('task', task)
+    celery = get_celery_app()
+    celery.conf.beat_schedule[f'update_{task}'] = kwargs

@@ -46,7 +46,7 @@ class IPC(object):
                     },
                 },
             }
-    _supported_backends = ['redis', 'file', 'mmap', 'cache']
+    _supported_backends = ['redis', 'rejson', 'file', 'mmap', 'cache']
     _backends = None
 
     logger = get_logger()
@@ -135,6 +135,151 @@ class IPC(object):
                 return int(value)
 
         return RedisIPC
+
+    def _init_rejson_backend(self, url):
+
+        from rejson import Client
+        from rejson import Path as JsonPath
+
+        assert '.' == JsonPath.rootPath()
+
+        def _normalize_path(path):
+            if path is None:
+                return '.'
+            if not isinstance(path, str):
+                raise ValueError("path should be a string or None.")
+            if not path.startswith('.'):
+                path = f'.{path}'
+                return path
+            return path
+
+        class RejsonIPC(object):
+
+            """This class manages an json object in redis.
+            """
+
+            _connection = Client.from_url(url, decode_responses=True)
+
+            _revkey = '_ipc_rev'
+            """The key to store revision info."""
+
+            _revpath = _normalize_path(_revkey)
+
+            _objkey = '_ipc_obj'
+            """The key to store the actual object"""
+
+            _objpath = _normalize_path(_objkey)
+
+            _keykey = '_ipc_key'
+            _keypath = _normalize_path(_keykey)
+
+            @property
+            def _key(self):
+                """The unique key of this object to use in the redis db."""
+                return f'_ipc_{self.label}'
+
+            def __init__(self, label):
+                self._label = label
+                self._pipeline = None
+                self._rev = None
+
+            @property
+            def label(self):
+                """The unique label of this object."""
+                return self._label
+
+            @staticmethod
+            def _ensure_entry(obj, key, val):
+                if key in obj:
+                    return obj
+                obj[key] = val
+                return obj
+
+            def _ensure_metadata(self, obj):
+                for key, val in [
+                        (self._revkey, 0),
+                        (self._objkey, None),
+                        (self._keykey, self._key),
+                        ]:
+                    self._ensure_entry(obj, key, val)
+                return obj
+
+            @property
+            def connection(self):
+                if self._pipeline is not None:
+                    return self._pipeline
+                return self._connection
+
+            @property
+            def pipeline(self):
+
+                class RejsonIPCPipeline:
+
+                    def __init__(self, ipc):
+                        self._ipc = ipc
+
+                    def __enter__(self):
+                        self._ipc._pipeline = self._ipc._connection.pipeline()
+                        return self._ipc._pipeline
+
+                    def __exit__(self, *args):
+                        self._ipc._pipeline.execute()
+                        self._ipc._pipeline = None
+                return RejsonIPCPipeline(self)
+
+            def get(self, path=None):
+                """Return the object with path."""
+                return self('get', path)
+
+            def set(self, obj, path=None):
+                """Set the object at path."""
+                return self('set', path, obj)
+
+            def _prefix_path(self, path):
+                path = _normalize_path(path)
+                return f'{self._objpath}{path}'.rstrip('.')
+
+            def __call__(self, op, path, *args, **kwargs):
+                """Operate on path."""
+                logger = get_logger()
+
+                path = self._prefix_path(path)
+                logger.debug(
+                        f"op={op} path={path} args={args} kwargs={kwargs}")
+                logger.debug("")
+                _op = getattr(self.connection, f'json{op}')
+                if op == 'set' and path == self._objpath:
+                    # this is to set the object
+                    # check the key exist in the client
+                    obj, = args
+                    logger.debug(f"set object to {obj} at key={self._key}")
+                    if not self.connection.exists(self._key):
+                        # create the object
+                        _obj = self._ensure_metadata(dict())
+                        _obj[self._objkey] = obj
+                        logger.debug(f"set redis key={self._key} {_obj}")
+                        self.connection.jsonset(self._key, '.', _obj)
+                        return
+                with self.pipeline:
+                    if op not in ['get', 'type']:
+                        # thees ops will update the object.
+                        self.connection.jsonnumincrby(
+                                self._key, self._revpath, 1)
+                    return _op(self._key, path, *args, **kwargs)
+
+            def get_if_updated(self, obj):
+                if self._key not in obj or self._revkey not in obj or \
+                        obj[self._key] != self._key:
+                    raise RuntimeError('invalid object for checking update.')
+                rev = self.connection.jsonget(self._key, self._revpath)
+                if obj[self._revkey] == rev:
+                    return obj
+                # get object and attach the rev and key to it
+                obj = self.get()
+                self._ensure_entry(obj, self._revkey, rev)
+                self._ensure_entry(obj, self._key, self._key)
+                return obj
+        return RejsonIPC
 
     def init_app(self, server, config=None):
         config = self._ensure_config(config)

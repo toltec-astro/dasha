@@ -23,7 +23,7 @@ class SyncedDatabase(object):
         self._datastore = datastore()
 
         logger = get_task_logger(self._label)
-        logger.setLevel('INFO')
+        # logger.setLevel('INFO')
         celery = get_celery_app()
 
         class TaskBase(celery.QueueOnce):
