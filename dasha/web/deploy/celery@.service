@@ -10,25 +10,26 @@ Group=toltec
 # another option for an even more restricted service is
 # DynamicUser=yes
 # see http://0pointer.net/blog/dynamic-users-with-systemd.html
-
+Environment="VENV=/home/toltec/zma/venvs/toltec"
+Environment="CELERY_LOGLEVEL=info"
+EnvironmentFile=/home/toltec/zma/run/dasha/taco
 EnvironmentFile=/home/toltec/zma/run/dasha/%i
-Environment='CELERY_CREATE_DIRS=1'
 RuntimeDirectory=celery
 LogsDirectory=celery
 WorkingDirectory=/home/toltec/zma/run
-ExecStart=/home/toltec/zma/venvs/toltec/bin/celery multi start worker \
+ExecStart=/usr/bin/env ${VENV}/bin/celery multi start worker \
 	-A dasha.web.celery_app \
 	--pidfile=/var/run/celery/%i.pid \
 	--logfile=/var/log/celery/%i.log \
-	--concurrency=2 --loglevel=info
-ExecStop=/home/toltec/zma/venvs/toltec/bin/celery multi stopwait worker \
+	--concurrency=4 -l ${CELERY_LOGLEVEL}
+ExecStop=/usr/bin/env ${VENV}/bin/celery multi stopwait worker \
 	-A dasha.web.celery_app \
 	--pidfile=/var/run/celery/%i.pid
-ExecReload=/home/toltec/zma/venvs/toltec/bin/celery multi restart worker \
+ExecReload=/usr/bin/env ${VENV}/bin/celery multi restart worker \
 	-A dasha.web.celery_app \
 	--pidfile=/var/run/celery/%i.pid \
 	--logfile=/var/log/celery/%i.log \
-	--concurrency=2 --loglevel=info
+	--concurrency=4 -l ${CELERY_LOGLEVEL} 
 
 [Install]
 WantedBy=multi-user.target

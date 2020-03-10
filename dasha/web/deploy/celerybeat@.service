@@ -11,15 +11,20 @@ Group=toltec
 # DynamicUser=yes
 # see http://0pointer.net/blog/dynamic-users-with-systemd.html
 
+Environment="VENV=/home/toltec/zma/venvs/toltec"
+Environment="CELERY_LOGLEVEL=info"
+EnvironmentFile=/home/toltec/zma/run/dasha/taco
+EnvironmentFile=/home/toltec/zma/run/dasha/taco
 EnvironmentFile=/home/toltec/zma/run/dasha/%i
 RuntimeDirectory=celery
 LogsDirectory=celery
 WorkingDirectory=/home/toltec/zma/run
-ExecStart=/home/toltec/zma/venvs/toltec/bin/celery beat \
-	-A dasha.web.celery_app \
+ExecStartPre=-/usr/bin/redis-cli flushall
+ExecStart=/usr/bin/env ${VENV}/bin/celery \
+	-A dasha.web.celery_app beat \
 	--pidfile=/var/run/celery/%i_beat.pid \
 	--logfile=/var/log/celery/%i_beat.log \
-	--loglevel=info
+	--loglevel=${CELERY_LOGLEVEL}
 
 [Install]
 WantedBy=multi-user.target

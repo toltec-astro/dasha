@@ -12,6 +12,7 @@ Group=www-data
 # see http://0pointer.net/blog/dynamic-users-with-systemd.html
 
 EnvironmentFile=/home/toltec/zma/run/dasha/%i
+EnvironmentFile=/home/toltec/zma/run/dasha/taco
 RuntimeDirectory=celery
 LogsDirectory=celery
 WorkingDirectory=/home/toltec/zma/run
