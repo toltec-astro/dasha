@@ -93,20 +93,24 @@ class IPC(object):
             _dispatch_key_positons = {
                     'get': ((0, ), None),
                     'set': ((0, ), None),
+                    'exists': ((0, ), None),
                     }
 
-            def __init__(self, namespace=None):
-                self._key_decor = RedisKeyDecorator(prefix=namespace)
+            def __init__(self, label=None):
+                self._key_decor = RedisKeyDecorator(prefix=label)
 
             def __call__(self, func_name, *args, **kwargs):
+                logger = get_logger()
                 _key_pos, _key_return_pos = self._dispatch_key_positons[
                         func_name]
                 if isinstance(_key_pos, slice):
                     _key_pos = range(*_key_pos.indices(len(args)))
 
+                args = list(args)
                 for i, a in enumerate(args):
                     if i in _key_pos:
-                        args[i] = self._key_decor.decorate(a)
+                        args[i] = self._key_decor.decorate(a)[0]
+                logger.debug(f"op={func_name}, args={args}, kwargs={kwargs}")
                 result = getattr(
                         self.connection, func_name)(*args, **kwargs)
                 return result
@@ -138,6 +142,7 @@ class IPC(object):
 
     def _init_rejson_backend(self, url):
 
+        import redis
         from rejson import Client
         from rejson import Path as JsonPath
 
@@ -229,7 +234,10 @@ class IPC(object):
 
             def get(self, path=None):
                 """Return the object with path."""
-                return self('get', path)
+                try:
+                    return self('get', path)
+                except redis.exceptions.ResponseError:
+                    return None
 
             def set(self, obj, path=None):
                 """Set the object at path."""
@@ -246,26 +254,32 @@ class IPC(object):
                 path = self._prefix_path(path)
                 logger.debug(
                         f"op={op} path={path} args={args} kwargs={kwargs}")
-                logger.debug("")
                 _op = getattr(self.connection, f'json{op}')
                 if op == 'set' and path == self._objpath:
                     # this is to set the object
                     # check the key exist in the client
                     obj, = args
-                    logger.debug(f"set object to {obj} at key={self._key}")
+                    logger.debug(f"set root object to {obj} at key={self._key}")
                     if not self.connection.exists(self._key):
                         # create the object
                         _obj = self._ensure_metadata(dict())
                         _obj[self._objkey] = obj
-                        logger.debug(f"set redis key={self._key} {_obj}")
+                        logger.debug(f"create object at key={self._key} {_obj}")
                         self.connection.jsonset(self._key, '.', _obj)
                         return
+                if op == 'set':
+                    if not self.connection.exists(self._key):
+                        logger.debug(f'set root object for key={self._key} path={path}')
+                        self.set(dict()) 
+                    else:
+                        logger.debug(f"set object key={self._key} obj={self.connection.jsonget(self._key, '.')} path={path} args={args} kwargs={kwargs}")
                 with self.pipeline:
                     if op not in ['get', 'type']:
                         # thees ops will update the object.
                         self.connection.jsonnumincrby(
                                 self._key, self._revpath, 1)
-                    return _op(self._key, path, *args, **kwargs)
+                    result = _op(self._key, path, *args, **kwargs)
+                return result
 
             def get_if_updated(self, obj):
                 if self._key not in obj or self._revkey not in obj or \
