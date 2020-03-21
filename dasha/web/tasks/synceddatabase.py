@@ -47,7 +47,7 @@ class SyncedDatabase(object):
                 logger.debug(
                         f"update table of {old.shape} with "
                         f" query={query} got table of {new.shape}")
-                new = new.append(old)
+                # new = new.append(old)
             update._datastore.set(new)
 
         celery.conf.beat_schedule.update(**{
