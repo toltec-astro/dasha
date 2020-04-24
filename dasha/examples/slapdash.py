@@ -7,27 +7,34 @@ the `dasha.web.templates.slapdash` template.
 
 extensions = [
     {
-        'module': 'dasha.web.extensions.db',
-        'config': {
-            'SQLALCHEMY_BINDS': {'default': 'sqlite:///memory'}
-            },
-        },
-    {
-        'module': 'dasha.web.extensions.cache',
-        'config': {'CACHE_TYPE': 'simple'}
-        },
-    {
         'module': 'dasha.web.extensions.dasha',
         'config': {
-            'template': 'simple',
-            'TITLE': 'DashA',
-            # 'template': 'slapdash',
-            # 'pages': [
-            #     {
-            #         'template': 'dashaexample',
-            #         'title_text': 'Example',
-            #         }
-            #     ],
+            'template': 'dasha.web.templates.slapdash',
+            'TITLE': 'MySite',
+            'pages': [
+                {
+                    'template': 'dasha.examples.nat',
+                    'route_name': 'nat',
+                    'title_text': 'Nat',
+                    'title_icon': 'fas fa-table',
+                    },
+                {
+                    'template': 'dasha.web.templates.viewgrid',
+                    'route_name': 'nat_in_grid',
+                    'title_text': 'Nat in Grid',
+                    'title_icon': 'fas fa-table',
+                    'views': [
+                        {
+                            'template': 'dasha.examples.nat',
+                            'title_text': 'nat1'
+                            },
+                        {
+                            'template': 'dasha.examples.nat',
+                            'title_text': 'nat2'
+                            }
+                        ]
+                    }
+                ],
             }
         },
     ]
