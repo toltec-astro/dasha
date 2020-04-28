@@ -95,7 +95,10 @@ class SiteRuntime(object):
     @classmethod
     def from_object(cls, obj, **kwargs):
         """Create `SiteRuntime` object from a module."""
-        return cls(**dict_from_object(obj), **kwargs)
+        obj_d = dict_from_object(obj)
+        if 'extensions' not in obj_d:
+            raise RuntimeError(f"no extension list defined in {obj}.")
+        return cls(**obj_d, **kwargs)
 
     @classmethod
     def from_path(cls, module_path):
@@ -123,6 +126,8 @@ class SiteRuntime(object):
         try:
             return cls.from_object(importlib.import_module(module_path))
         except Exception:
+            logger.debug(
+                    f"not a valid import path {module_path}, try as file path")
             # try interpret as path
             path = Path(module_path).expanduser().resolve()
             sys.path.insert(0, path.parent.as_posix())
