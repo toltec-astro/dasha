@@ -8,6 +8,9 @@ from tollan.utils.registry import Registry
 from . import ExtensionProxy
 
 
+__all__ = ['cache', 'get_cached_data', 'CachedData']
+
+
 cache = ExtensionProxy(Cache, sys.modules[__name__])
 
 

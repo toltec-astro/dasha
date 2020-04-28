@@ -12,6 +12,9 @@ from tollan.utils.log import get_logger
 from tollan.utils.fmt import pformat_dict
 
 
+__all__ = ['ipc', 'IPC', ]
+
+
 class _KeyDecorator(object):
     def __init__(self, prefix=None, suffix=None):
         self._prefix = prefix or ''
@@ -37,7 +40,7 @@ class _KeyDecorator(object):
 
 
 class IPC(object):
-    """A class that manages various ipc resources."""
+    """A class that manages various interprocess communication resources."""
 
     _default_config = {
             'backends': {
@@ -259,20 +262,27 @@ class IPC(object):
                     # this is to set the object
                     # check the key exist in the client
                     obj, = args
-                    logger.debug(f"set root object to {obj} at key={self._key}")
+                    logger.debug(
+                            f"set root object to {obj} at key={self._key}")
                     if not self.connection.exists(self._key):
                         # create the object
                         _obj = self._ensure_metadata(dict())
                         _obj[self._objkey] = obj
-                        logger.debug(f"create object at key={self._key} {_obj}")
+                        logger.debug(
+                                f"create object at key={self._key} {_obj}")
                         self.connection.jsonset(self._key, '.', _obj)
                         return
                 if op == 'set':
                     if not self.connection.exists(self._key):
-                        logger.debug(f'set root object for key={self._key} path={path}')
-                        self.set(dict()) 
+                        logger.debug(
+                                f'set root object for '
+                                f'key={self._key} path={path}')
+                        self.set(dict())
                     else:
-                        logger.debug(f"set object key={self._key} obj={self.connection.jsonget(self._key, '.')} path={path} args={args} kwargs={kwargs}")
+                        logger.debug(
+                            f"set object key={self._key} "
+                            f"obj={self.connection.jsonget(self._key, '.')}"
+                            f" path={path} args={args} kwargs={kwargs}")
                 with self.pipeline:
                     if op not in ['get', 'type']:
                         # thees ops will update the object.

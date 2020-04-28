@@ -16,25 +16,29 @@ __all__ = ['site', 'create_app']
 if os.environ.get('FLASK_ENV', 'development'):
     init_log(level='DEBUG')
 
+env_registry.register(
+        'DASHA_SITE',
+        'The import or file path of the site module.',
+        'dasha.default_site')
+env_registry.register('DASHA_LOGFILE', 'The file for logging.', None)
+env_registry.register('DASHA_LOGLEVEL', 'The DashA log level.', 'INFO')
 
-env_registry.register('DASHA_LOGFILE', 'The file for logging.')
-env_registry.register('DASHA_LOGLEVEL', 'The DashA log level.')
 
-
-site = SiteRuntime.from_env()
-"""Used to manage the site runtime configs."""
+site = SiteRuntime.from_path(env_registry.get('DASHA_SITE'))
+"""The site runtime instance."""
 
 
 @timeit
 def create_app():
     logger = get_logger()
+    logger.debug(f"registered env vars:{pformat_dict(env_registry)}")
+
     server = site.get_server()
     for ext in site.get_extentions():
         with logit(logger.debug, f"init app extension {ext.__name__}"):
             ext.init_app(server)
-    logger.debug(f"registered env vars:{pformat_dict(env_registry)}")
     # reconfigure the logger
-    logfile = env_registry.get('DASHA_LOGFILE', None)
-    loglevel = env_registry.get('DASHA_LOGLEVEL', 'INFO')
+    logfile = env_registry.get('DASHA_LOGFILE')
+    loglevel = env_registry.get('DASHA_LOGLEVEL')
     init_log(level=loglevel, file_=logfile)
     return server

@@ -6,6 +6,9 @@ from . import ExtensionProxy
 from ..templates.dasha import DashA
 
 
+__all__ = ['dasha', 'get_current_dash_app']
+
+
 dasha = ExtensionProxy(DashA, sys.modules[__name__])
 
 

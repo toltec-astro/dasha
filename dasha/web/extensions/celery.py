@@ -11,6 +11,12 @@ from tollan.utils import object_from_spec
 from celery_once import QueueOnce
 
 
+__all__ = [
+        'celeryext', 'register_tasks', 'get_celery_app', 'get_celery_tasks',
+        'schedule_task'
+        ]
+
+
 celeryext = ExtensionProxy(FlaskCeleryExt, sys.modules[__name__])
 
 config = {}

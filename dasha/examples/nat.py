@@ -50,7 +50,7 @@ class nat(ComponentTemplate):
                     ]
                 )
         def update(n_intervals, value):
-            return str(n_intervals * value) + ' s'
+            return str((n_intervals or 0) * value) + ' s'
 
 
 extensions = [

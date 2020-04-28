@@ -3,6 +3,9 @@
 import wrapt
 
 
+__all__ = ['ExtensionProxy', ]
+
+
 class ExtensionProxy(wrapt.ObjectProxy):
     """This class provide lazy initialization of extension.
 

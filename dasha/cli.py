@@ -87,8 +87,9 @@ def run():
     parser = argparse.ArgumentParser(
             description='Run DashA site.')
     parser.add_argument(
-            'site',
+            '--site', '-s',
             metavar='NAME',
+            default='',
             help="The module name or path to the site. "
                  "Examples: ~/mysite.py, mypackage.mysite")
     parser, handle_ext_args = _add_ext_arg(parser)
