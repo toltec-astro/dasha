@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>dasha.web.extensions.dasha &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <link rel="stylesheet" href="../../../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../../../../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../../../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../../../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../../../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	 &#187;
+      </li>
+      <li><a href="../../../index.html" >Module code</a> &#187;</li>
+      <li><a href="../../web.html" accesskey="U">dasha.web</a> &#187;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dasha.web.extensions.dasha</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python</span>
+
+<span class="kn">from</span> <span class="nn">wrapt</span> <span class="kn">import</span> <span class="n">ObjectProxy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">Dash</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.log</span> <span class="kn">import</span> <span class="n">timeit</span><span class="p">,</span> <span class="n">get_logger</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.fmt</span> <span class="kn">import</span> <span class="n">pformat_yaml</span>
+<span class="kn">from</span> <span class="nn">..templates</span> <span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">from</span> <span class="nn">tollan.utils</span> <span class="kn">import</span> <span class="n">rupdate</span><span class="p">,</span> <span class="n">ensure_prefix</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DashA&#39;</span><span class="p">,</span> <span class="s1">&#39;dasha&#39;</span><span class="p">,</span> <span class="s1">&#39;dash_app&#39;</span><span class="p">,</span> <span class="s1">&#39;resolve_url&#39;</span><span class="p">,</span> <span class="s1">&#39;get_url_stem&#39;</span><span class="p">]</span>
+
+
+<span class="n">dash_app</span> <span class="o">=</span> <span class="n">ObjectProxy</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;A proxy to the `~dash.Dash` instance.&quot;&quot;&quot;</span>
+
+
+<span class="n">dasha</span> <span class="o">=</span> <span class="n">ObjectProxy</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;A proxy to the `~dasha.web.extensions.dasha.DashA` instance.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="DashA"><a class="viewcode-back" href="../../../../api/dasha.web.extensions.dasha.DashA.html#dasha.web.extensions.dasha.DashA">[docs]</a><span class="k">class</span> <span class="nc">DashA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class sets up a Dash app to serve a `~dasha.web.templates.Template`</span>
+<span class="sd">    instance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    config : dict</span>
+<span class="sd">        The Dash configurations and template configurations to use.</span>
+<span class="sd">        Dash configurations shall be specified as ALL CAPS.</span>
+<span class="sd">        This object is passed to `~dasha.web.templates.Template.from_dict`</span>
+<span class="sd">        to create the template instance when `init_app` is called.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">()</span>
+
+    <span class="n">_dash_config_default</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;SERVE_LOCALLY&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;ASSETS_FOLDER&quot;</span><span class="p">:</span> <span class="s1">&#39;../templates/assets&#39;</span><span class="p">,</span>
+            <span class="s2">&quot;REQUESTS_PATHNAME_PREFIX&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;ROUTES_PATHNAME_PREFIX&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;EXTERNAL_STYLESHEETS&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(),</span>
+            <span class="s2">&quot;EXTERNAL_SCRIPTS&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(),</span>
+            <span class="s2">&quot;META_TAGS&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;viewport&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;width=device-width, initial-scale=1,&quot;</span>
+                                   <span class="s2">&quot; shrink-to-fit=no&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">],</span>
+            <span class="c1"># default app title</span>
+            <span class="s1">&#39;TITLE&#39;</span><span class="p">:</span> <span class="kc">None</span>
+            <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dash_config_default</span><span class="p">)</span>
+        <span class="n">rupdate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="c1"># This is needed to preserve any pre-registered templates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_template_registry</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">Template</span><span class="o">.</span><span class="n">_template_registry</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="DashA.init_app"><a class="viewcode-back" href="../../../../api/dasha.web.extensions.dasha.DashA.html#dasha.web.extensions.dasha.DashA.init_app">[docs]</a>    <span class="k">def</span> <span class="nf">init_app</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">extract_dash_args</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+            <span class="n">dash_args</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">Dash</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">dash_args</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+                    <span class="n">result</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">config</span>
+
+        <span class="n">dash_config</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">extract_dash_args</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dash config:</span><span class="se">\n</span><span class="si">{</span><span class="n">pformat_yaml</span><span class="p">(</span><span class="n">dash_config</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DashA config:</span><span class="se">\n</span><span class="si">{</span><span class="n">pformat_yaml</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">app</span> <span class="o">=</span> <span class="n">dash_app</span><span class="o">.</span><span class="n">__wrapped__</span> <span class="o">=</span> <span class="n">Dash</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">__package__</span><span class="p">,</span>
+            <span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">,</span>
+            <span class="n">suppress_callback_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">dash_config</span>
+            <span class="p">)</span>
+
+        <span class="n">serve_locally</span> <span class="o">=</span> <span class="n">dash_config</span><span class="p">[</span><span class="s2">&quot;serve_locally&quot;</span><span class="p">]</span>
+        <span class="c1"># TITLE is not a Dash keyword argument.</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;TITLE&#39;</span><span class="p">)</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">scripts</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">serve_locally</span> <span class="o">=</span> <span class="n">serve_locally</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">css</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">serve_locally</span> <span class="o">=</span> <span class="n">serve_locally</span>
+
+        <span class="c1"># dev tools</span>
+        <span class="c1"># app.enable_dev_tools(debug=True),</span>
+
+        <span class="k">with</span> <span class="n">server</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+            <span class="n">Template</span><span class="o">.</span><span class="n">_template_registry</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_template_registry</span><span class="p">)</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">Template</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;setup layout&quot;</span><span class="p">):</span>
+                <span class="n">template</span><span class="o">.</span><span class="n">setup_layout</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+                <span class="c1"># try infer a title if title is not set</span>
+                <span class="k">if</span> <span class="n">app</span><span class="o">.</span><span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">app</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="s1">&#39;title_text&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">timeit</span><span class="p">(</span><span class="s1">&#39;serve layout&#39;</span><span class="p">):</span>
+                <span class="n">app</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">layout</span>
+        <span class="k">return</span> <span class="n">server</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">init_ext</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">dasha</span><span class="o">.</span><span class="n">__wrapped__</span> <span class="o">=</span> <span class="n">DashA</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ext</span>
+
+
+<span class="k">def</span> <span class="nf">init_app</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">dasha</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="resolve_url"><a class="viewcode-back" href="../../../../api/dasha.web.extensions.dasha.resolve_url.html#dasha.web.extensions.dasha.resolve_url">[docs]</a><span class="k">def</span> <span class="nf">resolve_url</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Expands an internal URL to include prefix the app is mounted at.&quot;&quot;&quot;</span>
+    <span class="n">routes_prefix</span> <span class="o">=</span> <span class="n">dash_app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">routes_pathname_prefix</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">routes_prefix</span><span class="si">}{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_url_stem"><a class="viewcode-back" href="../../../../api/dasha.web.extensions.dasha.get_url_stem.html#dasha.web.extensions.dasha.get_url_stem">[docs]</a><span class="k">def</span> <span class="nf">get_url_stem</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The inverse of `resolve_url`.&quot;&quot;&quot;</span>
+    <span class="n">routes_prefix</span> <span class="o">=</span> <span class="n">dash_app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">routes_pathname_prefix</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">routes_prefix</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">path</span>
+    <span class="n">routes_prefix</span> <span class="o">=</span> <span class="n">ensure_prefix</span><span class="p">(</span><span class="n">routes_prefix</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">),</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">ensure_prefix</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">routes_prefix</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">routes_prefix</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ensure_prefix</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

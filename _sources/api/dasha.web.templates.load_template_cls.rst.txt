@@ -1,6 +1,0 @@
-load_template_cls
-=================
-
-.. currentmodule:: dasha.web.templates
-
-.. autofunction:: load_template_cls

@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>IdTree &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <title>IdTree &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -19,8 +19,8 @@
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="IdTreeABCMeta" href="dasha.web.templates.IdTreeABCMeta.html" />
-    <link rel="prev" title="ComponentWrapper" href="dasha.web.templates.ComponentWrapper.html" />
+    <link rel="next" title="Template" href="dasha.web.templates.Template.html" />
+    <link rel="prev" title="IdTreeMeta" href="dasha.web.templates.IdTreeMeta.html" />
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 
   </head><body>
@@ -48,21 +48,20 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="dasha.web.templates.IdTreeABCMeta.html" title="IdTreeABCMeta">
+	<a href="dasha.web.templates.Template.html" title="Template">
 	  next &raquo;
 	</a>
       </li>
       <li class="right">
-	<a href="dasha.web.templates.ComponentWrapper.html" title="ComponentWrapper">
+	<a href="dasha.web.templates.IdTreeMeta.html" title="IdTreeMeta">
 	  &laquo; previous
 	</a>
 	 |
       </li>
       <li>
-	<a href="../index.html">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	<a href="../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
 	 &#187;
       </li>
-      <li><a href="../dasha/index.html" accesskey="U">DashA Documentation</a> &#187;</li>
       
       <li>IdTree</li> 
     </ul>
@@ -76,15 +75,15 @@
             
   <div class="section" id="idtree">
 <h1>IdTree<a class="headerlink" href="#idtree" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="dasha.web.templates.IdTree">
-<em class="property">class </em><code class="sig-prename descclassname">dasha.web.templates.</code><code class="sig-name descname">IdTree</code><span class="sig-paren">(</span><em class="sig-param">parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#IdTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.IdTree" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">anytree.node.nodemixin.NodeMixin</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">dasha.web.templates.</code><code class="sig-name descname">IdTree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#IdTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.IdTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://anytree.readthedocs.io/en/latest/api/anytree.node.html#anytree.node.nodemixin.NodeMixin" title="(in anytree v2.8.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">anytree.node.nodemixin.NodeMixin</span></code></a></p>
 <p>A mixin class that provides unique ids for class instances.</p>
 <p>A hierarchy of ids are managed in a tree-like data structure,
-enabled by the underlying <code class="xref py py-obj docutils literal notranslate"><span class="pre">NodeMixin</span></code> class. The id of each
-tree node is a compositions of the parent’s id and the label of
-this node.</p>
+enabled by the underlying <a class="reference external" href="https://anytree.readthedocs.io/en/latest/api/anytree.node.html#anytree.node.nodemixin.NodeMixin" title="(in anytree v2.8.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NodeMixin</span></code></a> class.
+The id of each tree node is a compositions of the parent’s id and
+the label of this node.</p>
 <p class="rubric">Attributes Summary</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -93,7 +92,7 @@ this node.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.templates.IdTree.id" title="dasha.web.templates.IdTree.id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The unique id.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.templates.IdTree.idbase" title="dasha.web.templates.IdTree.idbase"><code class="xref py py-obj docutils literal notranslate"><span class="pre">idbase</span></code></a></p></td>
 <td><p>The base name of the generated id.</p></td>
@@ -101,12 +100,13 @@ this node.</p>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="dasha.web.templates.IdTree.id">
 <code class="sig-name descname">id</code><a class="headerlink" href="#dasha.web.templates.IdTree.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The unique id.</p>
+</dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="dasha.web.templates.IdTree.idbase">
 <code class="sig-name descname">idbase</code><a class="headerlink" href="#dasha.web.templates.IdTree.idbase" title="Permalink to this definition">¶</a></dt>
 <dd><p>The base name of the generated id.</p>
@@ -138,8 +138,8 @@ this node.</p>
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
-    Last built 02 Mar 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
   </p>
 </footer>
   </body>

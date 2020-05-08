@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>dasha.web.extensions.ipc_backends.rejson &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <link rel="stylesheet" href="../../../../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+    <script src="../../../../../_static/jquery.js"></script>
+    <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    <script type="text/javascript" src="../../../../../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../../../../../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../../../../../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../../../../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../../../../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../../../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../../../../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	 &#187;
+      </li>
+      <li><a href="../../../../index.html" >Module code</a> &#187;</li>
+      <li><a href="../../../web.html" accesskey="U">dasha.web</a> &#187;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dasha.web.extensions.ipc_backends.rejson</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">redis</span>
+<span class="kn">from</span> <span class="nn">rejson</span> <span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span> <span class="nn">rejson</span> <span class="kn">import</span> <span class="n">Path</span> <span class="k">as</span> <span class="n">_JsonPath</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.log</span> <span class="kn">import</span> <span class="n">get_logger</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;JsonPath&#39;</span><span class="p">,</span> <span class="s1">&#39;RejsonIPC&#39;</span><span class="p">,</span> <span class="p">]</span>
+
+
+<div class="viewcode-block" id="JsonPath"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.JsonPath.html#dasha.web.extensions.ipc_backends.rejson.JsonPath">[docs]</a><span class="k">class</span> <span class="nc">JsonPath</span><span class="p">(</span><span class="n">_JsonPath</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This extends `~rejson.Path` with various helpers.&quot;&quot;&quot;</span>
+
+    <span class="n">root</span> <span class="o">=</span> <span class="n">_JsonPath</span><span class="o">.</span><span class="n">rootPath</span><span class="p">()</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">_JsonPath</span><span class="o">.</span><span class="n">rootPath</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_JsonPath</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">strPath</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid input path type.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;path cannot be ends with &#39;</span><span class="si">{self.sep}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JsonPath.is_absolute"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.JsonPath.html#dasha.web.extensions.ipc_backends.rejson.JsonPath.is_absolute">[docs]</a>    <span class="k">def</span> <span class="nf">is_absolute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strPath</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="JsonPath.is_root"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.JsonPath.html#dasha.web.extensions.ipc_backends.rejson.JsonPath.is_root">[docs]</a>    <span class="k">def</span> <span class="nf">is_root</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strPath</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span></div>
+
+<div class="viewcode-block" id="JsonPath.is_empty"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.JsonPath.html#dasha.web.extensions.ipc_backends.rejson.JsonPath.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strPath</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="JsonPath.joinpath"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.JsonPath.html#dasha.web.extensions.ipc_backends.rejson.JsonPath.joinpath">[docs]</a>    <span class="k">def</span> <span class="nf">joinpath</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Join this path with `other`.</span>
+
+<span class="sd">        `ValueError` is raised if `other` is absolute.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only can join relative path.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_root</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">JsonPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strPath</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">strPath</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">JsonPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strPath</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">JsonPath</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strPath</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="si">}{</span><span class="n">other</span><span class="o">.</span><span class="n">strPath</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_root</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strPath</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_root</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strPath</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strPath</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="JsonPath.relative_to"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.JsonPath.html#dasha.web.extensions.ipc_backends.rejson.JsonPath.relative_to">[docs]</a>    <span class="k">def</span> <span class="nf">relative_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute a version of this path relative to `other`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">other</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">())</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">()</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">()</span>
+                <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;both paths should be relative or absolute.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JsonPath</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">strPath</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">is_root</span><span class="p">()</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strPath</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">JsonPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strPath</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):])</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unable to compute relative path.&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strPath</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">strPath</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">strPath</span><span class="si">}</span><span class="s1">)&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strPath</span></div>
+
+
+<div class="viewcode-block" id="RejsonIPC"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.RejsonIPC.html#dasha.web.extensions.ipc_backends.rejson.RejsonIPC">[docs]</a><span class="k">class</span> <span class="nc">RejsonIPC</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;This class manages a JSON object in redis.</span>
+
+<span class="sd">    The actual object stored in the redis db under &quot;redis_key&quot; looks like:</span>
+
+<span class="sd">    .. code::</span>
+
+<span class="sd">        {</span>
+<span class="sd">            &#39;_ipc_rev&#39;: 0,</span>
+<span class="sd">            &#39;_ipc_obj&#39;: {&#39;a&#39;: &#39;b&#39;},</span>
+<span class="sd">            &#39;_ipc_key&#39;: &#39;redis_key&#39;</span>
+<span class="sd">            }</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    label : str</span>
+<span class="sd">        The label of this IPC channel.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_connection</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;The actual redis client.</span>
+
+<span class="sd">    This will be replaced after `init_ipc` is called.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_pipeline</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;A redis pipeline instance.</span>
+
+<span class="sd">    This will be replaced after the `pipeline` context is entered.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_revkey</span> <span class="o">=</span> <span class="s1">&#39;_ipc_rev&#39;</span>
+    <span class="sd">&quot;&quot;&quot;The key name to store the revision number.&quot;&quot;&quot;</span>
+
+    <span class="n">_objkey</span> <span class="o">=</span> <span class="s1">&#39;_ipc_obj&#39;</span>
+    <span class="sd">&quot;&quot;&quot;The key name to store the json object.&quot;&quot;&quot;</span>
+
+    <span class="n">_keykey</span> <span class="o">=</span> <span class="s1">&#39;_ipc_key&#39;</span>
+    <span class="sd">&quot;&quot;&quot;The key name to store the redis root key name.&quot;&quot;&quot;</span>
+
+    <span class="n">_revpath</span> <span class="o">=</span> <span class="n">JsonPath</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_revkey</span><span class="p">)</span>
+    <span class="n">_objpath</span> <span class="o">=</span> <span class="n">JsonPath</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_objkey</span><span class="p">)</span>
+    <span class="n">_keypath</span> <span class="o">=</span> <span class="n">JsonPath</span><span class="p">()</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">_keykey</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_make_redis_key</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a unique key to use in the redis db.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;_ipc_</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rev</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">redis_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_redis_key</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_label</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_ensure_entry</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">defval</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Modify `obj` such that `key` is present in `obj` with default</span>
+<span class="sd">        value `defval`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">defval</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">_ensure_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Modify `obj` such that revkey, objkey, and keykey are present.&quot;&quot;&quot;</span>
+        <span class="n">redis_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_key</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">defval</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_revkey</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_objkey</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keykey</span><span class="p">,</span> <span class="n">redis_key</span><span class="p">),</span>
+                <span class="p">]:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">defval</span><span class="p">)</span>
+        <span class="c1"># check if redis_key matches.</span>
+        <span class="k">if</span> <span class="n">redis_key</span> <span class="o">!=</span> <span class="n">obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_keykey</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;inconsistent obj key </span><span class="si">{</span><span class="n">redis_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+<div class="viewcode-block" id="RejsonIPC.init_ipc"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.RejsonIPC.html#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.init_ipc">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">init_ipc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">Client</span><span class="o">.</span><span class="n">from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">decode_responses</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A context manager that puts the connection in pipeline mode.&quot;&quot;&quot;</span>
+        <span class="k">class</span> <span class="nc">RejsonIPCPipeline</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipc</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_ipc</span> <span class="o">=</span> <span class="n">ipc</span>
+
+            <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_ipc</span><span class="o">.</span><span class="n">_pipeline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ipc</span><span class="o">.</span><span class="n">_connection</span><span class="o">.</span><span class="n">pipeline</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ipc</span><span class="o">.</span><span class="n">_pipeline</span>
+
+            <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_ipc</span><span class="o">.</span><span class="n">_pipeline</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_ipc</span><span class="o">.</span><span class="n">_pipeline</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">RejsonIPCPipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RejsonIPC.get"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.RejsonIPC.html#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">JsonPath</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return object at `path`.</span>
+
+<span class="sd">        `None` is returned if unable to get object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">redis</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ResponseError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RejsonIPC.set"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.RejsonIPC.html#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">JsonPath</span><span class="o">.</span><span class="n">root</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set `obj` to path.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_rejson_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the actual json object path in the redis db.&quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">JsonPath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">JsonPath</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objpath</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RejsonIPC.__call__"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.RejsonIPC.html#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Operate at `path`.</span>
+
+<span class="sd">        Note that `path` is specified with respect to `_objpath`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s1">&#39;rejson_call&#39;</span><span class="p">)</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">JsonPath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">rejson_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rejson_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">redis_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_key</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;op=</span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2"> redis_key=</span><span class="si">{</span><span class="n">redis_key</span><span class="si">}</span><span class="s2"> rejson_path=</span><span class="si">{</span><span class="n">rejson_path</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;path=</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> args=</span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2"> kwargs=</span><span class="si">{</span><span class="n">kwargs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">_op</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;json</span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;set&#39;</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">is_root</span><span class="p">():</span>
+            <span class="c1"># this is to set the object</span>
+            <span class="c1"># check the key exist in the client</span>
+            <span class="n">obj</span><span class="p">,</span> <span class="o">=</span> <span class="n">args</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;set root object to </span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2"> at key=</span><span class="si">{</span><span class="n">redis_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">redis_key</span><span class="p">):</span>
+                <span class="c1"># create the object</span>
+                <span class="n">_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_metadata</span><span class="p">({</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_objkey</span><span class="p">:</span> <span class="n">obj</span>
+                    <span class="p">})</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;create object at key=</span><span class="si">{</span><span class="n">redis_key</span><span class="si">}</span><span class="s2"> &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;rejson_path=</span><span class="si">{</span><span class="n">JsonPath</span><span class="o">.</span><span class="n">root</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">_obj</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">jsonset</span><span class="p">(</span><span class="n">redis_key</span><span class="p">,</span> <span class="n">JsonPath</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">_obj</span><span class="p">)</span>
+                <span class="k">return</span>
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;set&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">redis_key</span><span class="p">):</span>
+                <span class="c1"># make sure root object exists</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">dict</span><span class="p">(),</span> <span class="n">path</span><span class="o">=</span><span class="n">JsonPath</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">op</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">]:</span>
+                <span class="c1"># thees ops will update the object.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">jsonnumincrby</span><span class="p">(</span>
+                        <span class="n">redis_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_revpath</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">_op</span><span class="p">(</span><span class="n">redis_key</span><span class="p">,</span> <span class="n">rejson_path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="RejsonIPC.get_if_updated"><a class="viewcode-back" href="../../../../../api/dasha.web.extensions.ipc_backends.rejson.RejsonIPC.html#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.get_if_updated">[docs]</a>    <span class="k">def</span> <span class="nf">get_if_updated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns new obj if it is updated.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">redis_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_key</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">redis_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_revkey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span> <span class="ow">or</span>
+                <span class="n">obj</span><span class="p">[</span><span class="n">redis_key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">redis_key</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;invalid object for checking update.&#39;</span><span class="p">)</span>
+        <span class="n">rev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">jsonget</span><span class="p">(</span><span class="n">redis_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_revpath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">obj</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_revkey</span><span class="p">]</span> <span class="o">==</span> <span class="n">rev</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">obj</span>
+        <span class="c1"># get object and attach the rev and key to it</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_entry</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_revkey</span><span class="p">,</span> <span class="n">rev</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_entry</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">redis_key</span><span class="p">,</span> <span class="n">redis_key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

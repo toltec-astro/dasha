@@ -1,0 +1,6 @@
+user_cache
+==========
+
+.. currentmodule:: dasha.web.extensions.cache
+
+.. autodata:: user_cache

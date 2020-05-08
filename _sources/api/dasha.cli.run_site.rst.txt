@@ -1,0 +1,6 @@
+run_site
+========
+
+.. currentmodule:: dasha.cli
+
+.. autofunction:: run_site

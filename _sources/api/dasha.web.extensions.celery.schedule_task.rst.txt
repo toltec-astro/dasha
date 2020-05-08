@@ -1,0 +1,6 @@
+schedule_task
+=============
+
+.. currentmodule:: dasha.web.extensions.celery
+
+.. autofunction:: schedule_task

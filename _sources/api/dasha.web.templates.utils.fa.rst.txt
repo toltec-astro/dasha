@@ -1,0 +1,6 @@
+fa
+==
+
+.. currentmodule:: dasha.web.templates.utils
+
+.. autofunction:: fa

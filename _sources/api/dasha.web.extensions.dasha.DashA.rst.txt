@@ -1,0 +1,27 @@
+DashA
+=====
+
+.. currentmodule:: dasha.web.extensions.dasha
+
+.. autoclass:: DashA
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~DashA.logger
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~DashA.init_app
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: logger
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: init_app

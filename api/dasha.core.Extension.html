@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Extension &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Stack" href="dasha.core.Stack.html" />
+    <link rel="prev" title="DashA Documentation" href="../index.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="dasha.core.Stack.html" title="Stack">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="../index.html" title="DashA Documentation">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	 &#187;
+      </li>
+      
+      <li>Extension</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="extension">
+<h1>Extension<a class="headerlink" href="#extension" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="dasha.core.Extension">
+<em class="property">class </em><code class="sig-prename descclassname">dasha.core.</code><code class="sig-name descname">Extension</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/core.html#Extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.core.Extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tollan.utils.namespace.Namespace</span></code></p>
+<p>This class provides a unified interface to configure and initialize
+extensions using the flask factory pattern (flask extensions).</p>
+<p>It shall be constructed via the <code class="xref py py-meth docutils literal notranslate"><span class="pre">from_dict()</span></code> class method. Two items
+are expected:</p>
+<ol class="arabic">
+<li><p>“module”. This shall be a module that defines the following two methods:</p>
+<blockquote>
+<div><p>1. <code class="docutils literal notranslate"><span class="pre">init_ext</span></code>. This shall be a function that takes a config dict
+and return a properly configured underlying flask extension object.</p>
+<p>2. <code class="docutils literal notranslate"><span class="pre">init_app</span></code>. This shall be a function that takes the underlying
+flask extension object and a config dict. It is called to setup the
+flask extension with respect to the given app.</p>
+</div></blockquote>
+</li>
+<li><p>“config”. The config dict to be passed to <code class="docutils literal notranslate"><span class="pre">init_ext</span></code> and <code class="docutils literal notranslate"><span class="pre">init_app</span></code>.</p></li>
+</ol>
+<p>Conventionally, an <code class="xref py py-obj docutils literal notranslate"><span class="pre">ObjectProxy</span></code> object should be made available
+at the extension module level to allow convenient importing from other
+modules. The <code class="docutils literal notranslate"><span class="pre">__wrapped__</span></code> object should be set to the underlying
+flask extension object at the end of <code class="docutils literal notranslate"><span class="pre">init_ext</span></code>.</p>
+<p>For an example of extension module, see <a class="reference internal" href="../index.html#module-dasha.web.extensions.db" title="dasha.web.extensions.db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db</span></code></a></p>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.core.Extension.init_app" title="dasha.core.Extension.init_app"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_app</span></code></a>(self, server)</p></td>
+<td><p>Setup the underlying extension for app.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="dasha.core.Extension.init_app">
+<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">server</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/core.html#Extension.init_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.core.Extension.init_app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup the underlying extension for app.</p>
+<p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> is raised if this function is called multiple times.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">Extension</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/dasha.core.Extension.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

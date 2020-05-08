@@ -1,0 +1,6 @@
+dataframe_from_db
+=================
+
+.. currentmodule:: dasha.web.extensions.db
+
+.. autofunction:: dataframe_from_db

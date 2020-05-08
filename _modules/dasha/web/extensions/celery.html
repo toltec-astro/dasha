@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>dasha.web.extensions.celery &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <link rel="stylesheet" href="../../../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script type="text/javascript" src="../../../../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../../../../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../../../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../../../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../../../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	 &#187;
+      </li>
+      <li><a href="../../../index.html" >Module code</a> &#187;</li>
+      <li><a href="../../web.html" accesskey="U">dasha.web</a> &#187;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dasha.web.extensions.celery</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python</span>
+
+<span class="kn">from</span> <span class="nn">flask_celeryext</span> <span class="kn">import</span> <span class="n">FlaskCeleryExt</span>
+<span class="kn">from</span> <span class="nn">wrapt</span> <span class="kn">import</span> <span class="n">ObjectProxy</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.registry</span> <span class="kn">import</span> <span class="n">Registry</span>
+<span class="kn">from</span> <span class="nn">tollan.utils</span> <span class="kn">import</span> <span class="n">getobj</span>
+<span class="kn">from</span> <span class="nn">celery_once</span> <span class="kn">import</span> <span class="n">QueueOnce</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;celery_app&#39;</span><span class="p">,</span> <span class="s1">&#39;register_tasks&#39;</span><span class="p">,</span> <span class="s1">&#39;get_celery_tasks&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;schedule_task&#39;</span>
+        <span class="p">]</span>
+
+
+<span class="n">celery_app</span> <span class="o">=</span> <span class="n">ObjectProxy</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;A proxy to the `~celery.Celery` instance.&quot;&quot;&quot;</span>
+
+
+<span class="n">_celeryext</span> <span class="o">=</span> <span class="n">ObjectProxy</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;A proxy to the `~flask_celeryext.FlaskCeleryExt` instance.&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">init_ext</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="n">_celeryext</span><span class="o">.</span><span class="n">__wrapped__</span> <span class="o">=</span> <span class="n">FlaskCeleryExt</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ext</span>
+
+
+<span class="n">_celery_task_registry</span> <span class="o">=</span> <span class="n">Registry</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot;This keeps a record of celery tasks.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="register_tasks"><a class="viewcode-back" href="../../../../api/dasha.web.extensions.celery.register_tasks.html#dasha.web.extensions.celery.register_tasks">[docs]</a><span class="k">def</span> <span class="nf">register_tasks</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Register celery tasks in the registry.&quot;&quot;&quot;</span>
+    <span class="n">_celery_task_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span></div>
+
+
+<span class="k">def</span> <span class="nf">init_app</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">_celeryext</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
+    <span class="c1"># update the proxy object</span>
+    <span class="n">celery_app</span><span class="o">.</span><span class="n">__wrapped__</span> <span class="o">=</span> <span class="n">_celeryext</span><span class="o">.</span><span class="n">celery</span>
+
+    <span class="n">celery_app</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">redbeat_redis_url</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;CELERY_BROKER_URL&#39;</span><span class="p">],</span>
+        <span class="n">beat_scheduler</span><span class="o">=</span><span class="s1">&#39;redbeat.RedBeatScheduler&#39;</span><span class="p">,</span>
+        <span class="n">beat_schedule</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span>
+        <span class="n">ONCE</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;backend&#39;</span><span class="p">:</span> <span class="s1">&#39;celery_once.backends.Redis&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;settings&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;CELERY_BROKER_URL&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;default_timeout&#39;</span><span class="p">:</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span>  <span class="c1"># second</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">ContextQueueOnce</span><span class="p">(</span><span class="n">QueueOnce</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">server</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+                <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">celery_app</span><span class="o">.</span><span class="n">QueueOnce</span> <span class="o">=</span> <span class="n">ContextQueueOnce</span>
+
+    <span class="n">_celery_task_registry</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="n">tasks</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tasks&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="n">getobj</span><span class="p">(</span><span class="n">task</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
+        <span class="n">register_tasks</span><span class="p">(</span>
+                <span class="n">type_</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">task</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;type&#39;</span><span class="p">}))</span>
+
+    <span class="n">post_init_app</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;post_init_app&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">post_init_app</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">post_init_app</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="get_celery_tasks"><a class="viewcode-back" href="../../../../api/dasha.web.extensions.celery.get_celery_tasks.html#dasha.web.extensions.celery.get_celery_tasks">[docs]</a><span class="k">def</span> <span class="nf">get_celery_tasks</span><span class="p">():</span>
+    <span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_celery_task_registry</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">modules</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">modules</span></div>
+
+
+<div class="viewcode-block" id="schedule_task"><a class="viewcode-back" href="../../../../api/dasha.web.extensions.celery.schedule_task.html#dasha.web.extensions.celery.schedule_task">[docs]</a><span class="k">def</span> <span class="nf">schedule_task</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">task</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;task&#39;</span><span class="p">,</span> <span class="n">task</span><span class="p">)</span>
+    <span class="n">celery_app</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">beat_schedule</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;update_</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

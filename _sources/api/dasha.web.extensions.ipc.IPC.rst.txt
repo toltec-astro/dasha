@@ -1,0 +1,29 @@
+IPC
+===
+
+.. currentmodule:: dasha.web.extensions.ipc
+
+.. autoclass:: IPC
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~IPC.logger
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~IPC.get_or_create
+      ~IPC.init_app
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: logger
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_or_create
+   .. automethod:: init_app

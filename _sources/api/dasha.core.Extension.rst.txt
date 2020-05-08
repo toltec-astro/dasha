@@ -1,0 +1,17 @@
+Extension
+=========
+
+.. currentmodule:: dasha.core
+
+.. autoclass:: Extension
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Extension.init_app
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: init_app

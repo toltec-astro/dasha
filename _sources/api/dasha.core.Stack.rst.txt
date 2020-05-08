@@ -1,0 +1,17 @@
+Stack
+=====
+
+.. currentmodule:: dasha.core
+
+.. autoclass:: Stack
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Stack.logger
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: logger

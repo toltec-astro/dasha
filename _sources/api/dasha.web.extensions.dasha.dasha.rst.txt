@@ -1,0 +1,6 @@
+dasha
+=====
+
+.. currentmodule:: dasha.web.extensions.dasha
+
+.. autodata:: dasha

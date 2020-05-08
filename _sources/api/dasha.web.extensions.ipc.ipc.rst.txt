@@ -1,0 +1,6 @@
+ipc
+===
+
+.. currentmodule:: dasha.web.extensions.ipc
+
+.. autodata:: ipc

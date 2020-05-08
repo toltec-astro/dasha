@@ -1,0 +1,35 @@
+Site
+====
+
+.. currentmodule:: dasha.core
+
+.. autoclass:: Site
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Site.logger
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Site.from_any
+      ~Site.from_dict
+      ~Site.from_filepath
+      ~Site.from_object
+      ~Site.init_app
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: logger
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: from_any
+   .. automethod:: from_dict
+   .. automethod:: from_filepath
+   .. automethod:: from_object
+   .. automethod:: init_app

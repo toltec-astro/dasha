@@ -1,0 +1,6 @@
+resolve_url
+===========
+
+.. currentmodule:: dasha.web.extensions.dasha
+
+.. autofunction:: resolve_url

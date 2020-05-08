@@ -1,0 +1,6 @@
+get_url_stem
+============
+
+.. currentmodule:: dasha.web.extensions.dasha
+
+.. autofunction:: get_url_stem

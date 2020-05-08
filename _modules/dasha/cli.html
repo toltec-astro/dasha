@@ -1,0 +1,273 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>dasha.cli &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script type="text/javascript" src="../../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li>
+	<a href="../../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	 &#187;
+      </li>
+      <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+      
+       
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dasha.cli</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.sys</span> <span class="kn">import</span> <span class="n">parse_systemd_envfile</span>
+<span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.fmt</span> <span class="kn">import</span> <span class="n">pformat_yaml</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.log</span> <span class="kn">import</span> <span class="n">init_log</span><span class="p">,</span> <span class="n">get_logger</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;load_env_helper&#39;</span><span class="p">,</span> <span class="s1">&#39;run_demo&#39;</span><span class="p">,</span> <span class="s1">&#39;run_site&#39;</span><span class="p">,</span> <span class="s1">&#39;run_flask&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="load_env_helper"><a class="viewcode-back" href="../../api/dasha.cli.load_env_helper.html#dasha.cli.load_env_helper">[docs]</a><span class="k">def</span> <span class="nf">load_env_helper</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;A helper utility to expand env vars defined in systemd environment</span>
+<span class="sd">    files in shell.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Load systemd env file.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;env_files&#39;</span><span class="p">,</span>
+            <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;ENV_FILE&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to systemd env file.&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">envs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">env_files</span><span class="p">:</span>
+        <span class="n">envs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parse_systemd_envfile</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">envs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="c1"># Print the env vars so that it can be captured by the shell</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_add_site_env_arg</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="c1"># note that site overrides DASHA_SITE in envfiles.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;--site&#39;</span><span class="p">,</span> <span class="s1">&#39;-s&#39;</span><span class="p">,</span>
+            <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;NAME&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The module name or path to the site. &quot;</span>
+                 <span class="s2">&quot;Examples: ~/mysite.py, mypackage.mysite&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;--env_files&#39;</span><span class="p">,</span> <span class="s1">&#39;-e&#39;</span><span class="p">,</span>
+            <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;ENV_FILE&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to systemd env file.&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">handle_site_env_args</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">()</span>
+        <span class="n">envs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">env_files</span> <span class="ow">or</span> <span class="nb">tuple</span><span class="p">():</span>
+            <span class="n">envs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parse_systemd_envfile</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">site</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">envs</span><span class="p">[</span><span class="s1">&#39;DASHA_SITE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">site</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">envs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;loaded envs:</span><span class="se">\n</span><span class="si">{</span><span class="n">pformat_yaml</span><span class="p">(</span><span class="n">envs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">envs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">parser</span><span class="p">,</span> <span class="n">handle_site_env_args</span>
+
+
+<span class="k">def</span> <span class="nf">_add_ext_arg</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="n">_all_ext_procs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;flask&#39;</span><span class="p">,</span> <span class="s1">&#39;celery&#39;</span><span class="p">,</span> <span class="s1">&#39;beat&#39;</span><span class="p">,</span> <span class="s1">&#39;flower&#39;</span><span class="p">]</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;extension&#39;</span><span class="p">,</span>
+            <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;EXT&#39;</span><span class="p">,</span>
+            <span class="n">choices</span><span class="o">=</span><span class="n">_all_ext_procs</span><span class="p">,</span>
+            <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="s1">&#39;flask&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The extension process to run&quot;</span>
+                 <span class="s2">&quot; Available options: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_all_ext_procs</span><span class="p">))</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_run_celery_cmd</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">celery.bin.worker</span> <span class="k">as</span> <span class="nn">celery_worker</span>
+        <span class="kn">import</span> <span class="nn">celery.bin.beat</span> <span class="k">as</span> <span class="nn">celery_beat</span>
+        <span class="kn">from</span> <span class="nn">.web.celery_app</span> <span class="kn">import</span> <span class="n">celery_app</span>
+        <span class="kn">from</span> <span class="nn">flower.command</span> <span class="kn">import</span> <span class="n">FlowerCommand</span>
+
+        <span class="k">class</span> <span class="nc">_flower</span><span class="p">(</span><span class="n">FlowerCommand</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_from_argv</span><span class="p">(</span><span class="s1">&#39;flower&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">dispatch_cmd</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;worker&#39;</span><span class="p">:</span> <span class="n">celery_worker</span><span class="o">.</span><span class="n">worker</span><span class="p">,</span>
+                <span class="s1">&#39;beat&#39;</span><span class="p">:</span> <span class="n">celery_beat</span><span class="o">.</span><span class="n">beat</span><span class="p">,</span>
+                <span class="s1">&#39;flower&#39;</span><span class="p">:</span> <span class="n">_flower</span>
+                <span class="p">}</span>
+        <span class="n">dispatch_options</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;worker&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;loglevel&#39;</span><span class="p">:</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;traceback&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">}</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">dispatch_cmd</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="n">app</span><span class="o">=</span><span class="n">celery_app</span><span class="p">)</span>
+        <span class="n">cmd</span><span class="p">(</span><span class="o">**</span><span class="n">dispatch_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;worker&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()))</span>
+
+    <span class="k">def</span> <span class="nf">handle_ext_args</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;flask&#39;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">.web</span> <span class="kn">import</span> <span class="n">create_app</span>
+            <span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">()</span>
+            <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8050</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">extension</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;celery&#39;</span><span class="p">,</span> <span class="s1">&#39;beat&#39;</span><span class="p">,</span> <span class="s1">&#39;flower&#39;</span><span class="p">]:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">extension</span>
+            <span class="n">dispatch_cmd</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;celery&#39;</span><span class="p">:</span> <span class="s1">&#39;worker&#39;</span><span class="p">,</span>
+                    <span class="p">}</span>
+            <span class="n">_run_celery_cmd</span><span class="p">(</span><span class="n">dispatch_cmd</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+    <span class="k">return</span> <span class="n">parser</span><span class="p">,</span> <span class="n">handle_ext_args</span>
+
+
+<div class="viewcode-block" id="run_site"><a class="viewcode-back" href="../../api/dasha.cli.run_site.html#dasha.cli.run_site">[docs]</a><span class="k">def</span> <span class="nf">run_site</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;A helper utility to run DashA site.&quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Run DashA site.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">,</span> <span class="n">handle_site_env_args</span> <span class="o">=</span> <span class="n">_add_site_env_arg</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">,</span> <span class="n">handle_ext_args</span> <span class="o">=</span> <span class="n">_add_ext_arg</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">handle_site_env_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">handle_ext_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="run_demo"><a class="viewcode-back" href="../../api/dasha.cli.run_demo.html#dasha.cli.run_demo">[docs]</a><span class="k">def</span> <span class="nf">run_demo</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;A helper utility to run the examples in `~dasha.examples`&quot;&quot;&quot;</span>
+
+    <span class="n">all_demos</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">stem</span><span class="p">:</span> <span class="n">p</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span>
+                <span class="nb">filter</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">),</span>
+                    <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+                        <span class="s1">&#39;examples&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.py&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">}</span>
+    <span class="n">all_demo_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">all_demos</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Run the DashA demos.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;NAME&#39;</span><span class="p">,</span>
+            <span class="n">choices</span><span class="o">=</span><span class="n">all_demo_names</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The name of the demo to run.&quot;</span>
+                 <span class="s2">&quot; Available demos: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">all_demo_names</span><span class="p">))</span>
+            <span class="p">)</span>
+    <span class="n">parser</span><span class="p">,</span> <span class="n">handle_ext_args</span> <span class="o">=</span> <span class="n">_add_ext_arg</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">site</span> <span class="o">=</span> <span class="n">all_demos</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DASHA_SITE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">site</span>
+    <span class="n">handle_ext_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span></div>
+
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">context_settings</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;ignore_unknown_options&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">run_flask</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Run DashA site.&quot;&quot;&quot;</span>
+    <span class="c1"># this is just a wrapper to an argumentparser.</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cmd_self</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cmd_self</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Run DashA site.&#39;</span><span class="p">,</span>
+            <span class="n">prog</span><span class="o">=</span><span class="s1">&#39;flask </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_self</span><span class="p">)))</span>
+    <span class="n">parser</span><span class="p">,</span> <span class="n">handle_site_env_args</span> <span class="o">=</span> <span class="n">_add_site_env_arg</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+
+    <span class="n">init_log</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">handle_site_env_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FLASK_APP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;dasha.web.app&#39;</span>
+
+    <span class="c1"># get port</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLASK_RUN_PORT&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="mi">8050</span>
+    <span class="kn">from</span> <span class="nn">flask.cli</span> <span class="kn">import</span> <span class="n">run_command</span>
+    <span class="n">ctx</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">run_command</span><span class="p">,</span> <span class="n">reload</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right"> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

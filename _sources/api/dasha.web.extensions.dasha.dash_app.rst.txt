@@ -1,0 +1,6 @@
+dash_app
+========
+
+.. currentmodule:: dasha.web.extensions.dasha
+
+.. autodata:: dash_app

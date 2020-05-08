@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>dasha.web &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <title>dasha.web &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
     <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -46,7 +46,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="../../index.html">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	<a href="../../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
 	 &#187;
       </li>
       <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
@@ -67,32 +67,72 @@
 <span class="sd">&quot;&quot;&quot;This module defines DashA web server globals.&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">tollan.utils.log</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">timeit</span><span class="p">,</span> <span class="n">logit</span><span class="p">,</span> <span class="n">init_log</span>
-<span class="kn">from</span> <span class="nn">tollan.utils.fmt</span> <span class="kn">import</span> <span class="n">pformat_dict</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.log</span> <span class="kn">import</span> <span class="n">get_logger</span><span class="p">,</span> <span class="n">timeit</span><span class="p">,</span> <span class="n">init_log</span>
+<span class="kn">from</span> <span class="nn">tollan.utils.fmt</span> <span class="kn">import</span> <span class="n">pformat_yaml</span>
 <span class="kn">from</span> <span class="nn">tollan.utils.env</span> <span class="kn">import</span> <span class="n">env_registry</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">SiteRuntime</span>
+<span class="kn">from</span> <span class="nn">wrapt</span> <span class="kn">import</span> <span class="n">ObjectProxy</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">Site</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="s1">&#39;create_app&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="s1">&#39;create_site&#39;</span><span class="p">,</span> <span class="s1">&#39;create_app&#39;</span><span class="p">]</span>
 
 
-<span class="c1"># enable logging if flask development is set</span>
-<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">,</span> <span class="s1">&#39;development&#39;</span><span class="p">):</span>
+<span class="c1"># enable logging for the start up if flask development is set</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;development&#39;</span><span class="p">:</span>
     <span class="n">init_log</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">init_log</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
 
 
-<span class="n">site</span> <span class="o">=</span> <span class="n">SiteRuntime</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
-<span class="sd">&quot;&quot;&quot;Used to manage the site runtime configs.&quot;&quot;&quot;</span>
+<span class="n">site</span> <span class="o">=</span> <span class="n">ObjectProxy</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A proxy to the `~dasha.core.Site` instance, which is made available after</span>
+<span class="sd">`~dasha.web.create_site` is called.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="create_site"><a class="viewcode-back" href="../../api/dasha.web.create_site.html#dasha.web.create_site">[docs]</a><span class="nd">@timeit</span>
+<span class="k">def</span> <span class="nf">create_site</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;DashA entry point.</span>
+
+<span class="sd">    Call this function to make available the `~dasha.web.site` context.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    `~dasha.Site`</span>
+<span class="sd">        The site instance.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">()</span>
+
+    <span class="n">env_registry</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">env_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+            <span class="s1">&#39;DASHA_SITE&#39;</span><span class="p">,</span> <span class="s1">&#39;The site module or path.&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dasha.examples.dasha_intro&#39;</span><span class="p">)</span>
+    <span class="n">env_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;DASHA_LOGFILE&#39;</span><span class="p">,</span> <span class="s1">&#39;The file for logging.&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">env_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;DASHA_LOGLEVEL&#39;</span><span class="p">,</span> <span class="s1">&#39;The DashA log level.&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;registered env vars:</span><span class="se">\n</span><span class="si">{</span><span class="n">pformat_yaml</span><span class="p">(</span><span class="n">env_registry</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">site</span><span class="o">.</span><span class="n">__wrapped__</span> <span class="o">=</span> <span class="n">Site</span><span class="o">.</span><span class="n">from_any</span><span class="p">(</span><span class="n">env_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DASHA_SITE&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">site</span></div>
 
 
 <div class="viewcode-block" id="create_app"><a class="viewcode-back" href="../../api/dasha.web.create_app.html#dasha.web.create_app">[docs]</a><span class="nd">@timeit</span>
 <span class="k">def</span> <span class="nf">create_app</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Flask entry point.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">()</span>
-    <span class="n">server</span> <span class="o">=</span> <span class="n">site</span><span class="o">.</span><span class="n">get_server</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">site</span><span class="o">.</span><span class="n">get_extentions</span><span class="p">():</span>
-        <span class="k">with</span> <span class="n">logit</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;init app extension </span><span class="si">{ext.__name__}</span><span class="s2">&quot;</span><span class="p">):</span>
-            <span class="n">ext</span><span class="o">.</span><span class="n">init_app</span><span class="p">(</span><span class="n">server</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;registered env vars:{pformat_dict(env_registry)}&quot;</span><span class="p">)</span>
+
+    <span class="n">site</span> <span class="o">=</span> <span class="n">create_site</span><span class="p">()</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;init dasha site:</span><span class="se">\n</span><span class="si">{</span><span class="n">pformat_yaml</span><span class="p">(</span><span class="n">site</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">server</span> <span class="o">=</span> <span class="n">site</span><span class="o">.</span><span class="n">init_app</span><span class="p">()</span>
+    <span class="c1"># reconfigure the logger</span>
+    <span class="n">logfile</span> <span class="o">=</span> <span class="n">env_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DASHA_LOGFILE&#39;</span><span class="p">)</span>
+    <span class="n">loglevel</span> <span class="o">=</span> <span class="n">env_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DASHA_LOGLEVEL&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;reset logger: loglevel=</span><span class="si">{</span><span class="n">loglevel</span><span class="si">}</span><span class="s2"> logfile=</span><span class="si">{</span><span class="n">logfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">init_log</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span> <span class="n">file_</span><span class="o">=</span><span class="n">logfile</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">server</span></div>
 </pre></div>
 
@@ -112,8 +152,8 @@
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
-    Last built 02 Mar 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
   </p>
 </footer>
   </body>

@@ -1,0 +1,41 @@
+JsonPath
+========
+
+.. currentmodule:: dasha.web.extensions.ipc_backends.rejson
+
+.. autoclass:: JsonPath
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~JsonPath.name
+      ~JsonPath.parent
+      ~JsonPath.root
+      ~JsonPath.sep
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~JsonPath.is_absolute
+      ~JsonPath.is_empty
+      ~JsonPath.is_root
+      ~JsonPath.joinpath
+      ~JsonPath.relative_to
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: name
+   .. autoattribute:: parent
+   .. autoattribute:: root
+   .. autoattribute:: sep
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: is_absolute
+   .. automethod:: is_empty
+   .. automethod:: is_root
+   .. automethod:: joinpath
+   .. automethod:: relative_to

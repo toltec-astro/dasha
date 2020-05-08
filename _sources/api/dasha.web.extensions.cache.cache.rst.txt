@@ -1,0 +1,6 @@
+cache
+=====
+
+.. currentmodule:: dasha.web.extensions.cache
+
+.. autodata:: cache

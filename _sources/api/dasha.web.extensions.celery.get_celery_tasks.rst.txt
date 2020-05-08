@@ -1,0 +1,6 @@
+get_celery_tasks
+================
+
+.. currentmodule:: dasha.web.extensions.celery
+
+.. autofunction:: get_celery_tasks

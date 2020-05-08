@@ -1,0 +1,6 @@
+celery_app
+==========
+
+.. currentmodule:: dasha.web.extensions.celery
+
+.. autodata:: celery_app

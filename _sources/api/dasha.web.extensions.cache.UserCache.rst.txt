@@ -1,0 +1,33 @@
+UserCache
+=========
+
+.. currentmodule:: dasha.web.extensions.cache
+
+.. autoclass:: UserCache
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~UserCache.namespace
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~UserCache.__call__
+      ~UserCache.get
+      ~UserCache.invalidate
+      ~UserCache.set
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: namespace
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: __call__
+   .. automethod:: get
+   .. automethod:: invalidate
+   .. automethod:: set

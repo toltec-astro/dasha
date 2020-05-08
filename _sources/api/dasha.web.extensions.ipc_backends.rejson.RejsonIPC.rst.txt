@@ -1,0 +1,41 @@
+RejsonIPC
+=========
+
+.. currentmodule:: dasha.web.extensions.ipc_backends.rejson
+
+.. autoclass:: RejsonIPC
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~RejsonIPC.connection
+      ~RejsonIPC.label
+      ~RejsonIPC.pipeline
+      ~RejsonIPC.redis_key
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~RejsonIPC.__call__
+      ~RejsonIPC.get
+      ~RejsonIPC.get_if_updated
+      ~RejsonIPC.init_ipc
+      ~RejsonIPC.set
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: connection
+   .. autoattribute:: label
+   .. autoattribute:: pipeline
+   .. autoattribute:: redis_key
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: __call__
+   .. automethod:: get
+   .. automethod:: get_if_updated
+   .. automethod:: init_ipc
+   .. automethod:: set

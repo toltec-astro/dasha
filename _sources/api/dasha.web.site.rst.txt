@@ -1,0 +1,6 @@
+site
+====
+
+.. currentmodule:: dasha.web
+
+.. autodata:: site

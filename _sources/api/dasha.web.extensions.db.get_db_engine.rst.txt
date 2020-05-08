@@ -1,0 +1,6 @@
+get_db_engine
+=============
+
+.. currentmodule:: dasha.web.extensions.db
+
+.. autofunction:: get_db_engine

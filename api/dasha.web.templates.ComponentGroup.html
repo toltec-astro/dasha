@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>ComponentGroup &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <title>ComponentGroup &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -19,8 +19,8 @@
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ComponentTemplate" href="dasha.web.templates.ComponentTemplate.html" />
-    <link rel="prev" title="load_template_cls" href="dasha.web.templates.load_template_cls.html" />
+    <link rel="next" title="fa" href="dasha.web.templates.utils.fa.html" />
+    <link rel="prev" title="ComponentTemplate" href="dasha.web.templates.ComponentTemplate.html" />
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 
   </head><body>
@@ -48,21 +48,20 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="dasha.web.templates.ComponentTemplate.html" title="ComponentTemplate">
+	<a href="dasha.web.templates.utils.fa.html" title="fa">
 	  next &raquo;
 	</a>
       </li>
       <li class="right">
-	<a href="dasha.web.templates.load_template_cls.html" title="load_template_cls">
+	<a href="dasha.web.templates.ComponentTemplate.html" title="ComponentTemplate">
 	  &laquo; previous
 	</a>
 	 |
       </li>
       <li>
-	<a href="../index.html">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	<a href="../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
 	 &#187;
       </li>
-      <li><a href="../dasha/index.html" accesskey="U">DashA Documentation</a> &#187;</li>
       
       <li>ComponentGroup</li> 
     </ul>
@@ -76,9 +75,9 @@
             
   <div class="section" id="componentgroup">
 <h1>ComponentGroup<a class="headerlink" href="#componentgroup" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="dasha.web.templates.ComponentGroup">
-<em class="property">class </em><code class="sig-prename descclassname">dasha.web.templates.</code><code class="sig-name descname">ComponentGroup</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentGroup" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dasha.web.templates.</code><code class="sig-name descname">ComponentGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentGroup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="dasha.web.templates.ComponentTemplate.html#dasha.web.templates.ComponentTemplate" title="dasha.web.templates.ComponentTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">dasha.web.templates.ComponentTemplate</span></code></a></p>
 <p>This is a base class for managing a set of components as one unit.</p>
 <p>The elements in the group is defined in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">_component_group</span></code> class
@@ -100,7 +99,7 @@ attribute. It is a list of dicts which shall contain the follows:</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentGroup.layout" title="dasha.web.templates.ComponentGroup.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a></p></td>
-<td><p>Implement this to return a valid Dash layout object.</p></td>
+<td><p>The layout generated from traversing the component tree.</p></td>
 </tr>
 </tbody>
 </table>
@@ -117,16 +116,22 @@ attribute. It is a list of dicts which shall contain the follows:</p>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="dasha.web.templates.ComponentGroup.layout">
 <code class="sig-name descname">layout</code><a class="headerlink" href="#dasha.web.templates.ComponentGroup.layout" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement this to return a valid Dash layout object.</p>
+<dd><p>The layout generated from traversing the component tree.</p>
+<p>The traversing is depth first.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Properties with callable values are evaluated the time the property
+is queried.</p>
+</div>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="dasha.web.templates.ComponentGroup.setup_layout">
-<code class="sig-name descname">setup_layout</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">app</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentGroup.setup_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentGroup.setup_layout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setup_layout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">app</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentGroup.setup_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentGroup.setup_layout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implement this to declare layout components and their callbacks.</p>
 </dd></dl>
 
@@ -156,8 +161,8 @@ attribute. It is a list of dicts which shall contain the follows:</p>
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
-    Last built 02 Mar 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
   </p>
 </footer>
   </body>

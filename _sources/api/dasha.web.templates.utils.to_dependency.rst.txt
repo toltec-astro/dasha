@@ -1,0 +1,6 @@
+to_dependency
+=============
+
+.. currentmodule:: dasha.web.templates.utils
+
+.. autofunction:: to_dependency

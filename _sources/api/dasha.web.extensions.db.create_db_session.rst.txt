@@ -1,0 +1,6 @@
+create_db_session
+=================
+
+.. currentmodule:: dasha.web.extensions.db
+
+.. autofunction:: create_db_session

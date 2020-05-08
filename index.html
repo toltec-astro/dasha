@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Documentation &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <title>DashA Documentation &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="DashA Documentation" href="dasha/index.html" />
+    <link rel="next" title="Extension" href="api/dasha.core.Extension.html" />
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 
   </head><body>
@@ -47,12 +47,12 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="dasha/index.html" title="DashA Documentation">
+	<a href="api/dasha.core.Extension.html" title="Extension">
 	  next &raquo;
 	</a>
       </li>
       <li>
-	<a href="#">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	<a href="#">dasha v0.1.dev32+g6ea9fce.d20200507</a>
 	 &#187;
       </li>
       
@@ -66,17 +66,392 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="documentation">
-<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
-<p>This is the documentation for DashA.</p>
-<p>DashA is a multi-page dash app framework that allows create complex and
-reusable pages.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="dasha/index.html">DashA Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="dasha/index.html#reference-api">Reference/API</a></li>
-</ul>
-</li>
+  <div class="section" id="dasha-documentation">
+<h1>DashA Documentation<a class="headerlink" href="#dasha-documentation" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">dasha</span></code> package is a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dash</span></code> app boilerplate that allows creating complex
+and reusable pages.</p>
+<div class="section" id="reference-api">
+<h2>Reference/API<a class="headerlink" href="#reference-api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-dasha.core">
+<span id="dasha-core-module"></span><h3>dasha.core Module<a class="headerlink" href="#module-dasha.core" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="classes">
+<h4>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.core.Extension.html#dasha.core.Extension" title="dasha.core.Extension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Extension</span></code></a>(*args, **kwargs)</p></td>
+<td><p>This class provides a unified interface to configure and initialize extensions using the flask factory pattern (flask extensions).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.core.Stack.html#dasha.core.Stack" title="dasha.core.Stack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Stack</span></code></a></p></td>
+<td><p>This class is a thin wrapper around a set of extensions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.core.Site.html#dasha.core.Site" title="dasha.core.Site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Site</span></code></a></p></td>
+<td><p>This class manages the context of a DashA site, composed of a server and a set of extensions.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="class-inheritance-diagram">
+<h4>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h4>
+<div class="graphviz"><object data="_images/inheritance-954da30345cd5b85ac4b913634c632b85acc1ef0.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of dasha.core.Extension, dasha.core.Stack, dasha.core.Site</p></object></div>
+</div>
+</div>
+<div class="section" id="module-dasha.cli">
+<span id="dasha-cli-module"></span><h3>dasha.cli Module<a class="headerlink" href="#module-dasha.cli" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="functions">
+<h4>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.cli.load_env_helper.html#dasha.cli.load_env_helper" title="dasha.cli.load_env_helper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_env_helper</span></code></a>()</p></td>
+<td><p>A helper utility to expand env vars defined in systemd environment files in shell.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.cli.run_demo.html#dasha.cli.run_demo" title="dasha.cli.run_demo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_demo</span></code></a>()</p></td>
+<td><p>A helper utility to run the examples in <code class="xref py py-obj docutils literal notranslate"><span class="pre">examples</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.cli.run_site.html#dasha.cli.run_site" title="dasha.cli.run_site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_site</span></code></a>()</p></td>
+<td><p>A helper utility to run DashA site.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="module-dasha.web">
+<span id="dasha-web-package"></span><h3>dasha.web Package<a class="headerlink" href="#module-dasha.web" title="Permalink to this headline">¶</a></h3>
+<p>This module defines DashA web server globals.</p>
+<div class="section" id="id1">
+<h4>Functions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.create_site.html#dasha.web.create_site" title="dasha.web.create_site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_site</span></code></a>()</p></td>
+<td><p>DashA entry point.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.create_app.html#dasha.web.create_app" title="dasha.web.create_app"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_app</span></code></a>()</p></td>
+<td><p>Flask entry point.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="variables">
+<h4>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.site.html#dasha.web.site" title="dasha.web.site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">site</span></code></a></p></td>
+<td><p>A proxy to the <a class="reference internal" href="api/dasha.core.Site.html#dasha.core.Site" title="dasha.core.Site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Site</span></code></a> instance, which is made available after <a class="reference internal" href="api/dasha.web.create_site.html#dasha.web.create_site" title="dasha.web.create_site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_site</span></code></a> is called.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="module-dasha.web.extensions.cache">
+<span id="dasha-web-extensions-cache-module"></span><h3>dasha.web.extensions.cache Module<a class="headerlink" href="#module-dasha.web.extensions.cache" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h4>Classes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.cache.UserCache.html#dasha.web.extensions.cache.UserCache" title="dasha.web.extensions.cache.UserCache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UserCache</span></code></a>(namespace)</p></td>
+<td><p>A class to manage user cache items in namespaces.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id3">
+<h4>Variables<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.cache.cache.html#dasha.web.extensions.cache.cache" title="dasha.web.extensions.cache.cache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cache</span></code></a></p></td>
+<td><p>A proxy to the <a class="reference external" href="https://pythonhosted.org/Flask-Caching/index.html#flask_caching.Cache" title="(in Flask-Caching v1.0.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cache</span></code></a> instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.extensions.cache.user_cache.html#dasha.web.extensions.cache.user_cache" title="dasha.web.extensions.cache.user_cache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">user_cache</span></code></a>(opname, \*args, \*\*kwargs)</p></td>
+<td><p>A global <a class="reference internal" href="api/dasha.web.extensions.cache.UserCache.html#dasha.web.extensions.cache.UserCache" title="dasha.web.extensions.cache.UserCache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UserCache</span></code></a> instance.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id4">
+<h4>Class Inheritance Diagram<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="graphviz"><object data="_images/inheritance-458ab354d69b97557868f7bdee2359cb185d85c4.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of dasha.web.extensions.cache.UserCache</p></object></div>
+</div>
+</div>
+<div class="section" id="module-dasha.web.extensions.celery">
+<span id="dasha-web-extensions-celery-module"></span><h3>dasha.web.extensions.celery Module<a class="headerlink" href="#module-dasha.web.extensions.celery" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h4>Functions<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.celery.register_tasks.html#dasha.web.extensions.celery.register_tasks" title="dasha.web.extensions.celery.register_tasks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">register_tasks</span></code></a>(obj)</p></td>
+<td><p>Register celery tasks in the registry.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.extensions.celery.get_celery_tasks.html#dasha.web.extensions.celery.get_celery_tasks" title="dasha.web.extensions.celery.get_celery_tasks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_celery_tasks</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.celery.schedule_task.html#dasha.web.extensions.celery.schedule_task" title="dasha.web.extensions.celery.schedule_task"><code class="xref py py-obj docutils literal notranslate"><span class="pre">schedule_task</span></code></a>(task, \*\*kwargs)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id6">
+<h4>Variables<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.celery.celery_app.html#dasha.web.extensions.celery.celery_app" title="dasha.web.extensions.celery.celery_app"><code class="xref py py-obj docutils literal notranslate"><span class="pre">celery_app</span></code></a></p></td>
+<td><p>A proxy to the <a class="reference external" href="https://docs.celeryproject.org/en/stable/reference/celery.html#celery.Celery" title="(in Celery v4.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Celery</span></code></a> instance.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="module-dasha.web.extensions.dasha">
+<span id="dasha-web-extensions-dasha-module"></span><h3>dasha.web.extensions.dasha Module<a class="headerlink" href="#module-dasha.web.extensions.dasha" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id7">
+<h4>Functions<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.dasha.resolve_url.html#dasha.web.extensions.dasha.resolve_url" title="dasha.web.extensions.dasha.resolve_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_url</span></code></a>(path)</p></td>
+<td><p>Expands an internal URL to include prefix the app is mounted at.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.extensions.dasha.get_url_stem.html#dasha.web.extensions.dasha.get_url_stem" title="dasha.web.extensions.dasha.get_url_stem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_url_stem</span></code></a>(path)</p></td>
+<td><p>The inverse of <a class="reference internal" href="api/dasha.web.extensions.dasha.resolve_url.html#dasha.web.extensions.dasha.resolve_url" title="dasha.web.extensions.dasha.resolve_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_url</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id8">
+<h4>Classes<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.dasha.DashA.html#dasha.web.extensions.dasha.DashA" title="dasha.web.extensions.dasha.DashA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DashA</span></code></a>(config)</p></td>
+<td><p>This class sets up a Dash app to serve a <a class="reference internal" href="api/dasha.web.templates.Template.html#dasha.web.templates.Template" title="dasha.web.templates.Template"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Template</span></code></a> instance.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id9">
+<h4>Variables<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.dasha.dasha.html#dasha.web.extensions.dasha.dasha" title="dasha.web.extensions.dasha.dasha"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dasha</span></code></a></p></td>
+<td><p>A proxy to the <a class="reference internal" href="api/dasha.web.extensions.dasha.DashA.html#dasha.web.extensions.dasha.DashA" title="dasha.web.extensions.dasha.DashA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DashA</span></code></a> instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.extensions.dasha.dash_app.html#dasha.web.extensions.dasha.dash_app" title="dasha.web.extensions.dasha.dash_app"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dash_app</span></code></a></p></td>
+<td><p>A proxy to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Dash</span></code> instance.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id10">
+<h4>Class Inheritance Diagram<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<div class="graphviz"><object data="_images/inheritance-d8259547092ab2fb8742f6a682f9914fca1d69b0.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of dasha.web.extensions.dasha.DashA</p></object></div>
+</div>
+</div>
+<div class="section" id="module-dasha.web.extensions.db">
+<span id="dasha-web-extensions-db-module"></span><h3>dasha.web.extensions.db Module<a class="headerlink" href="#module-dasha.web.extensions.db" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id11">
+<h4>Functions<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.db.get_db_engine.html#dasha.web.extensions.db.get_db_engine" title="dasha.web.extensions.db.get_db_engine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_db_engine</span></code></a>(bind[, server])</p></td>
+<td><p>Return the database engine for <code class="xref py py-obj docutils literal notranslate"><span class="pre">bind</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.extensions.db.create_db_session.html#dasha.web.extensions.db.create_db_session" title="dasha.web.extensions.db.create_db_session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_db_session</span></code></a>(bind[, server])</p></td>
+<td><p>Return a database session for <code class="xref py py-obj docutils literal notranslate"><span class="pre">bind</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.db.dataframe_from_db.html#dasha.web.extensions.db.dataframe_from_db" title="dasha.web.extensions.db.dataframe_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataframe_from_db</span></code></a>(query[, bind, session])</p></td>
+<td><p>Return dataframe from database query.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id12">
+<h4>Variables<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.db.db.html#dasha.web.extensions.db.db" title="dasha.web.extensions.db.db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db</span></code></a></p></td>
+<td><p>A proxy to the <a class="reference external" href="https://flask-sqlalchemy.palletsprojects.com/en/2.x/api/#flask_sqlalchemy.SQLAlchemy" title="(in Flask-SQLAlchemy v2.x)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SQLAlchemy</span></code></a> instance.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="module-dasha.web.extensions.ipc">
+<span id="dasha-web-extensions-ipc-module"></span><h3>dasha.web.extensions.ipc Module<a class="headerlink" href="#module-dasha.web.extensions.ipc" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id13">
+<h4>Classes<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.ipc.IPC.html#dasha.web.extensions.ipc.IPC" title="dasha.web.extensions.ipc.IPC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPC</span></code></a></p></td>
+<td><p>A class that manages various interprocess communication resources.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id14">
+<h4>Variables<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.ipc.ipc.html#dasha.web.extensions.ipc.ipc" title="dasha.web.extensions.ipc.ipc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ipc</span></code></a></p></td>
+<td><p>A proxy to the <a class="reference internal" href="api/dasha.web.extensions.ipc.IPC.html#dasha.web.extensions.ipc.IPC" title="dasha.web.extensions.ipc.IPC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IPC</span></code></a> instance.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id15">
+<h4>Class Inheritance Diagram<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h4>
+<div class="graphviz"><object data="_images/inheritance-57943651513a511b83e67988d9a37b1c565b7706.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of dasha.web.extensions.ipc.IPC</p></object></div>
+</div>
+</div>
+<div class="section" id="module-dasha.web.extensions.ipc_backends.rejson">
+<span id="dasha-web-extensions-ipc-backends-rejson-module"></span><h3>dasha.web.extensions.ipc_backends.rejson Module<a class="headerlink" href="#module-dasha.web.extensions.ipc_backends.rejson" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h4>Classes<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.extensions.ipc_backends.rejson.JsonPath.html#dasha.web.extensions.ipc_backends.rejson.JsonPath" title="dasha.web.extensions.ipc_backends.rejson.JsonPath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JsonPath</span></code></a>([path])</p></td>
+<td><p>This extends <code class="xref py py-obj docutils literal notranslate"><span class="pre">Path</span></code> with various helpers.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.extensions.ipc_backends.rejson.RejsonIPC.html#dasha.web.extensions.ipc_backends.rejson.RejsonIPC" title="dasha.web.extensions.ipc_backends.rejson.RejsonIPC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RejsonIPC</span></code></a>(label)</p></td>
+<td><p>This class manages a JSON object in redis.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id17">
+<h4>Class Inheritance Diagram<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h4>
+<div class="graphviz"><object data="_images/inheritance-84099f0091b894d40ea3fb348033a94dc03641ce.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of dasha.web.extensions.ipc_backends.rejson.JsonPath, dasha.web.extensions.ipc_backends.rejson.RejsonIPC</p></object></div>
+</div>
+</div>
+<div class="section" id="module-dasha.web.templates">
+<span id="dasha-web-templates-package"></span><h3>dasha.web.templates Package<a class="headerlink" href="#module-dasha.web.templates" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id18">
+<h4>Classes<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.templates.IdTreeMeta.html#dasha.web.templates.IdTreeMeta" title="dasha.web.templates.IdTreeMeta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdTreeMeta</span></code></a>(name, bases, attrs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.templates.IdTree.html#dasha.web.templates.IdTree" title="dasha.web.templates.IdTree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IdTree</span></code></a>([parent])</p></td>
+<td><p>A mixin class that provides unique ids for class instances.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.templates.Template.html#dasha.web.templates.Template" title="dasha.web.templates.Template"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Template</span></code></a>([parent])</p></td>
+<td><p>An abstract class that defines an encapsulated entity around a functional group of dash components and the callbacks.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.templates.ComponentWrapper.html#dasha.web.templates.ComponentWrapper" title="dasha.web.templates.ComponentWrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComponentWrapper</span></code></a>(component[, parent])</p></td>
+<td><p>A class that wraps a Dash component instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.templates.ComponentTemplate.html#dasha.web.templates.ComponentTemplate" title="dasha.web.templates.ComponentTemplate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComponentTemplate</span></code></a>(*args, **kwargs)</p></td>
+<td><p>A class that wraps a Dash component type.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.templates.ComponentGroup.html#dasha.web.templates.ComponentGroup" title="dasha.web.templates.ComponentGroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComponentGroup</span></code></a>(**kwargs)</p></td>
+<td><p>This is a base class for managing a set of components as one unit.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id19">
+<h4>Class Inheritance Diagram<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h4>
+<div class="graphviz"><object data="_images/inheritance-8416135ca5c0f164ee1127a2a594d6da5a9acdf6.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of dasha.web.templates.IdTreeMeta, dasha.web.templates.IdTree, dasha.web.templates.Template, dasha.web.templates.ComponentWrapper, dasha.web.templates.ComponentTemplate, dasha.web.templates.ComponentGroup</p></object></div>
+</div>
+</div>
+<div class="section" id="module-dasha.web.templates.utils">
+<span id="dasha-web-templates-utils-module"></span><h3>dasha.web.templates.utils Module<a class="headerlink" href="#module-dasha.web.templates.utils" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id20">
+<h4>Functions<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h4>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.templates.utils.fa.html#dasha.web.templates.utils.fa" title="dasha.web.templates.utils.fa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fa</span></code></a>(className, \*\*kwargs)</p></td>
+<td><p>Return a font-awesome icon.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.templates.utils.to_dependency.html#dasha.web.templates.utils.to_dependency" title="dasha.web.templates.utils.to_dependency"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dependency</span></code></a>(type_, dep)</p></td>
+<td><p>Convert a dependency object to another <code class="xref py py-obj docutils literal notranslate"><span class="pre">type_</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="section" id="index">
+<h2>Index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
 </div>
 </div>
@@ -88,7 +463,70 @@ reusable pages.</p>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
 <ul>
-<li><a class="reference internal" href="#">Documentation</a></li>
+<li><a class="reference internal" href="#">DashA Documentation</a><ul>
+<li><a class="reference internal" href="#reference-api">Reference/API</a><ul>
+<li><a class="reference internal" href="#module-dasha.core">dasha.core Module</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.cli">dasha.cli Module</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.web">dasha.web Package</a><ul>
+<li><a class="reference internal" href="#id1">Functions</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.web.extensions.cache">dasha.web.extensions.cache Module</a><ul>
+<li><a class="reference internal" href="#id2">Classes</a></li>
+<li><a class="reference internal" href="#id3">Variables</a></li>
+<li><a class="reference internal" href="#id4">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.web.extensions.celery">dasha.web.extensions.celery Module</a><ul>
+<li><a class="reference internal" href="#id5">Functions</a></li>
+<li><a class="reference internal" href="#id6">Variables</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.web.extensions.dasha">dasha.web.extensions.dasha Module</a><ul>
+<li><a class="reference internal" href="#id7">Functions</a></li>
+<li><a class="reference internal" href="#id8">Classes</a></li>
+<li><a class="reference internal" href="#id9">Variables</a></li>
+<li><a class="reference internal" href="#id10">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.web.extensions.db">dasha.web.extensions.db Module</a><ul>
+<li><a class="reference internal" href="#id11">Functions</a></li>
+<li><a class="reference internal" href="#id12">Variables</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.web.extensions.ipc">dasha.web.extensions.ipc Module</a><ul>
+<li><a class="reference internal" href="#id13">Classes</a></li>
+<li><a class="reference internal" href="#id14">Variables</a></li>
+<li><a class="reference internal" href="#id15">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.web.extensions.ipc_backends.rejson">dasha.web.extensions.ipc_backends.rejson Module</a><ul>
+<li><a class="reference internal" href="#id16">Classes</a></li>
+<li><a class="reference internal" href="#id17">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.web.templates">dasha.web.templates Package</a><ul>
+<li><a class="reference internal" href="#id18">Classes</a></li>
+<li><a class="reference internal" href="#id19">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dasha.web.templates.utils">dasha.web.templates.utils Module</a><ul>
+<li><a class="reference internal" href="#id20">Functions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#index">Index</a></li>
+</ul>
+</li>
 </ul>
 
 
@@ -103,8 +541,8 @@ reusable pages.</p>
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
-    Last built 02 Mar 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
   </p>
 </footer>
   </body>

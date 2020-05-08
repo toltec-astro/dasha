@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Site &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="load_env_helper" href="dasha.cli.load_env_helper.html" />
+    <link rel="prev" title="Stack" href="dasha.core.Stack.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="dasha.cli.load_env_helper.html" title="load_env_helper">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="dasha.core.Stack.html" title="Stack">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	 &#187;
+      </li>
+      
+      <li>Site</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="site">
+<h1>Site<a class="headerlink" href="#site" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="dasha.core.Site">
+<em class="property">class </em><code class="sig-prename descclassname">dasha.core.</code><code class="sig-name descname">Site</code><a class="reference internal" href="../_modules/dasha/core.html#Site"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.core.Site" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tollan.utils.namespace.Namespace</span></code></p>
+<p>This class manages the context of a DashA site, composed of a server and
+a set of extensions.</p>
+<p>It shall be constructed via the <code class="docutils literal notranslate"><span class="pre">from_*</span></code> class methods. Two objects
+are expected:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>“server”. This shall be a function that returns the server instance.</dt><dd><p>This function optionally may take the site instance as the only
+argument.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>“extensions”. The shall be a list of items that an</dt><dd><p><a class="reference internal" href="dasha.core.Extension.html#dasha.core.Extension" title="dasha.core.Extension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Extension</span></code></a> object could be created from.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.core.Site.logger" title="dasha.core.Site.logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">logger</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.core.Site.from_any" title="dasha.core.Site.from_any"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_any</span></code></a>(arg)</p></td>
+<td><p>Create a site from <code class="xref py py-obj docutils literal notranslate"><span class="pre">arg</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.core.Site.from_dict" title="dasha.core.Site.from_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dict</span></code></a>(d, \*\*kwargs)</p></td>
+<td><p>Construct a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Namespace</span></code> instance from dict.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.core.Site.from_filepath" title="dasha.core.Site.from_filepath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_filepath</span></code></a>(filepath)</p></td>
+<td><p>Create a site from a python source file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.core.Site.from_object" title="dasha.core.Site.from_object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_object</span></code></a>(arg)</p></td>
+<td><p>Create a site from an object that contains the site configurations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.core.Site.init_app" title="dasha.core.Site.init_app"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_app</span></code></a>(self)</p></td>
+<td><p>Initialize server and the extensions.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt id="dasha.core.Site.logger">
+<code class="sig-name descname">logger</code><em class="property"> = &lt;Logger Site (INFO)&gt;</em><a class="headerlink" href="#dasha.core.Site.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="dasha.core.Site.from_any">
+<em class="property">classmethod </em><code class="sig-name descname">from_any</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/core.html#Site.from_any"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.core.Site.from_any" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a site from <code class="xref py py-obj docutils literal notranslate"><span class="pre">arg</span></code>.</p>
+<p>It checks the value of <code class="xref py py-obj docutils literal notranslate"><span class="pre">arg</span></code> and dispatches to the most probable
+<code class="docutils literal notranslate"><span class="pre">from_*</span></code> factory method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dasha.core.Site.from_dict">
+<em class="property">classmethod </em><code class="sig-name descname">from_dict</code><span class="sig-paren">(</span><em class="sig-param">d</em>, <em class="sig-param">\*\*kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/core.html#Site.from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.core.Site.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Namespace</span></code> instance from dict.</p>
+<p>This is different from <code class="xref py py-obj docutils literal notranslate"><span class="pre">object_from_dict</span></code> in
+that it uses the class attributes as the defaults, thus could behave
+differently if called from subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The class attribute settings may be overriden by the content of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">d</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">kwargs</span></code>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>*args</strong></dt><dd><p>A list of dicts.</p>
+</dd>
+<dt><strong>**kwargs</strong></dt><dd><p>Additional keyword arguments that get updated to the dict.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dasha.core.Site.from_filepath">
+<em class="property">classmethod </em><code class="sig-name descname">from_filepath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filepath</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/core.html#Site.from_filepath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.core.Site.from_filepath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a site from a python source file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filepath</strong><span class="classifier">str or <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Path</span></code></a></span></dt><dd><p>The path of the python source file to use.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="#dasha.core.Site" title="dasha.core.Site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Site</span></code></a></dt><dd><p>A <a class="reference internal" href="#dasha.core.Site" title="dasha.core.Site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Site</span></code></a> instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dasha.core.Site.from_object">
+<em class="property">classmethod </em><code class="sig-name descname">from_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arg</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/core.html#Site.from_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.core.Site.from_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a site from an object that contains the site configurations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>arg</strong><span class="classifier">object or str</span></dt><dd><p>The object to use. If str, <code class="xref py py-obj docutils literal notranslate"><span class="pre">getobj</span></code> is used to
+import the object.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="#dasha.core.Site" title="dasha.core.Site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Site</span></code></a></dt><dd><p>A <a class="reference internal" href="#dasha.core.Site" title="dasha.core.Site"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Site</span></code></a> instance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dasha.core.Site.init_app">
+<code class="sig-name descname">init_app</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/core.html#Site.init_app"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.core.Site.init_app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize server and the extensions.</p>
+<p>This will instantiates the extensions and call the <code class="docutils literal notranslate"><span class="pre">init_app</span></code>
+methods of them.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">server</span></code> will be replaced with the actual server
+instance after this call.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">Site</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/dasha.core.Site.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>

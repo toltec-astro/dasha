@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>ComponentTemplate &#8212; dasha v0.1.dev22+g6c4ee58.d20200302</title>
+    <title>ComponentTemplate &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -19,8 +19,8 @@
     <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ComponentWrapper" href="dasha.web.templates.ComponentWrapper.html" />
-    <link rel="prev" title="ComponentGroup" href="dasha.web.templates.ComponentGroup.html" />
+    <link rel="next" title="ComponentGroup" href="dasha.web.templates.ComponentGroup.html" />
+    <link rel="prev" title="ComponentWrapper" href="dasha.web.templates.ComponentWrapper.html" />
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
 
   </head><body>
@@ -48,21 +48,20 @@
     <h3>Navigation</h3>
     <ul>
       <li class="right">
-	<a href="dasha.web.templates.ComponentWrapper.html" title="ComponentWrapper">
+	<a href="dasha.web.templates.ComponentGroup.html" title="ComponentGroup">
 	  next &raquo;
 	</a>
       </li>
       <li class="right">
-	<a href="dasha.web.templates.ComponentGroup.html" title="ComponentGroup">
+	<a href="dasha.web.templates.ComponentWrapper.html" title="ComponentWrapper">
 	  &laquo; previous
 	</a>
 	 |
       </li>
       <li>
-	<a href="../index.html">dasha v0.1.dev22+g6c4ee58.d20200302</a>
+	<a href="../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
 	 &#187;
       </li>
-      <li><a href="../dasha/index.html" accesskey="U">DashA Documentation</a> &#187;</li>
       
       <li>ComponentTemplate</li> 
     </ul>
@@ -76,17 +75,24 @@
             
   <div class="section" id="componenttemplate">
 <h1>ComponentTemplate<a class="headerlink" href="#componenttemplate" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="dasha.web.templates.ComponentTemplate">
-<em class="property">class </em><code class="sig-prename descclassname">dasha.web.templates.</code><code class="sig-name descname">ComponentTemplate</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentTemplate" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">dasha.web.templates.</code><code class="sig-name descname">ComponentTemplate</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentTemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="dasha.web.templates.Template.html#dasha.web.templates.Template" title="dasha.web.templates.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">dasha.web.templates.Template</span></code></a></p>
-<p>A base class that wraps a Dash component type.</p>
+<p>A class that wraps a Dash component type.</p>
 <p>Instances of this class is typically created from calling the
-<code class="docutils literal notranslate"><span class="pre">make_component</span></code> class method of the <a class="reference internal" href="dasha.web.templates.Template.html#dasha.web.templates.Template" title="dasha.web.templates.Template"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Template</span></code></a> class, allowing
-one to declare as tree of components with automatic unique ids. The
-actual Dash components are only be created at the moment the <a class="reference internal" href="#dasha.web.templates.ComponentTemplate.layout" title="dasha.web.templates.ComponentTemplate.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a>
-attribute is accessed. This makes the same template object re-usable
-in multiple parts of a single page application.</p>
+<a class="reference internal" href="dasha.web.templates.Template.html#dasha.web.templates.Template.child" title="dasha.web.templates.Template.child"><code class="xref py py-meth docutils literal notranslate"><span class="pre">child()</span></code></a> method, which allows declaring
+a tree of components with automatic unique ids.</p>
+<p>Instances of this class serves as a lazy evaluation proxy around a native
+Dash components. Dash component properties on the template instance are
+passed to the actual component constructor when the <a class="reference internal" href="#dasha.web.templates.ComponentTemplate.layout" title="dasha.web.templates.ComponentTemplate.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a> property is
+queried.</p>
+<p>This allows one to define a set of interrelated components as a “template”
+and use multiple instances of it in a single page application, without the
+need to worrying about possible confliction in the ids.</p>
+<p>Furthermore, the easy-to-create tree structure through (chaining of)
+<a class="reference internal" href="dasha.web.templates.Template.html#dasha.web.templates.Template.child" title="dasha.web.templates.Template.child"><code class="xref py py-meth docutils literal notranslate"><span class="pre">child()</span></code></a> allows arbitrarily complex
+layouts to be created in a relatively compact syntax.</p>
 <p class="rubric">Attributes Summary</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -98,10 +104,10 @@ in multiple parts of a single page application.</p>
 <td><p>All child nodes.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentTemplate.id" title="dasha.web.templates.ComponentTemplate.id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The unique id.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentTemplate.layout" title="dasha.web.templates.ComponentTemplate.layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">layout</span></code></a></p></td>
-<td><p>Implement this to return a valid Dash layout object.</p></td>
+<td><p>The layout generated from traversing the component tree.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.templates.ComponentTemplate.parent" title="dasha.web.templates.ComponentTemplate.parent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent</span></code></a></p></td>
 <td><p>Parent Node.</p></td>
@@ -121,7 +127,7 @@ in multiple parts of a single page application.</p>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="dasha.web.templates.ComponentTemplate.children">
 <code class="sig-name descname">children</code><a class="headerlink" href="#dasha.web.templates.ComponentTemplate.children" title="Permalink to this definition">¶</a></dt>
 <dd><p>All child nodes.</p>
@@ -169,18 +175,25 @@ In case of an existing reference, the node <code class="xref py py-obj docutils 
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="dasha.web.templates.ComponentTemplate.id">
 <code class="sig-name descname">id</code><a class="headerlink" href="#dasha.web.templates.ComponentTemplate.id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="dasha.web.templates.ComponentTemplate.layout">
-<code class="sig-name descname">layout</code><a class="headerlink" href="#dasha.web.templates.ComponentTemplate.layout" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement this to return a valid Dash layout object.</p>
+<dd><p>The unique id.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
+<dt id="dasha.web.templates.ComponentTemplate.layout">
+<code class="sig-name descname">layout</code><a class="headerlink" href="#dasha.web.templates.ComponentTemplate.layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>The layout generated from traversing the component tree.</p>
+<p>The traversing is depth first.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Properties with callable values are evaluated the time the property
+is queried.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="dasha.web.templates.ComponentTemplate.parent">
 <code class="sig-name descname">parent</code><a class="headerlink" href="#dasha.web.templates.ComponentTemplate.parent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parent Node.</p>
@@ -217,9 +230,9 @@ to the new node.</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="method">
+<dl class="py method">
 <dt id="dasha.web.templates.ComponentTemplate.setup_layout">
-<code class="sig-name descname">setup_layout</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">app</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentTemplate.setup_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentTemplate.setup_layout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setup_layout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">app</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/templates.html#ComponentTemplate.setup_layout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.templates.ComponentTemplate.setup_layout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implement this to declare layout components and their callbacks.</p>
 </dd></dl>
 
@@ -249,8 +262,8 @@ to the new node.</p>
     <a href="#">Back to Top</a></p>
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
-    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 2.4.3. &nbsp;
-    Last built 02 Mar 2020. <br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
   </p>
 </footer>
   </body>

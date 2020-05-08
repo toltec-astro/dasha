@@ -1,0 +1,6 @@
+register_tasks
+==============
+
+.. currentmodule:: dasha.web.extensions.celery
+
+.. autofunction:: register_tasks

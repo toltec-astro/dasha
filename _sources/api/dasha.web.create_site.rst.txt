@@ -1,0 +1,6 @@
+create_site
+===========
+
+.. currentmodule:: dasha.web
+
+.. autofunction:: create_site

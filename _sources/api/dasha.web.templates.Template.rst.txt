@@ -20,7 +20,7 @@ Template
       ~Template.before_setup_layout
       ~Template.child
       ~Template.clear_registry
-      ~Template.from_spec
+      ~Template.from_dict
       ~Template.setup_layout
 
    .. rubric:: Attributes Documentation
@@ -33,5 +33,5 @@ Template
    .. automethod:: before_setup_layout
    .. automethod:: child
    .. automethod:: clear_registry
-   .. automethod:: from_spec
+   .. automethod:: from_dict
    .. automethod:: setup_layout

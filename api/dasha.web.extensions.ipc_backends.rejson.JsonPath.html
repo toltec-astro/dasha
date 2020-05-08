@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>JsonPath &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="shortcut icon" href="../_static/astropy_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RejsonIPC" href="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.html" />
+    <link rel="prev" title="ipc" href="dasha.web.extensions.ipc.ipc.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">DashA</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.html" title="RejsonIPC">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="dasha.web.extensions.ipc.ipc.html" title="ipc">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	 &#187;
+      </li>
+      
+      <li>JsonPath</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="jsonpath">
+<h1>JsonPath<a class="headerlink" href="#jsonpath" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath">
+<em class="property">class </em><code class="sig-prename descclassname">dasha.web.extensions.ipc_backends.rejson.</code><code class="sig-name descname">JsonPath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#JsonPath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rejson.path.Path</span></code></p>
+<p>This extends <code class="xref py py-obj docutils literal notranslate"><span class="pre">Path</span></code> with various helpers.</p>
+<p>Make a new path based on the string representation in <code class="xref py py-obj docutils literal notranslate"><span class="pre">path</span></code></p>
+<p class="rubric">Attributes Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.name" title="dasha.web.extensions.ipc_backends.rejson.JsonPath.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.parent" title="dasha.web.extensions.ipc_backends.rejson.JsonPath.parent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.root" title="dasha.web.extensions.ipc_backends.rejson.JsonPath.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.sep" title="dasha.web.extensions.ipc_backends.rejson.JsonPath.sep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sep</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.is_absolute" title="dasha.web.extensions.ipc_backends.rejson.JsonPath.is_absolute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_absolute</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.is_empty" title="dasha.web.extensions.ipc_backends.rejson.JsonPath.is_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_empty</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.is_root" title="dasha.web.extensions.ipc_backends.rejson.JsonPath.is_root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_root</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.joinpath" title="dasha.web.extensions.ipc_backends.rejson.JsonPath.joinpath"><code class="xref py py-obj docutils literal notranslate"><span class="pre">joinpath</span></code></a>(self, other)</p></td>
+<td><p>Join this path with <code class="xref py py-obj docutils literal notranslate"><span class="pre">other</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.relative_to" title="dasha.web.extensions.ipc_backends.rejson.JsonPath.relative_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relative_to</span></code></a>(self, other)</p></td>
+<td><p>Compute a version of this path relative to <code class="xref py py-obj docutils literal notranslate"><span class="pre">other</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath.name">
+<code class="sig-name descname">name</code><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath.parent">
+<code class="sig-name descname">parent</code><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath.root">
+<code class="sig-name descname">root</code><em class="property"> = '.'</em><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.root" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath.sep">
+<code class="sig-name descname">sep</code><em class="property"> = '.'</em><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.sep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath.is_absolute">
+<code class="sig-name descname">is_absolute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#JsonPath.is_absolute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.is_absolute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath.is_empty">
+<code class="sig-name descname">is_empty</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#JsonPath.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath.is_root">
+<code class="sig-name descname">is_root</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#JsonPath.is_root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.is_root" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath.joinpath">
+<code class="sig-name descname">joinpath</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#JsonPath.joinpath"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.joinpath" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join this path with <code class="xref py py-obj docutils literal notranslate"><span class="pre">other</span></code>.</p>
+<p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a> is raised if <code class="xref py py-obj docutils literal notranslate"><span class="pre">other</span></code> is absolute.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="dasha.web.extensions.ipc_backends.rejson.JsonPath.relative_to">
+<code class="sig-name descname">relative_to</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#JsonPath.relative_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.JsonPath.relative_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a version of this path relative to <code class="xref py py-obj docutils literal notranslate"><span class="pre">other</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Page Contents</h3>
+<ul>
+<li><a class="reference internal" href="#">JsonPath</a></li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/api/dasha.web.extensions.ipc_backends.rejson.JsonPath.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Zhiyuan Ma.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
+    Last built 08 May 2020. <br/>
+  </p>
+</footer>
+  </body>
+</html>
