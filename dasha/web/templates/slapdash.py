@@ -11,17 +11,31 @@ from dash.exceptions import PreventUpdate
 from tollan.utils import ensure_prefix
 from tollan.utils.log import get_logger
 from tollan.utils.registry import Registry
-from .utils import fa, resolve_url
+from .utils import fa
+from ..extensions.dasha import resolve_url
 from .sysinfo import SysInfo
-
-
 from dash.dependencies import Input, State, Output, ClientsideFunction
+from schema import Schema, Optional
 
 
-class SlapDashPageWrapper(ComponentTemplate):
+__all__ = ['SlapDash', ]
+
+
+class _SlapDashPageWrapper(ComponentTemplate):
     """This is a wrapper around any actual page template."""
 
     _component_cls = html.Div
+    # this is only used for validate pages in SlapDash
+    # this class should not be created using from_dict
+    _component_schema = Schema({
+        Optional('route_name'): str,
+        Optional('title_text'): str,
+        Optional('title_icon'): str,
+        })
+
+    @classmethod
+    def from_dict():
+        return NotImplemented
 
     def __init__(self, template, **kwargs):
         self._component_cls = template._component_cls
@@ -34,12 +48,17 @@ class SlapDashPageWrapper(ComponentTemplate):
                 self._template, 'route_name',
                 self._template.idbase), '/'))
 
+    @property
+    def _title_text(self):
+        return getattr(self._template, 'title_text', self._route_name)
+
+    @property
+    def _title_icon(self):
+        return getattr(self._template, 'title_icon', 'fas fa-ellipsis-v')
+
     def _make_navlink(self, container):
         """This is the used as the navlist child"""
-        title = []
-        if hasattr(self._template, 'title_icon'):
-            title.append(fa(self._template.title_icon))
-        title.append(self._template.title_text)
+        title = [fa(self._title_icon), self._title_text]
         return container.child(
                 dbc.NavLink,
                 children=title,
@@ -74,6 +93,11 @@ class SlapDashPageWrapper(ComponentTemplate):
 class SlapDash(ComponentTemplate):
 
     _component_cls = dbc.Container
+    _component_schema = Schema({
+        'title_text': str,
+        Optional('title_icon', default='far fa-chart-bar'): str,
+        'pages': [_SlapDashPageWrapper._namespace_from_dict_schema, ]
+        })
     fluid = True
     className = 'px-0'
     id = 'slapdash'
@@ -86,13 +110,11 @@ class SlapDash(ComponentTemplate):
         self._pages = pages
         self._page_registry = Registry.create()
 
-    @property
-    def title_text(self):
-        return self.TITLE
-
     def _make_title(self, container, component_cls, **kwargs):
         return container.child(component_cls, children=[
-                fa("far fa-chart-bar"),
+                fa(self.title_icon, style={
+                    'padding': '0.5rem 0rem'
+                    }),
                 self.title_text
             ], **kwargs)
 
@@ -102,8 +124,8 @@ class SlapDash(ComponentTemplate):
         #     container.child(html.Span(elem))
         container.child(SysInfo())
 
-    def _make_page(self, spec):
-        page = SlapDashPageWrapper(template=Template.from_spec(spec))
+    def _make_page(self, d):
+        page = _SlapDashPageWrapper(template=Template.from_dict(d))
         self._page_registry.register(page._route_name, page)
         return page
 
@@ -230,3 +252,7 @@ class SlapDash(ComponentTemplate):
     @property
     def layout(self):
         return super().layout
+
+
+# this set the default template cls returned by the module resolver
+_resolve_template_cls = SlapDash

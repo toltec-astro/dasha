@@ -3,42 +3,70 @@
 """This module defines DashA web server globals."""
 
 import os
-from tollan.utils.log import get_logger, timeit, logit, init_log
-from tollan.utils.fmt import pformat_dict
+from tollan.utils.log import get_logger, timeit, init_log
+from tollan.utils.fmt import pformat_yaml
 from tollan.utils.env import env_registry
-from .. import SiteRuntime
+from wrapt import ObjectProxy
+from .. import Site
 
 
-__all__ = ['site', 'create_app']
+__all__ = ['site', 'create_site', 'create_app']
 
 
 # enable logging for the start up if flask development is set
-if os.environ.get('FLASK_ENV', 'development'):
+if os.environ.get('FLASK_ENV', None) == 'development':
     init_log(level='DEBUG')
-
-env_registry.register(
-        'DASHA_SITE',
-        'The import or file path of the site module.',
-        'dasha.default_site')
-env_registry.register('DASHA_LOGFILE', 'The file for logging.', None)
-env_registry.register('DASHA_LOGLEVEL', 'The DashA log level.', 'INFO')
+else:
+    init_log(level='INFO')
 
 
-site = SiteRuntime.from_path(env_registry.get('DASHA_SITE'))
-"""The site runtime instance."""
+site = ObjectProxy(None)
+"""
+A proxy to the `~dasha.core.Site` instance, which is made available after
+`~dasha.web.create_site` is called.
+"""
+
+
+@timeit
+def create_site():
+    """DashA entry point.
+
+    Call this function to make available the `~dasha.web.site` context.
+
+    Returns
+    -------
+    `~dasha.Site`
+        The site instance.
+
+    """
+    logger = get_logger()
+
+    env_registry.clear()
+    env_registry.register(
+            'DASHA_SITE', 'The site module or path.',
+            'dasha.examples.dasha_intro')
+    env_registry.register('DASHA_LOGFILE', 'The file for logging.', None)
+    env_registry.register('DASHA_LOGLEVEL', 'The DashA log level.', 'INFO')
+    logger.debug(f"registered env vars:\n{pformat_yaml(env_registry)}")
+
+    site.__wrapped__ = Site.from_any(env_registry.get('DASHA_SITE'))
+    return site
 
 
 @timeit
 def create_app():
-    logger = get_logger()
-    logger.debug(f"registered env vars:{pformat_dict(env_registry)}")
+    """Flask entry point.
 
-    server = site.get_server()
-    for ext in site.get_extentions():
-        with logit(logger.debug, f"init app extension {ext.__name__}"):
-            ext.init_app(server)
+    """
+    logger = get_logger()
+
+    site = create_site()
+
+    logger.info(f"init dasha site:\n{pformat_yaml(site.to_dict())}")
+    server = site.init_app()
     # reconfigure the logger
     logfile = env_registry.get('DASHA_LOGFILE')
     loglevel = env_registry.get('DASHA_LOGLEVEL')
+    logger.debug(f"reset logger: loglevel={loglevel} logfile={logfile}")
     init_log(level=loglevel, file_=logfile)
     return server

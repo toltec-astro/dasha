@@ -10,7 +10,7 @@ extensions = [
         'module': 'dasha.web.extensions.dasha',
         'config': {
             'template': 'dasha.web.templates.slapdash',
-            'TITLE': 'MySite',
+            'title_text': 'MySite',
             'pages': [
                 {
                     'template': 'dasha.examples.nat',

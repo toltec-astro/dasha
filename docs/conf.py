@@ -55,6 +55,21 @@ highlight_language = 'python3'
 # major.minor, call `check_sphinx_version("x.y.z")` here.
 # check_sphinx_version("1.2.1")
 
+intersphinx_mapping['pandas'] = (
+        'https://pandas.pydata.org/pandas-docs/stable/', None)
+intersphinx_mapping['anytree'] = (
+        'https://anytree.readthedocs.io/en/latest/', None)
+intersphinx_mapping['sqlalchemy'] = (
+        'https://docs.sqlalchemy.org/en/13/', None)
+intersphinx_mapping['flask_sqlalchemy'] = (
+        'https://flask-sqlalchemy.palletsprojects.com/en/2.x/', None)
+intersphinx_mapping['celery'] = (
+        'https://docs.celeryproject.org/en/stable/', None)
+intersphinx_mapping['flask_caching'] = (
+        'https://pythonhosted.org/Flask-Caching/', None)
+intersphinx_mapping['tollan'] = (
+        'https://toltec-astro.github.io/tollan/', None)
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns.append('_templates')

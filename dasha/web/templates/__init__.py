@@ -1,8 +1,8 @@
 #! /usr/bin/env python
-import importlib
 from abc import abstractmethod
 from tollan.utils.registry import Registry
 from tollan.utils.log import get_logger
+from tollan.utils import getobj, rupdate
 import inspect
 
 from anytree import NodeMixin
@@ -12,12 +12,14 @@ import weakref
 from dash.development.base_component import Component as DashComponentBase
 from dash.development.base_component import ComponentMeta as DashComponentMeta
 from dash.dependencies import Input, State, Output
+from tollan.utils.namespace import NamespaceMixin
+from schema import Schema, Optional, And
 
 
 __all__ = [
-        'IdTreeMeta', 'IdTreeABCMeta', 'IdTree', 'Template',
-        'load_template_cls', 'ComponentWrapper', 'ComponentTemplate',
-        'load_component_template', 'ComponentGroup', ]
+        'IdTreeMeta', 'IdTree', 'Template',
+        'ComponentWrapper', 'ComponentTemplate',
+        'ComponentGroup', ]
 
 
 class IdTreeMeta(type):
@@ -45,17 +47,17 @@ class IdTreeMeta(type):
             h += 1
 
 
-class IdTreeABCMeta(IdTreeMeta, ABCMeta):
+class _IdTreeABCMeta(IdTreeMeta, ABCMeta):
     pass
 
 
-class IdTree(NodeMixin, metaclass=IdTreeABCMeta):
+class IdTree(NodeMixin, metaclass=_IdTreeABCMeta):
     """A mixin class that provides unique ids for class instances.
 
     A hierarchy of ids are managed in a tree-like data structure,
-    enabled by the underlying `NodeMixin` class. The id of each
-    tree node is a compositions of the parent's id and the label of
-    this node.
+    enabled by the underlying `~anytree.node.nodemixin.NodeMixin` class.
+    The id of each tree node is a compositions of the parent's id and
+    the label of this node.
     """
 
     def __init__(self, parent=None):
@@ -71,35 +73,51 @@ class IdTree(NodeMixin, metaclass=IdTreeABCMeta):
 
     @property
     def id(self):
+        """The unique id."""
         if self.parent is None or self.parent.id is None:
             return self.idbase
         sep = '-'
         return f"{self.parent.id}{sep}{self.idbase}"
 
 
-class Template(IdTree):
+class Template(IdTree, NamespaceMixin):
     """An abstract class that defines an encapsulated entity
     around a functional group of dash components and the
     callbacks.
 
-    One can do arbitrary nesting of the template through the `child`
-    factory function, which setup the created instance as the child.
-
-    The template instance serve as a lazy evaluation proxy around the wrapped
-    Dash components. Modification to relevant Dash component properties
-    are registered as kwargs that will pass to the actual component
-    constructor when the `layout` property is queried.
+    One can do arbitrary nesting of templates through the `child`
+    factory function, which returns a child template instance.
     """
 
     _template_registry = Registry.create()
     """This keeps a record of imported subclasses of this class."""
 
-    _skip_template_register = False
-    """If set to True, this class is skipped from registering
-    to the template registry."""
+    _template_is_final = NotImplemented
+    """If set to True, this class is considered "concrete" and is
+    registered in the `_template_registry`.
+    """
+
+    _namespace_type_key = 'template'
+
+    @classmethod
+    def _namespace_from_dict_op(cls, d):
+        # we resolve the namespace template here so that we can allow
+        # one use only the module path to specify a template class.
+        if cls._namespace_type_key not in d:
+            raise ValueError(
+                    f'unable to load template: '
+                    f'missing required key "{cls._namespace_type_key}"')
+        template_cls = cls._resolve_template_cls(d[cls._namespace_type_key])
+        return dict(d, **{cls._namespace_type_key: template_cls})
+
+    @classmethod
+    def _namespace_check_type(cls, ns_type):
+        # this allows from_dict return subclass instances.
+        return issubclass(ns_type, cls)
 
     def __init_subclass__(cls):
-        if not cls._skip_template_register:
+        # register if cls is marked as final
+        if cls._template_is_final:
             cls._template_registry.register(
                     cls._make_registry_key(cls), cls)
 
@@ -139,44 +157,54 @@ class Template(IdTree):
             child.setup_layout(app)
         self.after_setup_layout(app)
 
-    @staticmethod
-    def from_spec(spec, **kwargs):
-        """Return a instance of some template from `spec`.
+    @classmethod
+    def from_dict(cls, d, **kwargs):
+        """Return a template instance specified by dict `d`.
 
-        `spec` can either be a instance of Template, or a dict
-        with `template` entry.
+        `ValueError` is raised if "template" is not in `d`.
         """
-        if isinstance(spec, Template):
-            return spec
-        template_cls = load_template_cls(spec['template'])
-        for k, v in spec.items():
-            kwargs.setdefault(k, v)
-        return template_cls(**kwargs)
+        return super().from_dict(d, **kwargs)
 
     def child(self, factory, *args, **kwargs):
-        """Return a child template object from `factory`.
+        """Return a child template object.`.
 
         The actual creation of the object is delegated to the appropriate
-        subclass based on the factory type.
-        """
+        subclass based on the type of `factory`:
 
-        if isinstance(factory, Template):
+        1. `factory` is a `~dasha.web.templates.Template` instance. The
+        instance is added as-is as the child of this object. `ValueError`
+        is raised if `args` or `kwargs` are set.
+
+        2. `factory` is a Dash component class, (e.g.,
+        `~dash_html_components.Div`). A
+        `~dasha.web.templates.ComponentTemplate` object is created and
+        returned. `args` and `kwargs` are passed to the constructor.
+
+        3. `factory` is a Dash component instance. The instance is wrapped in a
+        `~dasha.web.templates.ComponentWrapper` object and returned.
+        `ValueError` is raised if `args` or `kwargs` are set.
+
+        `ValueError` is raised if `factory` does not conform to the cases
+        listed above.
+
+        """
+        def ensure_no_extra_args():
             if args or kwargs:
                 raise ValueError(
                     f"child args and kwargs shall not"
                     f" be specified for {type(factory)}")
+
+        if isinstance(factory, Template):
+            ensure_no_extra_args()
             factory.parent = self
             return factory
 
         if isinstance(factory, DashComponentMeta):
             # dash component cls
-            template_cls = load_component_template(factory)
+            template_cls = _make_component_template_cls(factory)
         elif isinstance(factory, DashComponentBase):
             # dash component instance
-            if args or kwargs:
-                raise ValueError(
-                        f"child args and kwargs shall not be specified"
-                        f" for {type(factory)}")
+            ensure_no_extra_args()
             args = (factory, )
             template_cls = ComponentWrapper
         else:
@@ -185,54 +213,87 @@ class Template(IdTree):
                     f" from type {type(factory)}")
         return template_cls(*args, **kwargs, parent=self)
 
+    @staticmethod
+    def _resolve_template_cls(arg):
+        """Return a template class specified by `arg`.
 
-def load_template_cls(spec):
-    """Return the template class specified as `spec`.
+        First, `arg` is resolved to an object using `tollan.utils.getobj`,
+        then it is checked against the following cases:
 
-    The full format of `spec` is `module:class`, where
-    ``:class`` can be omitted, in which case the class
-    loaded is the last
-    attribute in `module` that is a subclass of `Template`.
+        1. `~dasha.web.templates.Template`. `arg` is returned if it
+        is a final template class.
+
+        2. `~types.ModuleType`. The last module attribute that is a
+        `~dasha.web.templates.Template` and is marked final is returned.
+        In particular, if attribute ``_resolve_template_cls`` is
+        present in the module, the value is used.
+
+        3. `ValueError` is raised if none of the above.
+
+        """
+        logger = get_logger()
+
+        _arg = arg  # for logging
+        if isinstance(arg, str):
+            arg = getobj(arg)
+        # check if _resolve_template_cls attribute is present
+        if inspect.ismodule(arg) and hasattr(arg, "_resolve_template_cls"):
+            arg = getattr(arg, '_resolve_template_cls')
+
+        if _is_final_template_cls(arg):
+            template_cls = arg
+        elif inspect.ismodule(arg):
+            template_cls_members = list(filter(
+                        # this is to get member attributes that
+                        # are defined in this module, and is a valid
+                        # template class.
+                        lambda m: (
+                            _is_final_template_cls(m[1]) and
+                            m[1].__module__ == arg.__name__),
+                        inspect.getmembers(arg)
+                        ))
+            if not template_cls_members:
+                raise ValueError(
+                        f"no valid final template class found in {arg}")
+            # sort and return the last
+            # issue a warning if multiple template class are found
+            # but the actual class name is omitted
+            template_cls = sorted(
+                    template_cls_members,
+                    key=lambda o: inspect.getsourcelines(o[1])[1])[-1][1]
+            if len(template_cls_members) > 1:
+                logger.warning(
+                    f"multiple final template class found in {arg}, "
+                    f"the last one is used. Specify the class name to "
+                    f"suppress this warning.")
+        else:
+            raise ValueError(f"cannot resolve template class from {arg}")
+        logger.debug(
+                f"resolved template {_arg} as {template_cls}")
+        # By design, importing the final template class will register the
+        # subclass in the template registry. So we just retrieve it from the
+        # registry.
+        key = Template._make_registry_key(template_cls)
+        assert key in Template._template_registry
+        return Template._template_registry[key]
+
+
+def _is_final_template_cls(m):
+    """Returns True if `m` is a template class and is marked final.
+
+    Final template classes are registered to
+    `~dasha.templates.Template._template_registry` when declared.
+
+    Non-final template classes shall not be used directly.
     """
-    logger = get_logger()
-
-    def is_template(m):
-        return inspect.isclass(m) and issubclass(m, Template) and \
-            not m._skip_template_register
-
-    if is_template(spec):
-        cls = spec
-    elif isinstance(spec, str):
-        sep = ':'
-        if sep not in spec:
-            spec = f'{spec}:'
-        mod, cls = spec.split(sep, 1)
-        module = importlib.import_module(mod)
-        if cls == '':
-            cls = list(filter(
-                    lambda m: m[1].__module__ == module.__name__,
-                    filter(
-                        lambda m: is_template(m[1]),
-                        inspect.getmembers(module))))
-            if not cls:
-                raise RuntimeError(
-                        f"module {module} does not define a valid template.")
-            cls = sorted(cls, key=lambda o: inspect.getsourcelines(o[1])[1])
-            cls = cls[-1][1]
-            logger.debug(f"resolved template {spec.rstrip('sep')} as {cls}")
-    else:
-        raise RuntimeError(f"unrecognized spec type {spec}")
-    key = Template._make_registry_key(cls)
-    if key not in Template._template_registry:
-        raise RuntimeError(
-                f"template class {cls} of {spec} is not registered")
-    return Template._template_registry[key]
+    return (inspect.isclass(m) and issubclass(m, Template) and
+            m._template_is_final)
 
 
 class ComponentWrapper(Template):
-    """A class that wraps an existing Dash component."""
+    """A class that wraps a Dash component instance."""
 
-    _skip_template_register = True
+    _template_is_final = True
 
     def __init__(self, component, parent=None):
         self._component = component
@@ -255,17 +316,34 @@ class ComponentWrapper(Template):
 
 
 class ComponentTemplate(Template):
-    """A base class that wraps a Dash component type.
+    """A class that wraps a Dash component type.
 
     Instances of this class is typically created from calling the
-    ``make_component`` class method of the `Template` class, allowing
-    one to declare as tree of components with automatic unique ids. The
-    actual Dash components are only be created at the moment the `layout`
-    attribute is accessed. This makes the same template object re-usable
-    in multiple parts of a single page application."""
+    :meth:`~dasha.web.templates.Template.child` method, which allows declaring
+    a tree of components with automatic unique ids.
+
+    Instances of this class serves as a lazy evaluation proxy around a native
+    Dash components. Dash component properties on the template instance are
+    passed to the actual component constructor when the `layout` property is
+    queried.
+
+    This allows one to define a set of interrelated components as a "template"
+    and use multiple instances of it in a single page application, without the
+    need to worrying about possible confliction in the ids.
+
+    Furthermore, the easy-to-create tree structure through (chaining of)
+    :meth:`~dasha.web.templates.Template.child` allows arbitrarily complex
+    layouts to be created in a relatively compact syntax.
+
+    """
 
     _component_cls = NotImplemented
-    _skip_template_register = True
+    """To be overridden with Dash component type in subclasses."""
+    _component_schema = None
+    """To be overridden with custom schema in subclasses."""
+
+    _component_prop_names = None
+    _template_is_final = False
 
     def __init_subclass__(cls):
 
@@ -274,17 +352,36 @@ class ComponentTemplate(Template):
                 return inspect.getfullargspec(component_cls.__init__).args[1:]
             return None
 
+        # here we tag the finalness according to presence of _component_cls
         if cls._component_cls is NotImplemented:
-            cls._skip_template_register = True
+            cls._component_prop_names = None
+            cls._template_is_final = False
         else:
-            cls._skip_template_register = False
+            # generate property list
             prop_names = _get_component_prop_names(
                     cls._component_cls)
             cls._component_prop_names = prop_names
+            cls._template_is_final = True
+        # here we generate the namespace schema based on the component schema
+        if cls._component_schema is not None:
+            _schema = {
+                        # we need to exclude the _namespace_* entries
+                        # to avoid override the subclass settings.
+                        Optional(And(
+                            str,
+                            lambda s: not s.startswith('_namespace_')
+                            )): object
+                        }
+            rupdate(_schema, cls._component_schema.schema)
+            cls._namespace_from_dict_schema = Schema(
+                    _schema,
+                    ignore_extra_keys=True)
         super().__init_subclass__()
 
     def __init__(self, *args, **kwargs):
-        # put args in to kwargs
+        # put args in to kwargs by inspect the prop list.
+        # this allows the syntax of creating template similar to
+        # creating the underlying Dash components.
         for i, arg in enumerate(args):
             prop_name = self._component_prop_names[i]
             if prop_name in kwargs:
@@ -335,6 +432,14 @@ class ComponentTemplate(Template):
 
     @property
     def layout(self):
+        """The layout generated from traversing the component tree.
+
+        The traversing is depth first.
+
+        .. note::
+            Properties with callable values are evaluated the time the property
+            is queried.
+        """
 
         component_kwargs = dict()
         for prop_name in self._component_prop_names:
@@ -352,13 +457,16 @@ class ComponentTemplate(Template):
         return self._component_cls(**component_kwargs)
 
 
-def load_component_template(component_cls):
+def _make_component_template_cls(component_cls):
+    """Return a `~dasha.web.templates.ComponentTemplate` subclass for given
+    Dash component type."""
     # here we try get the created classes from the registry
     registry_key = Template._make_registry_key(component_cls)
     if registry_key in Template._template_registry:
         return Template._template_registry[registry_key]
 
     # create if not exists
+    # this will automatically register to _template_registry
     return type(
             f"{component_cls.__name__}",
             (ComponentTemplate, ), dict(
@@ -379,6 +487,7 @@ class ComponentGroup(ComponentTemplate):
     * prop: The property name to use for Input, Output, or State.
 
     """
+    # TODO rewrite this to use namespace schema.
 
     _component_types = ('output', 'input', 'state', 'static')
     _component_types_pl = ('outputs', 'inputs', 'states', 'statics')
