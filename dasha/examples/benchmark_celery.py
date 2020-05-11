@@ -1,7 +1,23 @@
 #! /usr/bin/env python
 
 """
-This file defines an example site that benchmarks the celery task queue.
+This file defines an example site that uses the celery task queue
+and the IPC data store.
+
+A running redis db is required as the backend.
+
+To run the task queue:
+
+.. code:: bash
+
+    $ dasha -s dasha.examples.benchmark_celery celery
+
+To run the site:
+
+.. code:: bash
+
+    $ dasha -s dasha.examples.benchmark_celery
+
 """
 
 from tollan.utils.env import env_registry
@@ -108,9 +124,16 @@ class CeleryBenchmark(ComponentTemplate):
             logger = get_logger()
             store = ipc.get_or_create('rejson', 'active_info')
             # get worker
-            # worker = store('objkeys', '.')[0]
+            worker = store('objkeys', '.')[0]
             # obj = store.get(worker)
-            obj = store.connection.jsonget(store.redis_key, '.')
+            # worker contains a dot, so we have to go like this to get
+            # the content.
+            # this should be fix by providing a special interface
+            # on ipc data store.
+            # or we should implement handling of this case on
+            # json path object.
+            worker_path = f'["_ipc_obj"]["{worker}"]'
+            obj = store.connection.jsonget(store.redis_key, worker_path)
             logger.debug(f"active_info: {obj}")
             return pformat_yaml(obj)
 

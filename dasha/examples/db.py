@@ -50,7 +50,10 @@ def create_tables(db):
         raise RuntimeError(f"unable to create tables: {e}")
     db.metadata.reflect(bind=engine)
     logger.debug(f"all tables: {pformat_yaml(db.metadata.tables)}")
+
     # insert some data
+    # this is following the sqlalchemy core usage
+    # https://docs.sqlalchemy.org/en/13/core/tutorial.html
     ins_client_info = db.metadata.tables['client_info'].insert()
     client_pk = engine.execute(ins_client_info).inserted_primary_key[0]
     ins = db.metadata.tables['my_table'].insert().values(
