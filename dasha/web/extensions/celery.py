@@ -63,6 +63,7 @@ def init_app(server, config):
 
     _celery_task_registry.clear()
 
+    # TODO use tollan.utils.namespace
     tasks = config.get('tasks', list())
     for task in tasks:
         type_ = getobj(task["type"])

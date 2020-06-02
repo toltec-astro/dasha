@@ -7,6 +7,7 @@ from wrapt import ObjectProxy
 from tollan.utils.log import get_logger
 from tollan.utils.fmt import pformat_yaml
 from copy import deepcopy
+from sqlalchemy import MetaData
 
 
 __all__ = ['db', 'get_db_engine', 'create_db_session', 'dataframe_from_db', ]
@@ -66,9 +67,10 @@ def init_app(server, config):
     def shutdown_db_session(exception=None):
         db.session.remove()
 
-    if 'post_init_app' in config:
+    post_init_app = config.get('post_init_app', None)
+    if post_init_app is not None:
         with server.app_context():
-            config['post_init_app'](db)
+            post_init_app()
 
 
 def get_db_engine(bind, server=None):
@@ -76,6 +78,13 @@ def get_db_engine(bind, server=None):
     if server is None:
         server = flask.current_app
     return db.get_engine(server, bind)
+
+
+def get_db_metadata(bind, server=None):
+    """Return the database metadata for `bind`."""
+    metadata = MetaData()
+    metadata.reflect(bind=get_db_engine(bind, server))
+    return metadata
 
 
 def create_db_session(bind, server=None):
@@ -111,8 +120,12 @@ def dataframe_from_db(query, bind=None, session=None, **kwargs):
         session = create_db_session(bind)
     # session is not None
 
+    parse_dates = [
+            'Date', 'created_at', 'updated_at'
+            ] + kwargs.pop('parse_dates', list())
     return pd.read_sql_query(
             query,
             con=session.bind,
-            parse_dates=['Date', 'created_at', 'updated_at'],
+            parse_dates=parse_dates,
+            **kwargs
             )

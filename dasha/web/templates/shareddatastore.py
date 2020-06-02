@@ -23,12 +23,20 @@ class SharedDataStore(ComponentTemplate):
         super().__init__(*args, **kwargs)
         self._callbacks = list()
 
-    def register_callback(self, outputs, inputs, states, callback):
+    def register_callback(
+            self, outputs=None, inputs=None, states=None, callback=None):
         """Register a callback.
 
         """
+        if callback is None:
+            def decorator(func):
+                return self.register_callback(
+                        outputs, inputs, states, callback=func)
+            return decorator
 
         def _ensure_list(l):
+            if l is None:
+                return list()
             if isinstance(l, (Input, Output, State)):
                 return [l]
             return list(l)

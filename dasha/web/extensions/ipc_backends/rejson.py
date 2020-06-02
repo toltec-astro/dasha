@@ -95,14 +95,18 @@ class RejsonIPC(object):
 
     """This class manages a JSON object in redis.
 
-    The actual object stored in the redis db under "redis_key" looks like:
+    The actual object stored in the redis db under ``redis_key`` looks like:
 
     .. code::
 
         {
-            '_ipc_rev': 0,
             '_ipc_obj': {'a': 'b'},
-            '_ipc_key': 'redis_key'
+            '_ipc_meta': {
+                'key': 'redis_key'
+                'rev': 0,
+                'created_at': xxxx,
+                'updated_at': yyyy,
+                }
             }
 
     Parameters
@@ -124,18 +128,25 @@ class RejsonIPC(object):
     This will be replaced after the `pipeline` context is entered.
     """
 
-    _revkey = '_ipc_rev'
-    """The key name to store the revision number."""
+    _obj_key = '_ipc_obj'
+    """The key name to store the actual JSON payload object."""
 
-    _objkey = '_ipc_obj'
-    """The key name to store the json object."""
+    _meta_key = '_ipc_meta'
+    """The key name to store the metadata."""
 
-    _keykey = '_ipc_key'
-    """The key name to store the redis root key name."""
+    # _key_key = f'{metakey}.key'
+    # """The key name to store the redis root key name."""
 
-    _revpath = JsonPath().joinpath(_revkey)
-    _objpath = JsonPath().joinpath(_objkey)
-    _keypath = JsonPath().joinpath(_keykey)
+    # _rev_key = f'{metakey}.rev'
+    # """The key name to store the revision number."""
+
+    # _created_at_key = f'{metakey}.created_at'
+    # """The key name to store the creation time."""
+
+    # _updated_at_key = f'{metakey}.updated_at'
+
+    _obj_path = JsonPath().joinpath(_obj_key)
+    _meta_path = JsonPath().joinpath(_meta_key)
 
     @staticmethod
     def _make_redis_key(label):
@@ -144,7 +155,6 @@ class RejsonIPC(object):
 
     def __init__(self, label):
         self._label = label
-        self._rev = None
 
     @property
     def label(self):
@@ -152,27 +162,24 @@ class RejsonIPC(object):
 
     @property
     def redis_key(self):
+        """The key of the redis db entry."""
         return self._make_redis_key(self._label)
 
-    @staticmethod
-    def _ensure_entry(obj, key, defval):
-        """Modify `obj` such that `key` is present in `obj` with default
-        value `defval`.
-        """
-        obj.setdefault(key, defval)
-        return obj
-
-    def _ensure_metadata(self, obj):
-        """Modify `obj` such that revkey, objkey, and keykey are present."""
+    def _ensure_metadata(self, obj, time):
+        """Modify `obj` such that metadata are present."""
         redis_key = self.redis_key
-        for key, defval in [
-                (self._revkey, 0),
-                (self._objkey, None),
-                (self._keykey, redis_key),
+        obj.setdefault(self._meta_key, dict())
+        meta = obj[self._meta_key]
+
+        for key, default in [
+                ('key', redis_key),
+                ('rev', 0),
+                ('created_at', time),
+                ('updated_at', time),
                 ]:
-            obj.setdefault(key, defval)
+            meta.setdefault(key, default)
         # check if redis_key matches.
-        if redis_key != obj[self._keykey]:
+        if redis_key != meta['key']:
             raise ValueError(f"inconsistent obj key {redis_key}")
         return obj
 
@@ -191,16 +198,40 @@ class RejsonIPC(object):
         """A context manager that puts the connection in pipeline mode."""
         class RejsonIPCPipeline:
 
+            logger = get_logger()
+
             def __init__(self, ipc):
                 self._ipc = ipc
+                # this is used to ensure that only one nesting of
+                # pipeline context.
+                self._is_nested = self._ipc._pipeline is not None
 
             def __enter__(self):
-                self._ipc._pipeline = self._ipc._connection.pipeline()
-                return self._ipc._pipeline
+                if not self._is_nested:
+                    self._ipc._pipeline = self._ipc._connection.pipeline()
+                return self
 
             def __exit__(self, *args):
-                self._ipc._pipeline.execute()
+                if self._is_nested:
+                    return
                 self._ipc._pipeline = None
+
+            def execute(self):
+                if self._is_nested:
+                    return None
+                result = self._ipc._pipeline.execute()
+                if len(result) == 1:
+                    return result[0]
+                return result
+
+            def try_execute(self):
+                try:
+                    return self.execute()
+                except Exception as e:
+                    self.logger.error(
+                            f"failed execute redis query: {e}", exc_info=True)
+                    return None
+
         return RejsonIPCPipeline(self)
 
     def get(self, path=JsonPath.root):
@@ -213,6 +244,20 @@ class RejsonIPC(object):
         except redis.exceptions.ResponseError:
             return None
 
+    def type(self, path=JsonPath.root):
+        return self('type', path)
+
+    def is_null(self, path=JsonPath.root):
+        return self('type', path) == 'null'
+
+    def get_meta(self, key=None):
+        """Return the metadata."""
+        if key is None:
+            path = self._meta_path
+        else:
+            path = self._meta_path.joinpath(key)
+        return self.connection.jsonget(self.redis_key, path)
+
     def set(self, obj, path=JsonPath.root):
         """Set `obj` to path."""
         return self('set', path, obj)
@@ -222,12 +267,12 @@ class RejsonIPC(object):
         path = JsonPath(path)
         if path.is_absolute():
             path = path.relative_to(JsonPath.root)
-        return self._objpath.joinpath(path)
+        return self._obj_path.joinpath(path)
 
     def __call__(self, op, path, *args, **kwargs):
         """Operate at `path`.
 
-        Note that `path` is specified with respect to `_objpath`.
+        Note that `path` is specified with respect to `_obj_path`.
         """
         logger = get_logger('rejson_call')
 
@@ -238,7 +283,6 @@ class RejsonIPC(object):
         logger.debug(
                 f"op={op} redis_key={redis_key} rejson_path={rejson_path} "
                 f"path={path} args={args} kwargs={kwargs}")
-        _op = getattr(self.connection, f'json{op}')
         if op == 'set' and path.is_root():
             # this is to set the object
             # check the key exist in the client
@@ -248,12 +292,14 @@ class RejsonIPC(object):
             if not self.connection.exists(redis_key):
                 # create the object
                 _obj = self._ensure_metadata({
-                    self._objkey: obj
-                    })
+                    self._obj_key: obj
+                    },
+                    time=self.connection.time()
+                    )
+                self.connection.jsonset(redis_key, JsonPath.root, _obj)
                 logger.debug(
                         f"create object at key={redis_key} "
                         f"rejson_path={JsonPath.root} {_obj}")
-                self.connection.jsonset(redis_key, JsonPath.root, _obj)
                 return
         if op == 'set':
             if not self.connection.exists(redis_key):
@@ -261,12 +307,25 @@ class RejsonIPC(object):
                 self.set(dict(), path=JsonPath.root)
             else:
                 pass
-        with self.pipeline:
-            if op not in ['get', 'type']:
+        with self.pipeline as p:
+            _read_only_ops = [
+                    'get', 'mget', 'type',
+                    'strlen', 'arrindex', 'arrlen',
+                    'objkeys', 'objlen', 'resp'
+                    ]
+            if op not in _read_only_ops:
                 # thees ops will update the object.
                 self.connection.jsonnumincrby(
-                        redis_key, self._revpath, 1)
-            result = _op(redis_key, rejson_path, *args, **kwargs)
+                        redis_key, self._meta_path.joinpath("rev"), 1)
+                # need to get the time immediately so use self._connection
+                self.connection.jsonset(
+                        redis_key,
+                        self._meta_path.joinpath("updated_at"),
+                        self._connection.time())
+            _op = getattr(self.connection, f'json{op}')
+            _op(redis_key, rejson_path, *args, **kwargs)
+            # here we always unpack the item
+            result = p.execute()
         return result
 
     def get_if_updated(self, obj=None):

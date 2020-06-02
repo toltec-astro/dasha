@@ -5,11 +5,14 @@ import dash_html_components as html
 import dash_daq as daq
 
 
+__all__ = ['ValueView', ]
+
+
 class ValueView(ComponentGroup):
     """This template provides a set of components to display values."""
 
     _component_cls = html.Div
-    className = 'd-flex'
+    className = 'd-flex align-content-stretch flex-wrap'
 
     _component_group = [
         {
@@ -39,11 +42,12 @@ class ValueView(ComponentGroup):
         if kwargs.get('text', None) is None and \
                 kwargs.get('bar', None) is None:
             raise ValueError('text and bar cannot be both None.')
+        self._source = kwargs
         super().__init__(**kwargs)
 
         @self._make_component_obj('label_container')
         def label_container(self, *args, **kwargs):
-            kwargs.setdefault('className', 'd-flex text-monospace')
+            kwargs.setdefault('className', 'd-flex flex-fill text-monospace')
             kwargs.setdefault('style', {
                     'min-width': '33%'
                     })
@@ -76,10 +80,3 @@ class ValueView(ComponentGroup):
                 *args,
                 **kwargs
                 )
-
-    def setup_layout(self, app):
-        super().setup_layout(app)
-
-    @property
-    def layout(self):
-        return super().layout

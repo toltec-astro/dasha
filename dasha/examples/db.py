@@ -15,34 +15,30 @@ from tollan.utils.fmt import pformat_yaml
 from dash_table import DataTable
 from dasha.web.extensions.db import (
         dataframe_from_db, get_db_engine, create_db_session, db)
-from sqlalchemy import Table, Column, Integer, String, select
+from sqlalchemy import Column, Integer, String, select
 
 
-def create_tables(db):
+def create_tables():
     logger = get_logger()
 
-    tables = []
+    from tollan.utils.db import TableDefList
+    from tollan.utils.db import conventions as c
 
-    from tollan.utils.db import convensions as c
+    TableDefList([
+            {
+                'name': 'my_table',
+                'columns': [
+                    c.pk(),
+                    Column('value', Integer),
+                    Column('info', String),
+                    c.created_at(),
+                    c.updated_at(),
+                    c.client_info_fk(),
+                    ]
+                },
+            c.client_info_table()
+            ]).init_db(db)
 
-    def qualified(name):
-        return name
-
-    def tbl(name, *args):
-        return Table(qualified(name), db.metadata, *args)
-
-    tables.extend([
-        tbl(
-                "my_table",
-                c.pk(),
-                Column('value', Integer),
-                Column('info', String),
-                c.created_at(),
-                c.updated_at(),
-                c.client_info(),
-            ),
-        c.tbl_client_info(db)
-        ])
     engine = get_db_engine(bind='default')
     try:
         db.metadata.create_all(engine)
@@ -100,11 +96,14 @@ class DBExample(ComponentTemplate):
 
         session = create_db_session(bind='default')
 
+        def is_pk(c):
+            return (c.name == 'pk') or (c.name.endswith('_pk'))
+
         # get column names
         colnames = [
             c.name
             for c in db.metadata.tables['my_table'].columns
-            if c.name not in ['client_info_pk']
+            if not is_pk(c)
             ] + ['hostname', ]
         # build query
         my_table = db.metadata.tables['my_table']
@@ -113,8 +112,6 @@ class DBExample(ComponentTemplate):
                 select([client_info.c.pk, client_info.c.hostname]),
                 my_table.c.client_info_pk == client_info.c.pk)
 
-        def is_pk(c):
-            return (c.name == 'pk') or (c.name.endswith('_pk'))
         stmt = select([col for col in j.columns if not is_pk(col)])
 
         extra_column_kwargs = {

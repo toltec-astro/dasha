@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 from ..extensions.db import dataframe_from_db
-from ..extensions.celery import get_celery_app
+from ..extensions.celery import celery
 from celery.utils.log import get_task_logger
 
 
@@ -24,7 +24,6 @@ class SyncedDatabase(object):
 
         logger = get_task_logger(self._label)
         # logger.setLevel('INFO')
-        celery = get_celery_app()
 
         class TaskBase(celery.QueueOnce):
             _datastore = self._datastore

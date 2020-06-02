@@ -315,6 +315,31 @@ class ComponentWrapper(Template):
         return self._component
 
 
+class ComponentRoot(Template):
+    """A class that serves as a virtual root component."""
+
+    _template_is_final = True
+
+    def __init__(self, id):
+        self._rootid = id
+        super().__init__(parent=None)
+
+    @property
+    def idbase(self):
+        self._rootid
+
+    @property
+    def id(self):
+        return self._rootid
+
+    def setup_layout(self, app):
+        super().setup_layout(app)
+
+    @property
+    def layout(self):
+        return [c.layout for c in self.children]
+
+
 class ComponentTemplate(Template):
     """A class that wraps a Dash component type.
 
@@ -344,6 +369,8 @@ class ComponentTemplate(Template):
 
     _component_prop_names = None
     _template_is_final = False
+
+    _reserved_prop_names = ('layout', )
 
     def __init_subclass__(cls):
 
@@ -392,13 +419,16 @@ class ComponentTemplate(Template):
         super().__init__(parent=parent)
 
         for k, v in kwargs.items():
+            if k in self._reserved_prop_names:
+                # use a alias version of it.
+                k = f'{k}_'
             setattr(self, k, v)
 
     @classmethod
     def _ensure_template(cls, value):
         if value is None:
             return None
-        if isinstance(value, ComponentTemplate):
+        if isinstance(value, Template):
             return value
         return ComponentWrapper(value)
 
@@ -443,9 +473,13 @@ class ComponentTemplate(Template):
 
         component_kwargs = dict()
         for prop_name in self._component_prop_names:
-            if not hasattr(self, prop_name):
+            if prop_name in self._reserved_prop_names:
+                attr_name = f'{prop_name}_'
+            else:
+                attr_name = prop_name
+            if not hasattr(self, attr_name):
                 continue
-            prop_value = getattr(self, prop_name)
+            prop_value = getattr(self, attr_name)
             if prop_name == 'children':
                 prop_value = tuple(c.layout for c in prop_value)
                 if len(prop_value) == 1:

@@ -21,6 +21,19 @@ from schema import Schema, Optional
 __all__ = ['SlapDash', ]
 
 
+def _get_404_layout(route, reason):
+    return dbc.Jumbotron([
+                    html.H1(
+                        "404: Not found",
+                        className="text-danger"),
+                    html.Hr(),
+                    html.P(
+                        f"Failed load {route}, "
+                        f"reason: {reason}."
+                        ),
+                ])
+
+
 class _SlapDashPageWrapper(ComponentTemplate):
     """This is a wrapper around any actual page template."""
 
@@ -78,16 +91,7 @@ class _SlapDashPageWrapper(ComponentTemplate):
                     f"unable to load page {self._route_name}",
                     exc_info=True)
             reason = str(e)
-            return dbc.Jumbotron([
-                    html.H1(
-                        "404: Not found",
-                        className="text-danger"),
-                    html.Hr(),
-                    html.P(
-                        f"Failed load {self._route_name}, "
-                        f"reason: {reason}."
-                        ),
-                ])
+            return _get_404_layout(self._route_name, reason)
 
 
 class SlapDash(ComponentTemplate):
@@ -189,10 +193,12 @@ class SlapDash(ComponentTemplate):
             if route_name.rstrip('/') == resolve_url('').rstrip('/'):
                 route_name = next(iter(self._page_registry))
                 logger.debug(f"use default page {route_name}")
-        logger.debug(
-                f"get layout for {route_name} from "
-                f"{self._page_registry.keys()}")
-        return self._page_registry[route_name].layout
+        if route_name in self._page_registry:
+            logger.debug(
+                    f"get layout for {route_name} from "
+                    f"{self._page_registry.keys()}")
+            return self._page_registry[route_name].layout
+        return _get_404_layout(route_name, 'Invalid route')
 
     def setup_layout(self, app):
         self.clientside_state = self.child(dcc.Store, data=dict())

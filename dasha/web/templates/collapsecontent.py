@@ -4,16 +4,25 @@ from dasha.web.templates import ComponentTemplate
 from dash.dependencies import Output, Input, State, ClientsideFunction
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+from schema import Schema
+
+
+__all__ = ['CollapseContent', ]
 
 
 class CollapseContent(ComponentTemplate):
+
     _component_cls = html.Div
+    _component_schema = Schema({
+        'button_text': str,
+        })
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._button = self.child(
                 dbc.Button, self.button_text,
-                className='mr-2 my-0 px-0 btn btn-link'
+                color="link",
+                className='mr-2 my-0 px-2'
                 )
         self.content = self.child(dbc.Collapse)
 
@@ -30,7 +39,3 @@ class CollapseContent(ComponentTemplate):
                 [Input(self._button.id, "n_clicks")],
                 [State(self.content.id, 'is_open')],
                 )
-
-    @property
-    def layout(self):
-        return super().layout

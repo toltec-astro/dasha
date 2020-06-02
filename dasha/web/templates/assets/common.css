@@ -49,3 +49,25 @@ a:hover {color: #014c8c !important}
     width: 3px !important;
 }
 
+
+/*Tooltip*/
+/* .tooltip { */
+/*   font-family: "Roboto", "Tahoma", "Helvetica", sans-serif; */
+/* } */
+.bs-tooltip-auto[x-placement^=top] .arrow::before, .bs-tooltip-top .arrow::before {
+    border-top-color: #757E94;
+}
+.bs-tooltip-auto[x-placement^=right] .arrow::before, .bs-tooltip-right .arrow::before {
+    border-right-color: #757E94;
+}
+.bs-tooltip-auto[x-placement^=bottom] .arrow::before, .bs-tooltip-bottom .arrow::before {
+    border-bottom-color: #757E94;
+}
+.bs-tooltip-auto[x-placement^=left] .arrow::before, .bs-tooltip-left .arrow::before {
+    border-left-color: #757E94;
+}
+.tooltip-inner {
+  background-color: #757E94;
+  color: white;
+  /* font-style: italic; */
+}

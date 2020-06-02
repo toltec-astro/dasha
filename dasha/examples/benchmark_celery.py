@@ -95,6 +95,8 @@ class CeleryBenchmark(ComponentTemplate):
                 )
         def update(n_intervals):
             logger = get_logger()
+            if n_intervals is None:
+                n_intervals = 0
             with timeit(f'update {n_intervals}'):
                 sleep.delay(5, index=n_intervals)
             with timeit(f'inspect celery'):
@@ -109,10 +111,21 @@ class CeleryBenchmark(ComponentTemplate):
             store = ipc.get_or_create('rejson', 'active_info')
             store.set(active)
             return n_intervals, len(tasks), str(worker), \
-                (n_intervals or 0) + 1, 100
+                n_intervals + 1, 100
 
         timer_for_active_info = body.child(dcc.Interval, interval=1000)
+        ipc_meta = body.child(html.Pre)
         active_info = body.child(html.Pre)
+
+        @app.callback(
+                Output(ipc_meta.id, 'children'),
+                [
+                    Input(timer_for_active_info.id, 'n_intervals'),
+                    ]
+                )
+        def get_ipc_meta(n_intervals):
+            store = ipc.get_or_create('rejson', 'active_info')
+            return pformat_yaml(store.get_meta())
 
         @app.callback(
                 Output(active_info.id, 'children'),
@@ -123,8 +136,12 @@ class CeleryBenchmark(ComponentTemplate):
         def get_active_info(n_intervals):
             logger = get_logger()
             store = ipc.get_or_create('rejson', 'active_info')
-            # get worker
-            worker = store('objkeys', '.')[0]
+            if store.is_null():
+                logger.debug("no active info found")
+                return "N/A"
+            # get the first worker
+            workers = store('objkeys', '.')
+            logger.info(f"workers: {workers}")
             # obj = store.get(worker)
             # worker contains a dot, so we have to go like this to get
             # the content.
@@ -132,6 +149,7 @@ class CeleryBenchmark(ComponentTemplate):
             # on ipc data store.
             # or we should implement handling of this case on
             # json path object.
+            worker = workers[0]
             worker_path = f'["_ipc_obj"]["{worker}"]'
             obj = store.connection.jsonget(store.redis_key, worker_path)
             logger.debug(f"active_info: {obj}")
