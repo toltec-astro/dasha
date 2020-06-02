@@ -18,7 +18,7 @@ from schema import Schema, Optional, And
 
 __all__ = [
         'IdTreeMeta', 'IdTree', 'Template',
-        'ComponentWrapper', 'ComponentTemplate',
+        'ComponentWrapper', 'ComponentRoot', 'ComponentTemplate',
         'ComponentGroup', ]
 
 
@@ -316,7 +316,9 @@ class ComponentWrapper(Template):
 
 
 class ComponentRoot(Template):
-    """A class that serves as a virtual root component."""
+    """A class that serves as a virtual root component.
+
+    This is useful to define dynamic layout within callbacks."""
 
     _template_is_final = True
 
