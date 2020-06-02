@@ -22,8 +22,11 @@ RejsonIPC
       ~RejsonIPC.__call__
       ~RejsonIPC.get
       ~RejsonIPC.get_if_updated
+      ~RejsonIPC.get_meta
       ~RejsonIPC.init_ipc
+      ~RejsonIPC.is_null
       ~RejsonIPC.set
+      ~RejsonIPC.type
 
    .. rubric:: Attributes Documentation
 
@@ -37,5 +40,8 @@ RejsonIPC
    .. automethod:: __call__
    .. automethod:: get
    .. automethod:: get_if_updated
+   .. automethod:: get_meta
    .. automethod:: init_ipc
+   .. automethod:: is_null
    .. automethod:: set
+   .. automethod:: type

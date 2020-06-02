@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dasha.web.extensions.db &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <title>dasha.web.extensions.db &#8212; dasha v0.1.dev34+g339e174</title>
     <link rel="stylesheet" href="../../../../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
@@ -46,7 +46,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="../../../../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	<a href="../../../../index.html">dasha v0.1.dev34+g339e174</a>
 	 &#187;
       </li>
       <li><a href="../../../index.html" >Module code</a> &#187;</li>
@@ -72,6 +72,7 @@
 <span class="kn">from</span> <span class="nn">tollan.utils.log</span> <span class="kn">import</span> <span class="n">get_logger</span>
 <span class="kn">from</span> <span class="nn">tollan.utils.fmt</span> <span class="kn">import</span> <span class="n">pformat_yaml</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">MetaData</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">,</span> <span class="s1">&#39;get_db_engine&#39;</span><span class="p">,</span> <span class="s1">&#39;create_db_session&#39;</span><span class="p">,</span> <span class="s1">&#39;dataframe_from_db&#39;</span><span class="p">,</span> <span class="p">]</span>
@@ -131,9 +132,10 @@
     <span class="k">def</span> <span class="nf">shutdown_db_session</span><span class="p">(</span><span class="n">exception</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="s1">&#39;post_init_app&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+    <span class="n">post_init_app</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;post_init_app&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">post_init_app</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">server</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
-            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;post_init_app&#39;</span><span class="p">](</span><span class="n">db</span><span class="p">)</span>
+            <span class="n">post_init_app</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="get_db_engine"><a class="viewcode-back" href="../../../../api/dasha.web.extensions.db.get_db_engine.html#dasha.web.extensions.db.get_db_engine">[docs]</a><span class="k">def</span> <span class="nf">get_db_engine</span><span class="p">(</span><span class="n">bind</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -141,6 +143,13 @@
     <span class="k">if</span> <span class="n">server</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">server</span> <span class="o">=</span> <span class="n">flask</span><span class="o">.</span><span class="n">current_app</span>
     <span class="k">return</span> <span class="n">db</span><span class="o">.</span><span class="n">get_engine</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">bind</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">get_db_metadata</span><span class="p">(</span><span class="n">bind</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the database metadata for `bind`.&quot;&quot;&quot;</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+    <span class="n">metadata</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">get_db_engine</span><span class="p">(</span><span class="n">bind</span><span class="p">,</span> <span class="n">server</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">metadata</span>
 
 
 <div class="viewcode-block" id="create_db_session"><a class="viewcode-back" href="../../../../api/dasha.web.extensions.db.create_db_session.html#dasha.web.extensions.db.create_db_session">[docs]</a><span class="k">def</span> <span class="nf">create_db_session</span><span class="p">(</span><span class="n">bind</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -176,10 +185,14 @@
         <span class="n">session</span> <span class="o">=</span> <span class="n">create_db_session</span><span class="p">(</span><span class="n">bind</span><span class="p">)</span>
     <span class="c1"># session is not None</span>
 
+    <span class="n">parse_dates</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;created_at&#39;</span><span class="p">,</span> <span class="s1">&#39;updated_at&#39;</span>
+            <span class="p">]</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;parse_dates&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span>
             <span class="n">query</span><span class="p">,</span>
             <span class="n">con</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">bind</span><span class="p">,</span>
-            <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;created_at&#39;</span><span class="p">,</span> <span class="s1">&#39;updated_at&#39;</span><span class="p">],</span>
+            <span class="n">parse_dates</span><span class="o">=</span><span class="n">parse_dates</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
             <span class="p">)</span></div>
 </pre></div>
 
@@ -200,7 +213,7 @@
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
-    Last built 08 May 2020. <br/>
+    Last built 02 Jun 2020. <br/>
   </p>
 </footer>
   </body>

@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>RejsonIPC &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <title>RejsonIPC &#8212; dasha v0.1.dev34+g339e174</title>
     <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -59,7 +59,7 @@
 	 |
       </li>
       <li>
-	<a href="../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	<a href="../index.html">dasha v0.1.dev34+g339e174</a>
 	 &#187;
       </li>
       
@@ -80,11 +80,15 @@
 <em class="property">class </em><code class="sig-prename descclassname">dasha.web.extensions.ipc_backends.rejson.</code><code class="sig-name descname">RejsonIPC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">label</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#RejsonIPC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This class manages a JSON object in redis.</p>
-<p>The actual object stored in the redis db under “redis_key” looks like:</p>
+<p>The actual object stored in the redis db under <code class="docutils literal notranslate"><span class="pre">redis_key</span></code> looks like:</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-    <span class="s1">&#39;_ipc_rev&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
     <span class="s1">&#39;_ipc_obj&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="s1">&#39;b&#39;</span><span class="p">},</span>
-    <span class="s1">&#39;_ipc_key&#39;</span><span class="p">:</span> <span class="s1">&#39;redis_key&#39;</span>
+    <span class="s1">&#39;_ipc_meta&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;redis_key&#39;</span>
+        <span class="s1">&#39;rev&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s1">&#39;created_at&#39;</span><span class="p">:</span> <span class="n">xxxx</span><span class="p">,</span>
+        <span class="s1">&#39;updated_at&#39;</span><span class="p">:</span> <span class="n">yyyy</span><span class="p">,</span>
+        <span class="p">}</span>
     <span class="p">}</span>
 </pre></div>
 </div>
@@ -113,7 +117,7 @@
 <td><p>A context manager that puts the connection in pipeline mode.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.redis_key" title="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.redis_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">redis_key</span></code></a></p></td>
-<td><p></p></td>
+<td><p>The key of the redis db entry.</p></td>
 </tr>
 </tbody>
 </table>
@@ -133,11 +137,20 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.get_if_updated" title="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.get_if_updated"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_if_updated</span></code></a>(self[, obj])</p></td>
 <td><p>Returns new obj if it is updated.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.init_ipc" title="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.init_ipc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_ipc</span></code></a>(url)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.get_meta" title="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.get_meta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_meta</span></code></a>(self[, key])</p></td>
+<td><p>Return the metadata.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.init_ipc" title="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.init_ipc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_ipc</span></code></a>(url)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.is_null" title="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.is_null"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_null</span></code></a>(self[, path])</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.set" title="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(self, obj[, path])</p></td>
 <td><p>Set <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code> to path.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.type" title="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">type</span></code></a>(self[, path])</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -161,14 +174,15 @@
 <dl class="py attribute">
 <dt id="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.redis_key">
 <code class="sig-name descname">redis_key</code><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.redis_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The key of the redis db entry.</p>
+</dd></dl>
 
 <p class="rubric">Methods Documentation</p>
 <dl class="py method">
 <dt id="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.__call__">
 <code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">op</em>, <em class="sig-param">path</em>, <em class="sig-param">\*args</em>, <em class="sig-param">\*\*kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#RejsonIPC.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Operate at <code class="xref py py-obj docutils literal notranslate"><span class="pre">path</span></code>.</p>
-<p>Note that <code class="xref py py-obj docutils literal notranslate"><span class="pre">path</span></code> is specified with respect to <code class="xref py py-obj docutils literal notranslate"><span class="pre">_objpath</span></code>.</p>
+<p>Note that <code class="xref py py-obj docutils literal notranslate"><span class="pre">path</span></code> is specified with respect to <code class="xref py py-obj docutils literal notranslate"><span class="pre">_obj_path</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -185,8 +199,19 @@
 </dd></dl>
 
 <dl class="py method">
+<dt id="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.get_meta">
+<code class="sig-name descname">get_meta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">key</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#RejsonIPC.get_meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.get_meta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the metadata.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.init_ipc">
 <em class="property">classmethod </em><code class="sig-name descname">init_ipc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#RejsonIPC.init_ipc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.init_ipc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.is_null">
+<code class="sig-name descname">is_null</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#RejsonIPC.is_null"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.is_null" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -194,6 +219,11 @@
 <code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#RejsonIPC.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set <code class="xref py py-obj docutils literal notranslate"><span class="pre">obj</span></code> to path.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt id="dasha.web.extensions.ipc_backends.rejson.RejsonIPC.type">
+<code class="sig-name descname">type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">path</span><span class="o">=</span><span class="default_value">'.'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dasha/web/extensions/ipc_backends/rejson.html#RejsonIPC.type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dasha.web.extensions.ipc_backends.rejson.RejsonIPC.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -222,7 +252,7 @@
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
-    Last built 08 May 2020. <br/>
+    Last built 02 Jun 2020. <br/>
   </p>
 </footer>
   </body>

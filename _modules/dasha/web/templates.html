@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dasha.web.templates &#8212; dasha v0.1.dev32+g6ea9fce.d20200507</title>
+    <title>dasha.web.templates &#8212; dasha v0.1.dev34+g339e174</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -46,7 +46,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="../../../index.html">dasha v0.1.dev32+g6ea9fce.d20200507</a>
+	<a href="../../../index.html">dasha v0.1.dev34+g339e174</a>
 	 &#187;
       </li>
       <li><a href="../../index.html" >Module code</a> &#187;</li>
@@ -380,6 +380,31 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_component</span></div>
 
 
+<span class="k">class</span> <span class="nc">ComponentRoot</span><span class="p">(</span><span class="n">Template</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class that serves as a virtual root component.&quot;&quot;&quot;</span>
+
+    <span class="n">_template_is_final</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rootid</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">idbase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rootid</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rootid</span>
+
+    <span class="k">def</span> <span class="nf">setup_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_layout</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">layout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">layout</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
+
+
 <div class="viewcode-block" id="ComponentTemplate"><a class="viewcode-back" href="../../../api/dasha.web.templates.ComponentTemplate.html#dasha.web.templates.ComponentTemplate">[docs]</a><span class="k">class</span> <span class="nc">ComponentTemplate</span><span class="p">(</span><span class="n">Template</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A class that wraps a Dash component type.</span>
 
@@ -409,6 +434,8 @@
 
     <span class="n">_component_prop_names</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">_template_is_final</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">_reserved_prop_names</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;layout&#39;</span><span class="p">,</span> <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
 
@@ -457,13 +484,16 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="n">parent</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_prop_names</span><span class="p">:</span>
+                <span class="c1"># use a alias version of it.</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">_&#39;</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_ensure_template</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ComponentTemplate</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Template</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">value</span>
         <span class="k">return</span> <span class="n">ComponentWrapper</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
@@ -508,9 +538,13 @@
 
         <span class="n">component_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">prop_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_component_prop_names</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">prop_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_prop_names</span><span class="p">:</span>
+                <span class="n">attr_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">prop_name</span><span class="si">}</span><span class="s1">_&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">attr_name</span> <span class="o">=</span> <span class="n">prop_name</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">):</span>
                 <span class="k">continue</span>
-            <span class="n">prop_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">)</span>
+            <span class="n">prop_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">prop_name</span> <span class="o">==</span> <span class="s1">&#39;children&#39;</span><span class="p">:</span>
                 <span class="n">prop_value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">layout</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">prop_value</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">prop_value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -680,7 +714,7 @@
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
-    Last built 08 May 2020. <br/>
+    Last built 02 Jun 2020. <br/>
   </p>
 </footer>
   </body>
