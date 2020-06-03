@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dasha.web &#8212; dasha v0.1.dev34+g339e174</title>
+    <title>dasha.web &#8212; dasha v0.1.dev38+g0785415.d20200602</title>
     <link rel="stylesheet" href="../../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
@@ -46,7 +46,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="../../index.html">dasha v0.1.dev34+g339e174</a>
+	<a href="../../index.html">dasha v0.1.dev38+g0785415.d20200602</a>
 	 &#187;
       </li>
       <li><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
@@ -119,7 +119,7 @@
             <span class="s1">&#39;DASHA_SITE&#39;</span><span class="p">,</span> <span class="s1">&#39;The site module or path.&#39;</span><span class="p">,</span>
             <span class="s1">&#39;dasha.examples.dasha_intro&#39;</span><span class="p">)</span>
     <span class="n">env_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;DASHA_LOGFILE&#39;</span><span class="p">,</span> <span class="s1">&#39;The file for logging.&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">env_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;DASHA_LOGLEVEL&#39;</span><span class="p">,</span> <span class="s1">&#39;The DashA log level.&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
+    <span class="n">env_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;DASHA_LOGLEVEL&#39;</span><span class="p">,</span> <span class="s1">&#39;The DashA log level.&#39;</span><span class="p">,</span> <span class="s1">&#39;Info&#39;</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;registered env vars:</span><span class="se">\n</span><span class="si">{</span><span class="n">pformat_yaml</span><span class="p">(</span><span class="n">env_registry</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">site</span><span class="o">.</span><span class="n">__wrapped__</span> <span class="o">=</span> <span class="n">Site</span><span class="o">.</span><span class="n">from_any</span><span class="p">(</span><span class="n">env_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DASHA_SITE&#39;</span><span class="p">))</span>
@@ -141,7 +141,8 @@
     <span class="n">logfile</span> <span class="o">=</span> <span class="n">env_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DASHA_LOGFILE&#39;</span><span class="p">)</span>
     <span class="n">loglevel</span> <span class="o">=</span> <span class="n">env_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DASHA_LOGLEVEL&#39;</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;reset logger: loglevel=</span><span class="si">{</span><span class="n">loglevel</span><span class="si">}</span><span class="s2"> logfile=</span><span class="si">{</span><span class="n">logfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">init_log</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span> <span class="n">file_</span><span class="o">=</span><span class="n">logfile</span><span class="p">)</span>
+    <span class="c1"># python logging level is upper case.</span>
+    <span class="n">init_log</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">file_</span><span class="o">=</span><span class="n">logfile</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">server</span></div>
 
 
@@ -173,7 +174,7 @@
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
-    Last built 02 Jun 2020. <br/>
+    Last built 03 Jun 2020. <br/>
   </p>
 </footer>
   </body>

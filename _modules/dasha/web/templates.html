@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>dasha.web.templates &#8212; dasha v0.1.dev34+g339e174</title>
+    <title>dasha.web.templates &#8212; dasha v0.1.dev38+g0785415.d20200602</title>
     <link rel="stylesheet" href="../../../_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
@@ -46,7 +46,7 @@
     <h3>Navigation</h3>
     <ul>
       <li>
-	<a href="../../../index.html">dasha v0.1.dev34+g339e174</a>
+	<a href="../../../index.html">dasha v0.1.dev38+g0785415.d20200602</a>
 	 &#187;
       </li>
       <li><a href="../../index.html" >Module code</a> &#187;</li>
@@ -83,7 +83,7 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;IdTreeMeta&#39;</span><span class="p">,</span> <span class="s1">&#39;IdTree&#39;</span><span class="p">,</span> <span class="s1">&#39;Template&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;ComponentWrapper&#39;</span><span class="p">,</span> <span class="s1">&#39;ComponentTemplate&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ComponentWrapper&#39;</span><span class="p">,</span> <span class="s1">&#39;ComponentRoot&#39;</span><span class="p">,</span> <span class="s1">&#39;ComponentTemplate&#39;</span><span class="p">,</span>
         <span class="s1">&#39;ComponentGroup&#39;</span><span class="p">,</span> <span class="p">]</span>
 
 
@@ -380,8 +380,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_component</span></div>
 
 
-<span class="k">class</span> <span class="nc">ComponentRoot</span><span class="p">(</span><span class="n">Template</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A class that serves as a virtual root component.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ComponentRoot"><a class="viewcode-back" href="../../../api/dasha.web.templates.ComponentRoot.html#dasha.web.templates.ComponentRoot">[docs]</a><span class="k">class</span> <span class="nc">ComponentRoot</span><span class="p">(</span><span class="n">Template</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class that serves as a virtual root component.</span>
+
+<span class="sd">    This is useful to define dynamic layout within callbacks.&quot;&quot;&quot;</span>
 
     <span class="n">_template_is_final</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -397,12 +399,12 @@
     <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rootid</span>
 
-    <span class="k">def</span> <span class="nf">setup_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_layout</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<div class="viewcode-block" id="ComponentRoot.setup_layout"><a class="viewcode-back" href="../../../api/dasha.web.templates.ComponentRoot.html#dasha.web.templates.ComponentRoot.setup_layout">[docs]</a>    <span class="k">def</span> <span class="nf">setup_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setup_layout</span><span class="p">(</span><span class="n">app</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">layout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">layout</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">layout</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="ComponentTemplate"><a class="viewcode-back" href="../../../api/dasha.web.templates.ComponentTemplate.html#dasha.web.templates.ComponentTemplate">[docs]</a><span class="k">class</span> <span class="nc">ComponentTemplate</span><span class="p">(</span><span class="n">Template</span><span class="p">):</span>
@@ -714,7 +716,7 @@
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
-    Last built 02 Jun 2020. <br/>
+    Last built 03 Jun 2020. <br/>
   </p>
 </footer>
   </body>

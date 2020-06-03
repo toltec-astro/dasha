@@ -4,7 +4,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>DashA Documentation &#8212; dasha v0.1.dev34+g339e174</title>
+    <title>DashA Documentation &#8212; dasha v0.1.dev38+g0785415.d20200602</title>
     <link rel="stylesheet" href="_static/bootstrap-astropy.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
@@ -52,7 +52,7 @@
 	</a>
       </li>
       <li>
-	<a href="#">dasha v0.1.dev34+g339e174</a>
+	<a href="#">dasha v0.1.dev38+g0785415.d20200602</a>
 	 &#187;
       </li>
       
@@ -410,10 +410,13 @@ and reusable pages.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.templates.ComponentWrapper.html#dasha.web.templates.ComponentWrapper" title="dasha.web.templates.ComponentWrapper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComponentWrapper</span></code></a>(component[, parent])</p></td>
 <td><p>A class that wraps a Dash component instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.templates.ComponentTemplate.html#dasha.web.templates.ComponentTemplate" title="dasha.web.templates.ComponentTemplate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComponentTemplate</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.templates.ComponentRoot.html#dasha.web.templates.ComponentRoot" title="dasha.web.templates.ComponentRoot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComponentRoot</span></code></a>(id)</p></td>
+<td><p>A class that serves as a virtual root component.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.templates.ComponentTemplate.html#dasha.web.templates.ComponentTemplate" title="dasha.web.templates.ComponentTemplate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComponentTemplate</span></code></a>(*args, **kwargs)</p></td>
 <td><p>A class that wraps a Dash component type.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="api/dasha.web.templates.ComponentGroup.html#dasha.web.templates.ComponentGroup" title="dasha.web.templates.ComponentGroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComponentGroup</span></code></a>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/dasha.web.templates.ComponentGroup.html#dasha.web.templates.ComponentGroup" title="dasha.web.templates.ComponentGroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ComponentGroup</span></code></a>(**kwargs)</p></td>
 <td><p>This is a base class for managing a set of components as one unit.</p></td>
 </tr>
 </tbody>
@@ -421,8 +424,8 @@ and reusable pages.</p>
 </div>
 <div class="section" id="id19">
 <h4>Class Inheritance Diagram<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h4>
-<div class="graphviz"><object data="_images/inheritance-8416135ca5c0f164ee1127a2a594d6da5a9acdf6.svg" type="image/svg+xml" class="inheritance graphviz">
-<p class="warning">Inheritance diagram of dasha.web.templates.IdTreeMeta, dasha.web.templates.IdTree, dasha.web.templates.Template, dasha.web.templates.ComponentWrapper, dasha.web.templates.ComponentTemplate, dasha.web.templates.ComponentGroup</p></object></div>
+<div class="graphviz"><object data="_images/inheritance-c66053d489466ae231771578d0d7891319fd6a65.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of dasha.web.templates.IdTreeMeta, dasha.web.templates.IdTree, dasha.web.templates.Template, dasha.web.templates.ComponentWrapper, dasha.web.templates.ComponentRoot, dasha.web.templates.ComponentTemplate, dasha.web.templates.ComponentGroup</p></object></div>
 </div>
 </div>
 <div class="section" id="module-dasha.web.templates.utils">
@@ -542,7 +545,7 @@ and reusable pages.</p>
   <p>
     &copy; Copyright 2020, Zhiyuan Ma.<br/>
     Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.0.3. &nbsp;
-    Last built 02 Jun 2020. <br/>
+    Last built 03 Jun 2020. <br/>
   </p>
 </footer>
   </body>

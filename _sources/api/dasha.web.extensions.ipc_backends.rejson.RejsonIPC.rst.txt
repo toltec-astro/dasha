@@ -19,12 +19,16 @@ RejsonIPC
 
    .. autosummary::
 
-      ~RejsonIPC.__call__
+      ~RejsonIPC.ensure_obj
       ~RejsonIPC.get
       ~RejsonIPC.get_if_updated
       ~RejsonIPC.get_meta
+      ~RejsonIPC.get_rejson_data
       ~RejsonIPC.init_ipc
+      ~RejsonIPC.is_initialized
       ~RejsonIPC.is_null
+      ~RejsonIPC.query_obj
+      ~RejsonIPC.reset
       ~RejsonIPC.set
       ~RejsonIPC.type
 
@@ -37,11 +41,15 @@ RejsonIPC
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: __call__
+   .. automethod:: ensure_obj
    .. automethod:: get
    .. automethod:: get_if_updated
    .. automethod:: get_meta
+   .. automethod:: get_rejson_data
    .. automethod:: init_ipc
+   .. automethod:: is_initialized
    .. automethod:: is_null
+   .. automethod:: query_obj
+   .. automethod:: reset
    .. automethod:: set
    .. automethod:: type
