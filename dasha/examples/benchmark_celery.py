@@ -125,7 +125,8 @@ class CeleryBenchmark(ComponentTemplate):
                 )
         def get_ipc_meta(n_intervals):
             store = ipc.get_or_create('rejson', 'active_info')
-            return pformat_yaml(store.get_meta())
+            meta = store.get_meta()
+            return pformat_yaml(meta)
 
         @app.callback(
                 Output(active_info.id, 'children'),
@@ -140,7 +141,7 @@ class CeleryBenchmark(ComponentTemplate):
                 logger.debug("no active info found")
                 return "N/A"
             # get the first worker
-            workers = store('objkeys', '.')
+            workers = store.query_obj('objkeys', '.')
             logger.info(f"workers: {workers}")
             # obj = store.get(worker)
             # worker contains a dot, so we have to go like this to get

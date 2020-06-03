@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 from ..ipc_backends.rejson import JsonPath, RejsonIPC
+import redis
 import pytest
 
 
@@ -110,35 +111,191 @@ def test_jsonpath_name():
     assert JsonPath('a.b.c').name == 'c'
 
 
-def test_rejson_ipc():
+def test_rejson_ipc_offline():
     inst = RejsonIPC('test')
 
     assert RejsonIPC._make_redis_key('test') == '_ipc_test'
     assert inst.label == 'test'
     assert inst.redis_key == '_ipc_test'
 
-    assert RejsonIPC._ensure_entry(dict(_ipc_rev=0), '_ipc_rev', 1) == {
-            '_ipc_rev': 0
+    assert inst._create_rejson_data(obj=123, time=456) == {
+            '_ipc_meta': {
+                'key': '_ipc_test',
+                'rev': 0,
+                'created_at': 456,
+                'updated_at': 456,
+                },
+            '_ipc_obj': 123
             }
-    assert RejsonIPC._ensure_entry(dict(), '_ipc_rev', 1) == {
-            '_ipc_rev': 1
-            }
-    assert inst._ensure_metadata(dict()) == {
-            '_ipc_rev': 0,
-            '_ipc_obj': None,
-            '_ipc_key': '_ipc_test',
-            }
-    assert inst._ensure_metadata(dict(_ipc_obj=1, _ipc_key='_ipc_test')) == {
-            '_ipc_rev': 0,
-            '_ipc_obj': 1,
-            '_ipc_key': '_ipc_test',
-            }
-    with pytest.raises(
-            ValueError, match='inconsistent obj key'
-            ):
-        inst._ensure_metadata(dict(_ipc_key='_ipc_abc'))
+    assert inst._resolve_obj_path('.') == '._ipc_obj'
+    assert inst._resolve_obj_path('.key') == '._ipc_obj.key'
+    assert inst._resolve_obj_path('key') == '._ipc_obj.key'
+    assert inst._resolve_obj_path('') == '._ipc_obj'
+    assert inst._resolve_meta_path('key') == '._ipc_meta.key'
+    assert inst._resolve_meta_path('') == '._ipc_meta'
 
-    assert inst._get_redis_path('.') == '._ipc_obj'
-    assert inst._get_redis_path('.key') == '._ipc_obj.key'
-    assert inst._get_redis_path('key') == '._ipc_obj.key'
-    assert inst._get_redis_path('') == '._ipc_obj'
+
+@pytest.fixture
+def rejson_ipc_conn():
+    inst = RejsonIPC('test')
+    inst.init_ipc('redis://localhost/15')
+    conn = inst._connection
+    conn.flushdb()
+    return conn, inst
+
+
+def test_rejson_ipc_check_conn(rejson_ipc_conn):
+    conn, inst = rejson_ipc_conn
+    conn.set('test_redis', 'good')
+    assert conn.get('test_redis') == 'good'
+
+
+def test_rejson_ipc_data_layout(rejson_ipc_conn):
+    conn, inst = rejson_ipc_conn
+    inst.ensure_obj(obj=123)
+
+    data = conn.jsonget(inst.redis_key, '.')
+
+    assert data['_ipc_obj'] == 123
+    assert data['_ipc_meta']['key'] == inst.redis_key
+    assert data['_ipc_meta']['rev'] == 0
+
+    assert inst.get_rejson_data() == data
+
+    assert inst.get_meta() == data['_ipc_meta']
+    assert inst.get_meta('rev') == 0
+
+
+def test_rejson_ipc_op_uninitialized(rejson_ipc_conn):
+    conn, inst = rejson_ipc_conn
+    data = conn.jsonget(inst.redis_key, '.')
+    assert data is None
+    assert inst.get_rejson_data() is None
+    assert inst.get_meta() is None
+    assert not inst.is_initialized()
+    assert inst.type() is None
+    assert inst.is_null() is None
+
+
+def test_rejson_ipc_op_null(rejson_ipc_conn):
+    conn, inst = rejson_ipc_conn
+    inst.ensure_obj()
+    assert inst.is_initialized()
+    assert inst.type() == 'null'
+    assert inst.is_null()
+
+    obj = inst.get()
+    assert inst.get() is None
+
+    meta = inst.get_meta()
+    assert meta['rev'] == 0
+
+    # check repeated get
+    assert obj is inst.get()
+    assert meta == inst.get_meta()
+
+
+def test_rejson_ipc_op_ensure_obj_exist(rejson_ipc_conn):
+    conn, inst = rejson_ipc_conn
+    inst.set(123)
+    inst.ensure_obj('str')
+
+    assert inst.is_initialized()
+    assert inst.type() == 'integer'
+    assert not inst.is_null()
+
+    obj = inst.get()
+    assert inst.get() == 123
+
+    meta = inst.get_meta()
+    assert meta['rev'] == 0
+
+    # check repeated get
+    assert obj is inst.get()
+    assert meta == inst.get_meta()
+
+
+def test_rejson_ipc_op_update_obj(rejson_ipc_conn):
+    conn, inst = rejson_ipc_conn
+    inst.ensure_obj({'a': 123})
+
+    assert inst.is_initialized()
+    assert inst.type() == 'object'
+    assert inst.type('a') == 'integer'
+    assert not inst.is_null()
+
+    obj = inst.get()
+    assert inst.get() == {'a': 123}
+
+    meta = inst.get_meta()
+    assert meta['rev'] == 0
+
+    # check repeated get
+    assert obj == inst.get()
+    assert meta == inst.get_meta()
+
+    # update data
+    inst.set('str', path='a')
+
+    assert inst.is_initialized()
+    assert inst.type() == 'object'
+    assert inst.type('a') == 'string'
+    assert not inst.is_null()
+
+    obj = inst.get()
+    assert inst.get() == {'a': 'str'}
+
+    meta1 = inst.get_meta()
+    assert meta1['rev'] == 1
+    assert meta1['created_at'] == meta['created_at']
+    assert (meta1['updated_at'][0] + meta1['updated_at'][1] * 1e-6) > \
+           (meta['updated_at'][0] + meta['updated_at'][1] * 1e-6)
+
+
+def test_rejson_ipc_op_subpath(rejson_ipc_conn):
+    conn, inst = rejson_ipc_conn
+
+    with pytest.raises(
+            redis.exceptions.ResponseError):
+        inst.set(123, path='a')
+    inst.set({'a': 123})
+    inst.set({'b': 'str'}, path='b')
+    obj = inst.get()
+    assert obj == {
+            'a': 123,
+            'b': {'b': 'str'}
+            }
+    meta = inst.get_meta()
+    assert meta['rev'] == 1
+
+
+def test_rejson_ipc_op_pipeline(rejson_ipc_conn):
+    conn, inst = rejson_ipc_conn
+
+    inst.set(dict())
+    for i in range(10):
+        inst.set(i, path=f'k{i}')
+    obj = inst.get()
+    assert obj == {f'k{i}': i for i in range(10)}
+    meta = inst.get_meta()
+    assert meta['rev'] == 10
+
+    with inst.pipeline as p:
+        inst.reset(dict())
+        for i in range(10):
+            inst.set(i * 2, path=f'k{i}')
+        p.execute()
+    obj = inst.get()
+    assert obj == {f'k{i}': i * 2 for i in range(10)}
+    meta = inst.get_meta()
+    assert meta['rev'] == 10
+
+    assert inst.query_obj('objkeys', path='.') == [f'k{i}' for i in range(10)]
+    # pipeline get
+    with inst.pipeline as p:
+        for i in range(10):
+            inst.get(f'k{i}')
+        result = p.execute()
+    assert result == [i * 2 for i in range(10)]
+    meta = inst.get_meta()
+    assert meta['rev'] == 10
