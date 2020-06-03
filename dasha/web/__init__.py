@@ -55,7 +55,7 @@ def create_site():
             'DASHA_SITE', 'The site module or path.',
             'dasha.examples.dasha_intro')
     env_registry.register('DASHA_LOGFILE', 'The file for logging.', None)
-    env_registry.register('DASHA_LOGLEVEL', 'The DashA log level.', 'INFO')
+    env_registry.register('DASHA_LOGLEVEL', 'The DashA log level.', 'Info')
     logger.info(f"registered env vars:\n{pformat_yaml(env_registry)}")
 
     site.__wrapped__ = Site.from_any(env_registry.get('DASHA_SITE'))
@@ -77,7 +77,8 @@ def create_app():
     logfile = env_registry.get('DASHA_LOGFILE')
     loglevel = env_registry.get('DASHA_LOGLEVEL')
     logger.debug(f"reset logger: loglevel={loglevel} logfile={logfile}")
-    init_log(level=loglevel, file_=logfile)
+    # python logging level is upper case.
+    init_log(level=loglevel.upper(), file_=logfile)
     return server
 
 
