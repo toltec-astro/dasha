@@ -395,7 +395,7 @@ class RejsonIPC(object):
         try:
             return self.query_obj('get', path)
         except redis.exceptions.ResponseError as e:
-            logger.warning(
+            logger.debug(
                     f"unable to get obj from {self.redis_key}: {e}",
                     exc_info=True)
         return None
