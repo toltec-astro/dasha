@@ -75,6 +75,7 @@ def _add_ext_arg(parser):
         import celery.bin.worker as celery_worker
         import celery.bin.beat as celery_beat
         from .web.celery_app import celery_app
+        from .web.extensions.celery import Q
         from flower.command import FlowerCommand
 
         class _flower(FlowerCommand):
@@ -90,6 +91,7 @@ def _add_ext_arg(parser):
                 'worker': {
                     'loglevel': 'DEBUG',
                     'traceback': True,
+                    'queues': [k for k in dir(Q) if not k.startswith('_')],
                     },
                 }
         cmd = dispatch_cmd[name](app=celery_app)

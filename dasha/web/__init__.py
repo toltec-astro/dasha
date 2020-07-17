@@ -52,6 +52,9 @@ def create_site():
 
     env_registry.clear()
     env_registry.register(
+            'SECRET_KEY', 'The secret key to use.',
+            'true')
+    env_registry.register(
             'DASHA_SITE', 'The site module or path.',
             'dasha.examples.dasha_intro')
     env_registry.register('DASHA_LOGFILE', 'The file for logging.', None)
@@ -59,6 +62,7 @@ def create_site():
     logger.info(f"registered env vars:\n{pformat_yaml(env_registry)}")
 
     site.__wrapped__ = Site.from_any(env_registry.get('DASHA_SITE'))
+    site.SECRET_KEY = env_registry.get('SECRET_KEY')
     return site
 
 
@@ -73,6 +77,7 @@ def create_app():
 
     logger.info(f"init dasha site:\n{pformat_yaml(site.to_dict())}")
     server = site.init_app()
+    # logger.info(f"flask config:\n{pformat_yaml(server.config)}")
     # reconfigure the logger
     logfile = env_registry.get('DASHA_LOGFILE')
     loglevel = env_registry.get('DASHA_LOGLEVEL')

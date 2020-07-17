@@ -35,12 +35,19 @@ def register_tasks(obj):
     _celery_task_registry.register(obj, str(obj))
 
 
+class Q(object):
+    """The default queues."""
+    default = 'default'
+    high_priority = "high_priority"
+    normal_priority = "normal_priority"
+    low_priority = "low_priority"
+
+
 def init_app(server, config):
     server.config.update(config)
     _celeryext.init_app(server)
     # update the proxy object
     celery_app.__wrapped__ = _celeryext.celery
-
     celery_app.conf.update(
         redbeat_redis_url=config['CELERY_BROKER_URL'],
         beat_scheduler='redbeat.RedBeatScheduler',
@@ -51,7 +58,16 @@ def init_app(server, config):
                     'url': config['CELERY_BROKER_URL'],
                     'default_timeout': 60 * 60  # second
                 }
-            }
+            },
+        # and route options
+        broker_transport_options={
+            'priority_steps': [0, 3, 6, 9],
+            'queue_order_strategy': 'priority',
+            },
+        task_default_priority=6,
+        task_default_queue=Q.default,
+        task_default_delivery_mode='transient',
+        worker_pool_restarts=True,
         )
 
     class ContextQueueOnce(QueueOnce):
@@ -86,4 +102,5 @@ def schedule_task(task, **kwargs):
     if not isinstance(task, str):
         task = task.name
     kwargs.setdefault('task', task)
-    celery_app.conf.beat_schedule[f'update_{task}'] = kwargs
+    kwargs.setdefault('options', {'queue': Q.default})
+    celery_app.conf.beat_schedule[f'schedule:{task}'] = kwargs
