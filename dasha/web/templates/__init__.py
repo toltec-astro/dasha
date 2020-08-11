@@ -14,6 +14,7 @@ from dash.development.base_component import ComponentMeta as DashComponentMeta
 from dash.dependencies import Input, State, Output
 from tollan.utils.namespace import NamespaceMixin
 from schema import Schema, Optional, And
+from cached_property import cached_property
 
 
 __all__ = [
@@ -58,6 +59,7 @@ class IdTree(NodeMixin, metaclass=_IdTreeABCMeta):
     enabled by the underlying `~anytree.node.nodemixin.NodeMixin` class.
     The id of each tree node is a compositions of the parent's id and
     the label of this node.
+
     """
 
     def __init__(self, parent=None):
@@ -71,13 +73,31 @@ class IdTree(NodeMixin, metaclass=_IdTreeABCMeta):
         return f"{self.__class__._idt_class_label}{sep}" \
                f"{self._idt_instance_label}"
 
-    @property
-    def id(self):
-        """The unique id."""
+    @cached_property
+    def _id_cached(self):
+        """The unique id, cached to avoid repeated computation."""
         if self.parent is None or self.parent.id is None:
             return self.idbase
         sep = '-'
         return f"{self.parent.id}{sep}{self.idbase}"
+
+    # these hooks is need to allow one invalidate the id
+    def _pre_detach(self, parent):
+        self.__dict__.pop('_id_cached', None)
+
+    def _post_detach(self, parent):
+        self.__dict__.pop('_id_cached', None)
+
+    def _pre_attach(self, parent):
+        self.__dict__.pop('_id_cached', None)
+
+    def _post_attach(self, parent):
+        self.__dict__.pop('_id_cached', None)
+
+    @property
+    def id(self):
+        """The unique id."""
+        return self._id_cached
 
 
 class Template(IdTree, NamespaceMixin):
@@ -441,9 +461,7 @@ class ComponentTemplate(Template):
 
     @property
     def id(self):
-        if hasattr(self, "_static_id"):
-            return self._static_id
-        return IdTree.id.fget(self)
+        return getattr(self, '_static_id', IdTree.id.fget(self))
 
     @id.setter
     def id(self, value):
