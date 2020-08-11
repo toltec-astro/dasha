@@ -101,7 +101,13 @@ def _add_ext_arg(parser):
         if args.extension == 'flask':
             from .web import create_app
             app = create_app()
-            app.run(debug=True, port=8050)
+            # get port
+            port = os.environ.get("FLASK_RUN_PORT", None)
+            try:
+                port = int(port)
+            except Exception:
+                port = 8050
+            app.run(debug=True, port=port)
         elif args.extension in ['celery', 'beat', 'flower']:
             e = args.extension
             dispatch_cmd = {
