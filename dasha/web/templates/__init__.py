@@ -12,6 +12,8 @@ import weakref
 from dash.development.base_component import Component as DashComponentBase
 from dash.development.base_component import ComponentMeta as DashComponentMeta
 from dash.dependencies import Input, State, Output
+import dash_bootstrap_components as dbc
+import numpy as np
 from tollan.utils.namespace import NamespaceMixin
 from schema import Schema, Optional, And
 from cached_property import cached_property
@@ -186,7 +188,7 @@ class Template(IdTree, NamespaceMixin):
         return super().from_dict(d, **kwargs)
 
     def child(self, factory, *args, **kwargs):
-        """Return a child template object.`.
+        """Return a child template object.
 
         The actual creation of the object is delegated to the appropriate
         subclass based on the type of `factory`:
@@ -232,6 +234,22 @@ class Template(IdTree, NamespaceMixin):
                     f"unable to create child template"
                     f" from type {type(factory)}")
         return template_cls(*args, **kwargs, parent=self)
+
+    def grid(self, nrows, ncols, squeeze=True):
+        """Return a grid layout."""
+        result = np.full((nrows, ncols), None, dtype=object)
+        current_row = None
+        for i in range(nrows):
+            for j in range(ncols):
+                if j == 0:
+                    current_row = self.child(dbc.Row)
+                result[i, j] = current_row.child(dbc.Col)
+        if squeeze:
+            if nrows == 1 or ncols == 1:
+                result = result.ravel()
+            if nrows == 1 and ncols == 1:
+                result = result[0]
+        return result
 
     @staticmethod
     def _resolve_template_cls(arg):
