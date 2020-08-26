@@ -4,6 +4,13 @@ from . import ComponentTemplate
 import dash_core_components as dcc
 from dash.dependencies import Input, State, Output, ClientsideFunction
 from tollan.utils import mapsum
+from collections import UserList
+
+
+class _DepList(UserList):
+    # this is used to allow we identify the ensured list
+    # so that we know when to automatically wrap the result
+    pass
 
 
 class SharedDataStore(ComponentTemplate):
@@ -37,8 +44,8 @@ class SharedDataStore(ComponentTemplate):
         def _ensure_list(l):
             if l is None:
                 return list()
-            if isinstance(l, (Input, Output, State)):
-                return [l]
+            if isinstance(l, (Input, Output, State, str)):
+                return _DepList([l])
             return list(l)
 
         self._callbacks.append(tuple(
@@ -67,7 +74,9 @@ class SharedDataStore(ComponentTemplate):
     def setup_layout(self, app):
         # this is to hold the key store object that is used to dispatch
         # data in to different output.
+        print(f'_callbacks: {self._callbacks}')
         keys = list()
+        key_strs = list()
         outputs, idx_o = self._make_unique(
                 mapsum(lambda i: i[0], self._callbacks))
         inputs, idx_i = self._make_unique(
@@ -76,6 +85,9 @@ class SharedDataStore(ComponentTemplate):
                 mapsum(lambda i: i[2], self._callbacks))
         # client side
         for output in outputs:
+            if isinstance(output, str):
+                key_strs.append(output)
+                continue
             keys.append(
                     self.parent.child(
                         dcc.Store,
@@ -90,6 +102,8 @@ class SharedDataStore(ComponentTemplate):
                 [Input(self.id, 'data')],
                 [State(keys[-1].id, 'data')],
                 )
+        if len(keys) > 0 and len(key_strs) > 0:
+            raise ValueError("cannot mix string output with component output")
 
         # server side
         @app.callback(
@@ -97,16 +111,25 @@ class SharedDataStore(ComponentTemplate):
             inputs,
             states + [State(key.id, 'data') for key in keys])
         def update(*args):
+            print(args)
             # unpack args
             _input_args = args[:len(inputs)]
             _state_args = args[len(inputs):len(states) - len(keys)]
+            if len(keys) > 0:  # component keys
+                _key_args = args[len(states) - len(keys):]
+            else:
+                _key_args = key_strs
 
             # de-uniquefy the args
             input_args = [_input_args[i] for i in idx_i]
             state_args = [_state_args[i] for i in idx_s]
+            key_args = [_key_args[i] for i in idx_o]
+
+            print(f'input args {input_args}')
+            print(f'state args {state_args}')
+            print(f'key args {key_args}')
 
             # dipatch call args
-            key_args = args[len(states) - len(keys):]
             call_args = list()
             for ii, (o, i, s, c) in enumerate(self._callbacks):
                 call_args.append(
@@ -115,11 +138,20 @@ class SharedDataStore(ComponentTemplate):
                             input_args[:len(i)] + state_args[:len(s)],
                             c,
                             ))
+                key_args = key_args[len(o):]
+                input_args = input_args[len(i):]
+                state_args = state_args[len(s):]
+            print(f'call args {call_args}')
             # make calls
             result = dict()
-            for k, a, c in call_args:
-                for kk, v in zip(k, c(*a)):
+            for ii, (k, a, c) in enumerate(call_args):
+                r = c(*a)
+                if isinstance(self._callbacks[ii][0], _DepList):
+                    # the call need to be wrapped as a list
+                    r = [r]
+                for kk, v in zip(k, r):
                     result[kk] = v
+            print(f'store result: {result}')
             return result
 
     @property
