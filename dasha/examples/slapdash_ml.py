@@ -64,7 +64,7 @@ extensions = [
                     {
                         'template': 'dasha.examples.nat',
                         'route_name': f'nat_x{i}',
-                        'title_text': 'Nat',
+                        'title_text': 'Nat' * 8,
                         'title_icon': 'fas fa-table',
                         }
                     for i in range(20)

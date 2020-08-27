@@ -79,7 +79,14 @@ class _SlapDashPageWrapper(ComponentTemplate):
                 dbc.NavLink,
                 children=title,
                 active=False,
-                href=self._route_name)
+                href=self._route_name,
+                className='pr-2',
+                style={
+                  'white-space': 'nowrap',
+                  'overflow': 'hidden',
+                  'text-overflow': 'ellipsis'
+                    }
+                )
 
     def setup_layout(self, app):
         self._template.setup_layout(app)
