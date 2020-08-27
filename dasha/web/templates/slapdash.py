@@ -142,10 +142,7 @@ class SlapDash(ComponentTemplate):
                 className=(
                     'navbar-dark bg-dark d-flex flex-column'),
                 id='sidebar')
-        header_row = sidebar.child(dbc.Row, style={
-            'line-height': '6rem',
-            'height': '6rem',
-            })
+        header_row = sidebar.child(dbc.Row)
         self._make_title(
                 header_row.child(dbc.Col).child(
                     html.Header, className="brand").child(
