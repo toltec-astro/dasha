@@ -25,8 +25,27 @@
   font-size: 1.1em;
 }
 
+.sidebar-section-header > button {
+  border: none;
+  color: #e5e5e5;
+}
+
+.sidebar-section-header > button:hover {
+  background-color: #444a50 !important;
+}
+
 #nav-collapse .nav-pills {
   margin: 1.0rem 0rem;
+}
+
+.sidebar-scrollable {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+
+.sidebar-scrollable::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 /* add the three horizontal bars icon for the toggle */

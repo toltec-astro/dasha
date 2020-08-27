@@ -14,8 +14,11 @@ from tollan.utils.registry import Registry
 from .utils import fa
 from ..extensions.dasha import resolve_url
 from .sysinfo import SysInfo
-from dash.dependencies import Input, State, Output, ClientsideFunction
+from dash.dependencies import (
+        Input, State, Output, ClientsideFunction, MATCH)
 from schema import Schema, Optional
+# from .utils import parse_triggered_prop_ids
+import dash
 
 
 __all__ = ['SlapDash', ]
@@ -136,16 +139,20 @@ class SlapDash(ComponentTemplate):
     def _make_sidebar(self, container):
         sidebar = container.child(
                 html.Div,
-                className='navbar-dark bg-dark d-flex flex-column',
+                className=(
+                    'navbar-dark bg-dark d-flex flex-column'),
                 id='sidebar')
-        header = sidebar.child(dbc.Row)
+        header_row = sidebar.child(dbc.Row, style={
+            'line-height': '6rem',
+            'height': '6rem',
+            })
         self._make_title(
-                header.child(dbc.Col).child(
+                header_row.child(dbc.Col).child(
                     html.Header, className="brand").child(
                         dcc.Link, href=resolve_url("/"),
                         ), html.H3)
-        toggles = header.child(dbc.Col, width='auto', align='center')
-        self.navbar_toggle = toggles.child(
+        toggles = header_row.child(dbc.Col, width='auto', align='center')
+        navbar_toggle = toggles.child(  # noqa: F841
                 html.Button,
                 children=html.Span(className="navbar-toggler-icon"),
                 className="navbar-toggler",
@@ -153,10 +160,11 @@ class SlapDash(ComponentTemplate):
                     "color": "rgba(0,0,0,.5)",
                     "border-color": "rgba(0,0,0,.1)",
                     'outline': 'none',
-                },
+                    # 'background-color': 'blue',
+                    },
                 id='navbar-toggle',
-            )
-        self.sidebar_toggle = toggles.child(
+                )
+        sidebar_toggle = toggles.child(  # noqa: F841
                 html.Button,
                 children=html.Span(className="navbar-toggler-icon"),
                 className="navbar-toggler",
@@ -165,17 +173,86 @@ class SlapDash(ComponentTemplate):
                     "color": "rgba(0,0,0,.5)",
                     "border-color": "rgba(0,0,0,.1)",
                     'outline': 'none',
-                },
+                    # 'background-color': 'blue',
+                    },
                 id='sidebar-toggle',
             )
 
-        self.sidebar_collapse = sidebar.child(
-                dbc.Collapse, id='nav-collapse', className='flex-grow-1')
-        self.navlist = self.sidebar_collapse.child(
-                dbc.Nav, vertical=True, pills=True)
+        sidebar_collapse = sidebar.child(
+                dbc.Collapse, id='nav-collapse',
+                className='flex-grow-1 sidebar-scrollable',
+                style={
+                    'overflow': 'auto',
+                    })
+
+        self.navlist = sidebar_collapse.child(
+                dbc.Nav, vertical=True, pills=True, className='mt-1')
+
+        submenu_id = 0
+
         for page in self._pages:
-            page['_view'] = self._make_page(page)
-            page['_view']._make_navlink(self.navlist)
+            # this is a top level page
+            if 'template' in page.keys():
+                page['_view'] = self._make_page(page)
+                page['_view']._make_navlink(self.navlist)
+            else:
+                for key in page.keys():
+                    section = self.navlist.child(
+                        html.Div,
+                        className='navbar-dark d-flex flex-column',
+                        style={
+                            'background-color': '#444a50',
+                            'outline': 'none',
+                            }
+                        )
+                    section_header = section.child(dbc.Row).child(
+                            dbc.Col,
+                            className='sidebar-section-header').child(
+                                dbc.Button,
+                                id={
+                                    'type': 'section-toggle',
+                                    'index': submenu_id
+                                    },
+                                className=(
+                                    'btn-block text-left px-0 bg-dark'),
+                                size='sm',
+                                ).child(
+                                        html.H5,
+                                        className='pt-2 pl-3')
+                    section_header.children = [
+                            key,
+                            html.I(
+                                className='fas fa-angle-right pl-2',
+                                id={
+                                    'type': 'section-toggle-icon',
+                                    'index': submenu_id
+                                    }
+                                )]
+                    section_collapse = section.child(
+                            dbc.Collapse,
+                            id={
+                                'type': 'section-collapse',
+                                'index': submenu_id
+                                },
+                            className='flex-grow-1 sidebar-scrollable',
+                            style={'overflow': 'auto'}
+                            )
+                    section_navlist = section_collapse.child(
+                            dbc.Nav,
+                            id={
+                                'type': 'section-navlist',
+                                'index': submenu_id
+                                },
+                            className='my-0',
+                            vertical=True,
+                            pills=True)
+                    submenu_id += 1
+
+                for subpages in page.values():
+                    for subpage in subpages:
+                        subpage['_view'] = self._make_page(subpage)
+                        subpage['_view']._make_navlink(section_navlist)
+
         self.clientside_state.data['navlink_default'] = \
             self._pages[0]['_view']._route_name
         self.location = self.child(dcc.Location, refresh=False)
@@ -218,6 +295,21 @@ class SlapDash(ComponentTemplate):
                  ]
                 )
 
+        # sidebar callbacks
+        app.clientside_callback(
+                ClientsideFunction(
+                    namespace='ui',
+                    function_name='activateNavlink',
+                    ),
+                Output(
+                    {'type': 'section-navlist', 'index': MATCH}, 'children'),
+                [Input(self.location.id, 'pathname')],
+                [State(
+                    {'type': 'section-navlist', 'index': MATCH}, 'children'),
+                 State(self.clientside_state.id, 'data'),
+                 ]
+                )
+
         app.clientside_callback(
                 ClientsideFunction(
                     namespace='ui',
@@ -238,6 +330,36 @@ class SlapDash(ComponentTemplate):
                 )
 
         @app.callback(
+            [
+                Output(
+                    {'type': 'section-collapse', 'index': MATCH}, 'is_open'),
+                Output(
+                    {'type': 'section-toggle-icon', 'index': MATCH},
+                    'className'),
+                ],
+            [
+                Input({'type': 'section-toggle', 'index': MATCH}, 'n_clicks')
+                ],
+            [
+                State({'type': 'section-collapse', 'index': MATCH}, 'is_open')
+                ],
+            prevent_initial_call=True,
+            )
+        def toggle_submenu(n_clicks, is_open):
+            print(f'toggle_submenu n = {n_clicks} o = {is_open}')
+            if n_clicks is None:
+                raise dash.exceptions.PreventUpdate
+            if is_open is None:
+                is_open = True
+            else:
+                is_open = not is_open
+            if is_open:
+                class_name = 'fas fa-angle-down pl-2'
+            else:
+                class_name = 'fas fa-angle-right pl-2'
+            return is_open, class_name
+
+        @app.callback(
                 Output(content_container.id, "children"),
                 [
                     Input(self.location.id, "pathname"),
@@ -253,7 +375,12 @@ class SlapDash(ComponentTemplate):
 
         # setup page layout, as pages are not in the object tree.
         for page in self._pages:
-            page['_view'].setup_layout(app)
+            if 'template' in page.keys():
+                page['_view'].setup_layout(app)
+            else:
+                for subpages in page.values():
+                    for subpage in subpages:
+                        subpage['_view'].setup_layout(app)
 
     @property
     def layout(self):

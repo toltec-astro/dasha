@@ -74,7 +74,6 @@ class SharedDataStore(ComponentTemplate):
     def setup_layout(self, app):
         # this is to hold the key store object that is used to dispatch
         # data in to different output.
-        print(f'_callbacks: {self._callbacks}')
         keys = list()
         key_strs = list()
         outputs, idx_o = self._make_unique(
@@ -111,7 +110,6 @@ class SharedDataStore(ComponentTemplate):
             inputs,
             states + [State(key.id, 'data') for key in keys])
         def update(*args):
-            print(args)
             # unpack args
             _input_args = args[:len(inputs)]
             _state_args = args[len(inputs):len(states) - len(keys)]
@@ -125,10 +123,6 @@ class SharedDataStore(ComponentTemplate):
             state_args = [_state_args[i] for i in idx_s]
             key_args = [_key_args[i] for i in idx_o]
 
-            print(f'input args {input_args}')
-            print(f'state args {state_args}')
-            print(f'key args {key_args}')
-
             # dipatch call args
             call_args = list()
             for ii, (o, i, s, c) in enumerate(self._callbacks):
@@ -141,7 +135,6 @@ class SharedDataStore(ComponentTemplate):
                 key_args = key_args[len(o):]
                 input_args = input_args[len(i):]
                 state_args = state_args[len(s):]
-            print(f'call args {call_args}')
             # make calls
             result = dict()
             for ii, (k, a, c) in enumerate(call_args):
@@ -151,7 +144,6 @@ class SharedDataStore(ComponentTemplate):
                     r = [r]
                 for kk, v in zip(k, r):
                     result[kk] = v
-            print(f'store result: {result}')
             return result
 
     @property
