@@ -85,8 +85,6 @@ class DashA(object):
             )
 
         serve_locally = dash_config["serve_locally"]
-        # TITLE is not a Dash keyword argument.
-        app.title = config.pop('TITLE')
         app.scripts.config.serve_locally = serve_locally
         app.css.config.serve_locally = serve_locally
 
