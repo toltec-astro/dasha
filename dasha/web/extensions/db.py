@@ -121,7 +121,7 @@ def dataframe_from_db(query, bind=None, session=None, **kwargs):
     # session is not None
 
     parse_dates = [
-            'Date', 'created_at', 'updated_at'
+            'Date', 'DateTime' 'created_at', 'updated_at'
             ] + kwargs.pop('parse_dates', list())
     return pd.read_sql_query(
             query,
