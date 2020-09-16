@@ -40,6 +40,7 @@ class ReJsonIPCInfo(ComponentTemplate):
         details = indicator_container.child(collapse).content
         # move the details container to self.
         details.parent = self
+        super().setup_layout(app)
 
         @app.callback(
                 [
@@ -83,5 +84,3 @@ class ReJsonIPCInfo(ComponentTemplate):
                         },
                     html.Pre(pformat_yaml(meta))
                     )
-
-        super().setup_layout(app)

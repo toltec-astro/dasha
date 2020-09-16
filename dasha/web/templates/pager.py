@@ -1,15 +1,17 @@
 #! /usr/bin/env python
 
 from dash.dependencies import Output, Input, State, ALL
-from dasha.web.templates.collapsecontent import CollapseContent
-from dasha.web.templates import ComponentTemplate
 import dash_html_components as html
 import dash_core_components as dcc
-from dasha.web.templates.utils import parse_triggered_prop_ids
 import dash_bootstrap_components as dbc
 from schema import Schema
 import dash
+
+from . import ComponentTemplate
+from .utils import parse_triggered_prop_ids
+from .collapsecontent import CollapseContent
 from .shareddatastore import SharedDataStore
+
 from tollan.utils.fmt import pformat_yaml
 from tollan.utils import to_typed
 

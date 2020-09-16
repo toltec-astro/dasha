@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import dash_html_components as html
 from dash.dependencies import Output, Input, State
+from plotly.subplots import make_subplots as _make_subplots
 import dash
 import json
 
@@ -67,3 +68,18 @@ def parse_triggered_prop_ids():
     return [
             parse_prop_id(d['prop_id']) for d in
             dash.callback_context.triggered]
+
+
+def make_subplots(nrows, ncols, fig_layout=None, **kwargs):
+    """Return a sensible multi-panel figure with predefined layout."""
+    _fig_layout = {
+            'uirevision': True,
+            'xaxis_autorange': True,
+            'yaxis_autorange': True,
+            'showlegend': True,
+            }
+    if fig_layout is not None:
+        _fig_layout.update(fig_layout)
+    fig = _make_subplots(nrows, ncols, **kwargs)
+    fig.update_layout(**_fig_layout)
+    return fig

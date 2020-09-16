@@ -24,7 +24,3 @@ class ViewGrid(ComponentTemplate):
             else:
                 row.child(dbc.Col, lg=6).child(view)
         super().setup_layout(app)
-
-    @property
-    def layout(self):
-        return super().layout

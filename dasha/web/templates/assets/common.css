@@ -71,3 +71,9 @@ a:hover {color: #014c8c !important}
   color: white;
   /* font-style: italic; */
 }
+
+
+/* form inline media */
+.form-check-compact > .form-check {
+    padding-left: 0 !important
+}

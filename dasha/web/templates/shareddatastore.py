@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 
-from . import ComponentTemplate
 import dash_core_components as dcc
 from dash.dependencies import Input, State, Output, ClientsideFunction
-from tollan.utils import mapsum
 from collections import UserList
+from tollan.utils import mapsum
+
+from . import ComponentTemplate
 
 
 class _DepList(UserList):

@@ -410,7 +410,7 @@ class ComponentTemplate(Template):
     _component_prop_names = None
     _template_is_final = False
 
-    _reserved_prop_names = ('layout', )
+    _reserved_prop_names = ('layout', 'height')
 
     def __init_subclass__(cls):
 
