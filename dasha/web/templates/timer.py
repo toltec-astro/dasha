@@ -26,7 +26,7 @@ class IntervalTimer(ComponentTemplate):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.min_interval = 50
+        self.min_interval = 500
         if len(self.interval_options) == 0:
             self.interval_options = [self.min_interval]
         if self.interval_option_value < 0:  # default

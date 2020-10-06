@@ -39,7 +39,7 @@ class ButtonListPager(ComponentTemplate):
     _component_cls = html.Div
     _component_schema = Schema({
         'title_text': str,
-        'n_items_per_page_options': [int, ]
+        'n_items_per_page_options': [object, ]
         })
 
     def __init__(self, *args, **kwargs):
