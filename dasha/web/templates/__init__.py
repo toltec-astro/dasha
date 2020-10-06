@@ -455,6 +455,9 @@ class ComponentTemplate(Template):
                 raise ValueError(
                     f"duplicated argument {prop_name} in args and kwargs.")
             kwargs[prop_name] = arg
+        if kwargs.pop('_validate_props', True) and \
+                self._namespace_from_dict_schema is not None:
+            kwargs = self._namespace_from_dict_schema.validate(kwargs)
         parent = kwargs.pop("parent", None)
         super().__init__(parent=parent)
 
@@ -463,6 +466,12 @@ class ComponentTemplate(Template):
                 # use a alias version of it.
                 k = f'{k}_'
             setattr(self, k, v)
+
+    @classmethod
+    def from_dict(cls, d):
+        if d.pop('_validate_props', True):
+            return super().from_dict(d)
+        return cls(**d)
 
     @classmethod
     def _ensure_template(cls, value):

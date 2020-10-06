@@ -4,7 +4,8 @@
 A set of commonly used component templates.
 """
 
-from .labeleddropdown import LabeledDropdown  # noqa: F401
+from .labeledselect import LabeledDropdown, LabeledChecklist  # noqa: F401
+from .labeledinput import LabeledInput  # noqa: F401
 from .collapsecontent import CollapseContent  # noqa: F401
 from .shareddatastore import SharedDataStore  # noqa: F401
 from .pager import ButtonListPager  # noqa: F401

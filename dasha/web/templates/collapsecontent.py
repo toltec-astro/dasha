@@ -14,7 +14,7 @@ class CollapseContent(ComponentTemplate):
 
     _component_cls = html.Div
     _component_schema = Schema({
-        'button_text': str,
+        'button_text': object,
         })
 
     def __init__(self, *args, **kwargs):

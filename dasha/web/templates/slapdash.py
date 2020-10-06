@@ -119,9 +119,8 @@ class SlapDash(ComponentTemplate):
             'min-width': 320,
             }
 
-    def __init__(self, pages, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._pages = pages
         self._page_registry = Registry.create()
 
     def _make_title(self, container, component_cls, **kwargs):
@@ -194,7 +193,7 @@ class SlapDash(ComponentTemplate):
 
         submenu_id = 0
 
-        for page in self._pages:
+        for page in self.pages:
             # this is a top level page
             if 'template' in page.keys():
                 page['_view'] = self._make_page(page)
@@ -258,7 +257,7 @@ class SlapDash(ComponentTemplate):
                         subpage['_view']._make_navlink(section_navlist)
 
         self.clientside_state.data['navlink_default'] = \
-            self._pages[0]['_view']._route_name
+            self.pages[0]['_view']._route_name
         self.location = self.child(dcc.Location, refresh=False)
 
         footer = sidebar.child(
@@ -378,7 +377,7 @@ class SlapDash(ComponentTemplate):
         super().setup_layout(app)
 
         # setup page layout, as pages are not in the object tree.
-        for page in self._pages:
+        for page in self.pages:
             if 'template' in page.keys():
                 page['_view'].setup_layout(app)
             else:
