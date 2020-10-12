@@ -14,6 +14,7 @@ from dash.development.base_component import ComponentMeta as DashComponentMeta
 from dash.dependencies import Input, State, Output
 import dash_bootstrap_components as dbc
 import numpy as np
+import json
 from tollan.utils.namespace import NamespaceMixin
 from schema import Schema, Optional, And
 from cached_property import cached_property
@@ -466,6 +467,7 @@ class ComponentTemplate(Template):
                 # use a alias version of it.
                 k = f'{k}_'
             setattr(self, k, v)
+        self._wildcard_props = dict()
 
     @classmethod
     def from_dict(cls, d):
@@ -507,6 +509,13 @@ class ComponentTemplate(Template):
     def setup_layout(self, app):
         super().setup_layout(app)
 
+    def set_wildcard_prop(self, name, value):
+        """Set the wildcard props of the component.
+
+        This is necessary because we do not have mechanism to handle those.
+        """
+        self._wildcard_props[name] = json.dumps(value)
+
     @property
     def layout(self):
         """The layout generated from traversing the component tree.
@@ -535,7 +544,7 @@ class ComponentTemplate(Template):
             if callable(prop_value):
                 prop_value = prop_value()
             component_kwargs[prop_name] = prop_value
-        return self._component_cls(**component_kwargs)
+        return self._component_cls(**component_kwargs, **self._wildcard_props)
 
 
 def _make_component_template_cls(component_cls):
