@@ -20,12 +20,13 @@ class LabeledInput(ComponentTemplate):
         })
 
     def __init__(self, *args, **kwargs):
+        size = kwargs.pop('size', 'md')
         super().__init__(*args, **kwargs)
-        container = self.child(dbc.InputGroup)
+        container = self.child(dbc.InputGroup, size=size)
         container.child(
                 dbc.InputGroupAddon(self.label_text, addon_type='prepend'))
         self._input = container.child(dbc.Input, **self.input_props)
-        # self._feedback = self.child(dbc.FormFeedback)
+        self._feedback = self.child(dbc.FormFeedback)
 
     @property
     def input(self):
