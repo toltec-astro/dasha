@@ -13,7 +13,7 @@ class LabeledInput(ComponentTemplate):
 
     """
 
-    _component_cls = dbc.FormGroup
+    _component_cls = dbc.InputGroup
     _component_schema = Schema({
         'label_text': str,
         Optional('input_props', default=dict): dict,
