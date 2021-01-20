@@ -77,3 +77,9 @@ a:hover {color: #014c8c !important}
 .form-check-compact > .form-check {
     padding-left: 0 !important
 }
+
+/* input */
+input:invalid {
+  border-color: red;
+  outline: none!important;
+}
