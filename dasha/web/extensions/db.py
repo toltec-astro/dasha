@@ -6,11 +6,17 @@ import pandas as pd
 from wrapt import ObjectProxy
 from tollan.utils.log import get_logger
 from tollan.utils.fmt import pformat_yaml
+from collections import UserDict
 from copy import deepcopy
 from sqlalchemy import MetaData
+from tollan.utils.db import SqlaDB
+from tollan.utils.registry import Registry, register_to
+import cachetools.func
 
 
-__all__ = ['db', 'get_db_engine', 'create_db_session', 'dataframe_from_db', ]
+__all__ = [
+        'db', 'get_db_engine', 'create_db_session', 'dataframe_from_db',
+        'DatabaseRuntime']
 
 
 db = ObjectProxy(None)
@@ -129,3 +135,120 @@ def dataframe_from_db(query, bind=None, session=None, **kwargs):
             parse_dates=parse_dates,
             **kwargs
             )
+
+
+_sqladb_setup_funcs = Registry.create()
+"""A registry to hold pre-defined SQLA database setup functions.
+"""
+
+
+@register_to(_sqladb_setup_funcs, 'reflect_tables')
+def _sqladb_setup_func_refect_tables(d):
+    return d.reflect_tables()
+
+
+class DatabaseRuntime(UserDict):
+    """A helper class to manage the DBs at runtime.
+
+    Parameters
+    ----------
+    binds_required : list, optional
+        The list of binds required. If any is missing, `RuntimeError`
+        is raised. Default is to ignore.
+    """
+
+    logger = get_logger()
+
+    def __init__(self, binds=None, binds_required=None, setup_funcs=None):
+        if binds is None:
+            from flask import current_app
+            binds = current_app.config['SQLALCHEMY_BINDS'].keys()
+        if binds_required is None:
+            binds_required = []
+        # resolve the setup funcs
+        if setup_funcs is None:
+            setup_funcs = dict()
+        _setup_funcs = dict()
+        for b, f in setup_funcs.items():
+            if isinstance(f, str):
+                if f in _sqladb_setup_funcs:
+                    _setup_funcs[b] = _sqladb_setup_funcs[f]
+                else:
+                    raise ValueError(
+                            f"unknown setup function {f} for bind={b}")
+            elif callable(f):
+                _setup_funcs[b] = f
+            else:
+                raise ValueError(
+                    f"invalid setup function for bind={b}: "
+                    f"callable or one of {list(_sqladb_setup_funcs.keys())} "
+                    f"is expected.")
+
+        self._binds = binds
+        self._binds_required = binds_required
+        self._setup_funcs = _setup_funcs
+
+        # create the dbs
+        sqladbs = dict()
+        for bind in binds:
+            sqladbs[bind] = self._get_sqladb(
+                    bind,
+                    raise_on_error=bind in binds_required
+                    )
+        super().__init__(sqladbs)
+
+        # run the setup for all binds
+        for b in self:
+            self._setup_sqladb(b)
+
+    def _setup_sqladb(self, bind):
+        sqladb = self[bind]
+        setup_func = self._setup_funcs.get(bind, None)
+        if setup_func is not None:
+            try:
+                setup_func(sqladb)
+            except Exception as e:
+                self.logger.error(
+                        f"unable to setup db {sqladb}: {e}",
+                        exc_info=True)
+                if bind in self._binds_required:
+                    raise
+        return sqladb
+
+    @classmethod
+    def _get_sqladb(cls, bind, raise_on_error=True):
+        try:
+            result = SqlaDB.from_flask_sqla(db, bind=bind)
+        except Exception as e:
+            cls.logger.error(
+                    f"unable to connect to db bind={bind}: {e}",
+                    exc_info=True)
+            if raise_on_error:
+                raise
+            else:
+                result = None
+        return result
+
+    @cachetools.func.ttl_cache(ttl=1)
+    def ensure_connection(self, bind):
+        session = self[bind].session
+        try:
+            session.execute('SELECT 1')
+        except Exception as e:
+            session.rollback()
+            self.logger.debug(f"reconnect db {bind}: {e}")
+            # this seems to be needed otherwise it will overflow the conn
+            # pool of SQLA.
+            session.close()
+            self._setup_sqladb(bind)
+
+    def __key(self):
+        return tuple(self.keys())
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__key() == other.__key()
+        return NotImplemented

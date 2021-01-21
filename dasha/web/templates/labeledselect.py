@@ -59,7 +59,7 @@ class LabeledChecklist(ComponentTemplate):
             ))
         checklist_props = dict(
                 labelClassName=(
-                    'btn btn-sm btn-link form-check-label'),
+                    'btn btn-sm btn-link form-check-label rounded-0'),
                 labelCheckedClassName='active btn-outline-primary',
                 custom=False,
                 inputClassName='d-none',
