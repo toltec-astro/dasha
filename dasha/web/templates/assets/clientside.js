@@ -67,7 +67,7 @@ window.dash_clientside.ui = {
         if (pathname === '/') {
             pathname = state['navlink_default']
         }
-        navitems = navitems_.map(a => ({...a}));
+        navitems = [navitems_].flat().map(a=>({...a}))
         navitems.forEach(function(navitem) {
             navitem.props.active = (pathname === navitem.props.href)
         })

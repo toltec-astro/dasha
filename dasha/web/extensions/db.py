@@ -131,7 +131,7 @@ def dataframe_from_db(query, bind=None, session=None, **kwargs):
             ] + kwargs.pop('parse_dates', list())
     return pd.read_sql_query(
             query,
-            con=session.bind,
+            con=session.get_bind(),
             parse_dates=parse_dates,
             **kwargs
             )
@@ -152,9 +152,15 @@ class DatabaseRuntime(UserDict):
 
     Parameters
     ----------
+    binds : list, optional
+        The list of binds to manage. If None, it will include all the
+        binds specified in the ``SQLALCHEMY_BINDS`` environment variable.
     binds_required : list, optional
         The list of binds required. If any is missing, `RuntimeError`
         is raised. Default is to ignore.
+    setup_funcs : list, optional
+        The list of functions to finish the setup of each DB instance.
+        If None, it will be ``reflect_tables`` for all the binds.
     """
 
     logger = get_logger()
@@ -167,9 +173,8 @@ class DatabaseRuntime(UserDict):
             binds_required = []
         # resolve the setup funcs
         if setup_funcs is None:
-            setup_funcs = dict()
-            for b in binds:
-                setup_funcs[b] = 'reflect_tables'
+            setup_funcs = {b: 'reflect_tables' for b in binds}
+        # check and resolve the strings in setup_funcs
         _setup_funcs = dict()
         for b, f in setup_funcs.items():
             if isinstance(f, str):
@@ -233,14 +238,14 @@ class DatabaseRuntime(UserDict):
 
     @cachetools.func.ttl_cache(ttl=1)
     def ensure_connection(self, bind):
-        session = self[bind].session
         try:
-            session.execute('SELECT 1')
+            with self[bind].session_context as session:
+                session.execute('SELECT 1')
         except Exception as e:
-            session.rollback()
             self.logger.debug(f"reconnect db {bind}: {e}")
             # this seems to be needed otherwise it will overflow the conn
             # pool of SQLA.
+            # TODO revisit this
             session.close()
             self._setup_sqladb(bind)
 
