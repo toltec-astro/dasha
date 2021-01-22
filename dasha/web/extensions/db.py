@@ -168,6 +168,8 @@ class DatabaseRuntime(UserDict):
         # resolve the setup funcs
         if setup_funcs is None:
             setup_funcs = dict()
+            for b in binds:
+                setup_funcs[b] = 'reflect_tables'
         _setup_funcs = dict()
         for b, f in setup_funcs.items():
             if isinstance(f, str):
