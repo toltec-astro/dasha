@@ -12,11 +12,13 @@ reusable pages.
 Installation and Usage
 ----------------------
 
-Note: tollan is a utility library used by dasha but is not listed in the
+Note::
+    tollan is a utility library used by dasha but is not listed in the
     ``setup.cfg`` file yet. Therefore it has to be installed manually
     for now.
 
-::
+To install::
+
    $ pip install git+https://github.com/toltec-astro/tollan.git
    $ pip install git+https://github.com/toltec-astro/dasha.git
 
