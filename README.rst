@@ -34,6 +34,8 @@ The same examples can also be run via the full ``dasha`` command::
 
    $ dasha -s dasha.examples.dasha_intro
 
+The command above will run the flask server in development mode,
+and you'll see the page in live at `localhost:8050` in your favorite browser.
 
 License
 -------
