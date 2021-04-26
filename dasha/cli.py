@@ -8,6 +8,7 @@ from tollan.utils.sys import parse_systemd_envfile
 import click
 from tollan.utils.fmt import pformat_yaml
 from tollan.utils.log import init_log, get_logger
+from tollan.utils import hookit
 
 
 __all__ = ['load_env_helper', 'run_demo', 'run_site', 'run_flask']
@@ -107,7 +108,18 @@ def _add_ext_arg(parser):
                 port = int(port)
             except Exception:
                 port = 8050
-            app.run(debug=True, port=port)
+            import flask.cli
+            # hook the server banner to include a splash screen with dasha info
+            # note that the development server should be
+            # running on 127.0.0.1 always
+            with hookit(flask.cli, 'show_server_banner') as hk:
+
+                def dasha_splash_screen(*args, **kwargs):
+                    click.echo(f'''
+~~~~ dasha is running: http://127.0.0.1:{port} ~~~~~
+''')
+                hk.set_post_func(dasha_splash_screen)
+                app.run(debug=True, port=port)
         elif args.extension in ['celery', 'beat', 'flower']:
             e = args.extension
             dispatch_cmd = {
