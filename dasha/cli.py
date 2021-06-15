@@ -77,16 +77,16 @@ def _add_ext_arg(parser):
         import celery.bin.beat as celery_beat
         from .web.celery_app import celery_app
         from .web.extensions.celery import Q
-        from flower.command import FlowerCommand
+        # from flower.command import FlowerCommand
 
-        class _flower(FlowerCommand):
-            def run(self, *args, **kwargs):
-                return self.run_from_argv('flower', (), **kwargs)
+        # class _flower(FlowerCommand):
+        #     def run(self, *args, **kwargs):
+        #         return self.run_from_argv('flower', (), **kwargs)
 
         dispatch_cmd = {
                 'worker': celery_worker.worker,
                 'beat': celery_beat.beat,
-                'flower': _flower
+                # 'flower': _flower
                 }
         dispatch_options = {
                 'worker': {
