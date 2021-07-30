@@ -9,6 +9,36 @@ DashA is a multi-page dash app framework that allows create complex and
 reusable pages.
 
 
+Installation and Usage
+----------------------
+
+.. Note:: Tollan is a utility library used by dasha but is not listed in the
+    ``setup.cfg`` file yet. Therefore it has to be installed manually
+    for now.
+
+To install::
+
+   $ pip install git+https://github.com/toltec-astro/tollan.git
+   $ pip install git+https://github.com/toltec-astro/dasha.git
+
+See ``dasha -h`` for usage.
+
+Dasha comes with a set of examples that can be found in ``dasha/examples/``.
+See ``dasha_demo -h`` for a list of the examples. For example, to run the
+example named ``dasha_intro``::
+
+   $ dasha_demo dasha_intro
+
+The same examples can also be run via the full ``dasha`` command::
+
+   $ dasha -s dasha.examples.dasha_intro
+
+The command above will run the flask server in development mode,
+and you'll see the page in live with your favorate browser::
+
+http://localhost:8050
+
+
 License
 -------
 
