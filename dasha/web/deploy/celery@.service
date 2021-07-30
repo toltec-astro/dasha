@@ -10,26 +10,37 @@ Group=toltec
 # another option for an even more restricted service is
 # DynamicUser=yes
 # see http://0pointer.net/blog/dynamic-users-with-systemd.html
-Environment="VENV=/home/toltec/zma/venvs/toltec"
-Environment="CELERY_LOGLEVEL=info"
-EnvironmentFile=/home/toltec/zma/run/dasha/taco
-EnvironmentFile=/home/toltec/zma/run/dasha/%i
+EnvironmentFile=/home/toltec/toltec_astro/run/dasha/taco
+EnvironmentFile=/home/toltec/toltec_astro/run/dasha/%i
 RuntimeDirectory=celery
 LogsDirectory=celery
-WorkingDirectory=/home/toltec/zma/run
-ExecStart=/usr/bin/env ${VENV}/bin/celery multi start worker \
-	-A dasha.web.celery_app \
-	--pidfile=/var/run/celery/%i.pid \
-	--logfile=/var/log/celery/%i.log \
-	--concurrency=4 -l ${CELERY_LOGLEVEL}
-ExecStop=/usr/bin/env ${VENV}/bin/celery multi stopwait worker \
-	-A dasha.web.celery_app \
-	--pidfile=/var/run/celery/%i.pid
-ExecReload=/usr/bin/env ${VENV}/bin/celery multi restart worker \
-	-A dasha.web.celery_app \
-	--pidfile=/var/run/celery/%i.pid \
-	--logfile=/var/log/celery/%i.log \
-	--concurrency=4 -l ${CELERY_LOGLEVEL} 
+Environment="CELERY_APP=dasha.web.celery_app"
+
+#    -Q:2 high_priority \
+ExecStart=/usr/bin/env ${PYVENV}/bin/celery multi start \
+     2 \
+    --range-prefix=worker_%i \
+    -Q:1 default,normal_priority,low_priority \
+    -Q:2 high_priority \
+    --pidfile=/var/run/celery/%i_celery.pid \
+    --logfile=${DASHA_LOGS_DIR}/%i_celery.log \
+    --concurrency=4 \
+    --loglevel=${LOGLEVEL_CELERY}
+ExecStop=/usr/bin/env ${PYVENV}/bin/celery multi stopwait \
+     2 \
+    --range-prefix=worker_%i \
+    -Q:1 default,normal_priority,low_priority \
+    -Q:2 high_priority \
+    --pidfile=/var/run/celery/%i_celery.pid
+ExecReload=/usr/bin/env ${PYVENV}/bin/celery multi restart \
+     2 \
+    --range-prefix=worker_%i \
+    -Q:1 default,normal_priority,low_priority \
+    -Q:2 high_priority \
+    --pidfile=/var/run/celery/%i_celery.pid \
+    --logfile=${DASHA_LOGS_DIR}/%i_celery.log \
+    --concurrency=4 \
+    --loglevel=${LOGLEVEL_CELERY}
 
 [Install]
 WantedBy=multi-user.target
