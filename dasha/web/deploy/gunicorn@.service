@@ -11,14 +11,17 @@ Group=toltec
 # another option for an even more restricted service is
 # DynamicUser=yes
 # see http://0pointer.net/blog/dynamic-users-with-systemd.html
-Environment="VENV=/home/toltec/zma/venvs/toltec"
-EnvironmentFile=/home/toltec/zma/run/dasha/taco
-EnvironmentFile=/home/toltec/zma/run/dasha/%i
 Environment="DASH_REQUESTS_PATHNAME_PREFIX=/%i/"
 Environment="DASH_ROUTES_PATHNAME_PREFIX=/%i/"
+EnvironmentFile=/home/toltec/toltec_astro/run/dasha/secret
+EnvironmentFile=/home/toltec/toltec_astro/run/dasha/taco
+EnvironmentFile=/home/toltec/toltec_astro/run/dasha/%i
 RuntimeDirectory=gunicorn
-WorkingDirectory=/home/toltec/zma/run
-ExecStart=/usr/bin/env "${VENV}/bin/gunicorn" --log-level DEBUG -w 4 dasha.web.wsgi
+LogsDirectory=gunicorn
+ExecStart=/usr/bin/env ${PYVENV}/bin/gunicorn \
+    --timeout 120 --log-level=${LOGLEVEL_GUNICORN} -w 4 dasha.web.wsgi \
+    --access-logfile=${DASHA_LOGS_DIR}/%i_gunicorn-access.log \
+    --error-logfile=${DASHA_LOGS_DIR}/%i_gunicorn.log
 ExecReload=/bin/kill -s HUP $MAINPID
 KillMode=mixed
 TimeoutStopSec=5

@@ -56,7 +56,7 @@ def init_app(server, config):
                 'backend': 'celery_once.backends.Redis',
                 'settings': {
                     'url': config['CELERY_BROKER_URL'],
-                    'default_timeout': 60 * 60  # second
+                    'default_timeout': 10 * 60  # second
                 }
             },
         # and route options
