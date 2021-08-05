@@ -34,7 +34,7 @@ def init_app(server, config):
     A default bind named "default" is enforced in the config.
 
     `ValueError` is raised if "default" is defined in ``SQLALCHEMY_BINDS``
-    and ``SQLALCHEMY_DATABASE_URL`` is defined differently.
+    and ``SQLALCHEMY_DATABASE_URI`` is defined differently.
 
     """
     logger = get_logger()
@@ -45,7 +45,7 @@ def init_app(server, config):
     # make a copy because we will modify it.
     flask_config = {k: deepcopy(v) for k, v in config.items() if k.isupper()}
 
-    db_url = flask_config.get('SQLALCHEMY_DATABASE_URL', None)
+    db_url = flask_config.get('SQLALCHEMY_DATABASE_URI', None)
     db_binds = flask_config.get('SQLALCHEMY_BINDS', dict())
     if db_url is None and len(db_binds) == 0:
         raise ValueError('no database is defined.')
@@ -63,7 +63,7 @@ def init_app(server, config):
     if db_url is None:
         # use default bind
         db_url = db_binds['default']
-    flask_config['SQLALCHEMY_DATABASE_URL'] = db_url
+    flask_config['SQLALCHEMY_DATABASE_URI'] = db_url
     flask_config['SQLALCHEMY_BINDS'] = db_binds
     logger.debug(f"update server config:\n{pformat_yaml(flask_config)}")
     server.config.update(flask_config)
