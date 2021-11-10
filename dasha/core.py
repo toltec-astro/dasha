@@ -242,7 +242,7 @@ class Site(Namespace):
 
     @classmethod
     def from_dict(cls, d, **kwargs):
-        cls.logger.debug(f"create site from\n{pformat_yaml(d)}")
+        cls.logger.debug(f"create site from\n{pformat_yaml(d['extensions'])}")
         return super().from_dict(d, **kwargs)
 
     @classmethod
