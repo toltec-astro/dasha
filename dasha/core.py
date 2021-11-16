@@ -1,179 +1,189 @@
 #! /usr/bin/env python
 
-from tollan.utils.namespace import Namespace, dict_from_object
-from schema import Schema, Use, And, Optional, SchemaError
 import flask
-from tollan.utils.log import get_logger, timeit, logit
-from tollan.utils import getobj
 from pathlib import Path
 import importlib.util
 from collections.abc import Mapping
+from dataclasses import dataclass, field
+from typing import Sequence
+from schema import Use
+
 from tollan.utils.fmt import pformat_yaml
-import functools
+from tollan.utils.log import get_logger, timeit, logit
+from tollan.utils import getobj
+from tollan.utils import rupdate
+from tollan.utils.dataclass_schema import add_schema
+from tollan.utils.schema import ObjectSchema
 
 
-__all__ = ['Extension', 'Stack', 'Site']
+__all__ = ['Extension', 'Site']
 
 
-class Extension(Namespace):
+DASHA_SITE_VAR_NAME = 'DASHA_SITE'
+
+
+def _ensure_obj(arg):
+    """Load python object if `arg` is string."""
+    if isinstance(arg, str):
+        return getobj(arg)
+    return arg
+
+
+@add_schema
+@dataclass
+class Extension(object):
     """
-    This class provides a unified interface to configure and initialize
+    A class to provide unified interface to configure and initialize
     extensions using the flask factory pattern (flask extensions).
 
     It shall be constructed via the :meth:`from_dict` class method. Two items
     are expected:
 
-    1. "module". This shall be a module that defines the following two methods:
+    1. ``module``. This shall be a module that defines the following two
+    methods:
 
-        1. ``init_ext``. This shall be a function that takes a config dict
-        and return a properly configured underlying flask extension object.
+        1. ``init_ext``. This shall be a function that takes a config dict and
+        return a properly configured underlying flask extension object.
 
         2. ``init_app``. This shall be a function that takes the underlying
         flask extension object and a config dict. It is called to setup the
         flask extension with respect to the given app.
 
-    2. "config". The config dict to be passed to ``init_ext`` and ``init_app``.
+    2. ``config``. The config dict to be passed to ``init_ext`` and
+    ``init_app``.
 
     Conventionally, an `~wrapt.ObjectProxy` object should be made available
     at the extension module level to allow convenient importing from other
     modules. The ``__wrapped__`` object should be set to the underlying
     flask extension object at the end of ``init_ext``.
 
+    The underlying extension object is also available as attribute :attr:`ext`.
+
     For an example of extension module, see `~dasha.web.extensions.db`
     """
 
-    # this allow extension to be created for any dict.
-    _namespace_type_key = None
+    module: object = field(
+        metadata={
+            'description': 'The extension module.',
+            'schema': ObjectSchema(
+                attrs_required=('init_ext', 'init_app'),
+                base_schema=Use(_ensure_obj))
+            }
+        )
+    config: dict = field(
+        default_factory=dict,
+        metadata={
+            'description': 'The extension config dict.',
+            }
+        )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __post_init__(self, *args, **kwargs):
         self._ext = self.module.init_ext(self.config)
 
-    def __repr__(self):
-        return f'{self.module.__name__}'
-
-    class _resolve_ext(object):
-        """Validatable that resolves str to a extension module."""
-
-        @staticmethod
-        def validate(arg):
-            if isinstance(arg, str):
-                return getobj(arg)
-            return arg
-
-    _namespace_from_dict_schema = Schema(
-            {
-                'module': _resolve_ext(),
-                'config': dict
-                },
-            ignore_extra_keys=True
-            )
-    _namespace_to_dict_schema = Schema(
-            {
-                'module': object,
-                'config': object
-                },
-            ignore_extra_keys=True
-            )
-
     def init_app(self, server):
-        """Setup the underlying extension for app.
-
-        `RuntimeError` is raised if this function is called multiple times.
+        """Set up the extension module for app.
 
         """
         self.module.init_app(server, self.config)
 
-    def __eq__(self, other):
-        """Extensions are identified by its module."""
-        return self.module.__eq__(other.module)
-
-    def __hash__(self):
-        """Extensions are identified by its module."""
-        return self.module.__hash__()
+    @property
+    def ext(self):
+        return self._ext
 
 
-class Stack(Namespace):
+def _resolve_ext(ext):
+    """Load extension if `ext` is dict.
     """
-    This class is a thin wrapper around a set of extensions.
+    # first pass, create extension objects
+    if isinstance(ext, Mapping):
+        return Extension.from_dict(ext)
+    return ext
+
+
+def _make_ext_list(exts):
+    """Load extension list from extension definitions.
+
+    Dict will be resolved to `Extension` object, and duplicates
+    will be merged.
 
     Parameters
     ----------
-    extensions : A list of `~dasha.core.Extension` or dict
-        A list of extensions. Items of dict type should be such that extension
-        objects can be constructed using
-        `~dasha.core.Extension.from_dict`.
-
+    exts : list of dict or `Extension`.
+        The extension definitions.
     """
-
-    logger = get_logger()
-
-    class _remove_dumplicated_extensions(object):
-        """Validatable that removes duplicates in the extension list.
-
-        Duplicates are identified by their class.
-
-        """
-
-        @staticmethod
-        def validate(exts):
-            # check exts types
-            ext_insts = set()
-            validated = []
-            for ext in exts:
-                if ext in ext_insts:
-                    raise SchemaError(
-                            f'duplicated extension found in stack: {ext}.')
-                ext_insts.add(ext)
-                validated.append(ext)
-            return validated
-
-    _namespace_from_dict_schema = Schema(
-            {
-                'extensions': And(
-                    [Use(Extension.from_dict), ],
-                    _remove_dumplicated_extensions(),
-                    ),
-                },
-            ignore_extra_keys=True
-            )
-    _namespace_to_dict_schema = Schema(
-            {
-                'extensions': [Use(Extension.to_dict), ],
-                },
-            ignore_extra_keys=True
-            )
+    exts = list(map(_resolve_ext, exts))
+    ext_dict = dict()
+    # check extension of same module and merge the config
+    for ext in exts:
+        if ext.module in ext_dict:
+            rupdate(ext_dict[ext.module].config, ext.config)
+        else:
+            ext_dict[ext.module] = ext
+    return list(ext_dict.values())
 
 
-def _default_server(config_obj):
-    """Return a basic flask server.
-
-    Parameters
-    ----------
-    config_obj : object
-        Object that may carry server configurations.
-
+def _make_flask_server():
+    """Return a basic flask server used as default when server is not specifed
+    in `Site`.
     """
-    server = flask.Flask(__package__)
-    server.config.from_object(config_obj)
-    return server
+    return flask.Flask(__package__)
 
 
-class Site(Namespace):
+@timeit
+def _resolve_server(arg):
+    """Load server instance."""
+
+    if isinstance(arg, str):
+        arg = getobj(arg)
+    if callable(arg):
+        return arg()
+    return arg
+
+
+@add_schema
+@dataclass
+class Site(object):
     """
-    This class manages the context of a DashA site, composed of a server and
-    a set of extensions.
+    A class to manage the context of a DashA site, composed of a Flask server,
+    a server config dict, and a set of extensions:
 
-    It shall be constructed via the ``from_*`` class methods. Two objects
-    are expected:
+    1. ``server``. Optional, this shall be a Flask server instance or a
+    callable return a server instance. If str, it is resolved using
+    `~tollan.utils.getobj`. When not specified, a basic Flask server is created
+    and used.
 
-    1. "server". This shall be a function that returns the server instance.
-        This function optionally may take the site instance as the only
-        argument.
+    1. ``server_config``. Optional. This shall be a dict or object for
+    configuring the Flask server. This is typically used to configure the
+    default Flask server when ``server`` is not set.
 
-    2. "extensions". The shall be a list of items that an
+    2. ``extensions``. The shall be a list of items that an
         `~dasha.core.Extension` object could be created from.
+
+    Instance of this class is typically created via the ``from_*`` class
+    methods.
     """
+    server: object = field(
+        default_factory=_make_flask_server,
+        metadata={
+            'description': 'The Flask server.',
+            'schema': Use(_resolve_server)
+            }
+        )
+
+    server_config: object = field(
+        default_factory=dict,
+        metadata={
+            'description': 'The Flask server config.',
+            }
+        )
+
+    extensions: Sequence[Extension] = field(
+        default_factory=list,
+        metadata={
+            'description': 'The extension list.',
+            'schema': Use(_make_ext_list)
+            }
+        )
 
     logger = get_logger()
 
@@ -191,63 +201,31 @@ class Site(Namespace):
         """
         logger = get_logger()
         server = self.server
-        with logit(logger.debug, f"init server"):
-            server = server(self)
+        with logit(logger.debug, f"init server {server}"):
+            config = self.server_config
+            if isinstance(config, Mapping):
+                server.config.update(config)
+            else:
+                server.config.from_object(config)
         for ext in self.extensions:
             with logit(
                     logger.debug, f"init extension {ext}"):
                 ext.init_app(server)
-        self.server = server
         return server
 
-    class _resolve_server_factory(object):
-        """Validatable that resolves str to a server factory function."""
-
-        @staticmethod
-        def validate(arg):
-            if isinstance(arg, str):
-                arg = getobj(arg)
-            if callable(arg):
-                return arg
-            raise SchemaError(f"Callable expected, {type(arg)} found.")
-
-    _namespace_from_dict_schema = Schema(
-            {
-                Optional(
-                    'server',
-                    # has to wrap this in a lambda to allow later call in
-                    # init_app
-                    default=functools.wraps(
-                        _default_server)(lambda: (_default_server))
-                        ): _resolve_server_factory(),
-                'extensions': And(
-                    # make stack and unpack to check for duplicates
-                    Use(lambda exts: dict(extensions=exts)),
-                    Use(Stack.from_dict),
-                    Use(lambda s: s.extensions),
-                    ),
-                # allcap keys are server configs
-                Optional(str.isupper): object
-                },
-            ignore_extra_keys=True
-            )
-    _namespace_to_dict_schema = Schema(
-            {
-                'server': object,
-                'extensions': [Use(Extension.to_dict)],
-                Optional(str.isupper): object
-                },
-            ignore_extra_keys=True
-            )
-
     @classmethod
-    def from_dict(cls, d, **kwargs):
-        cls.logger.debug(f"create site from\n{pformat_yaml(d['extensions'])}")
-        return super().from_dict(d, **kwargs)
+    def from_dict(cls, d):
+        cls.logger.debug(f"create site from\n{pformat_yaml(d)}")
+        # the add_schema creates from_dict_ because we have from_dict
+        # already
+        return cls.from_dict_(d)
 
     @classmethod
     def from_filepath(cls, filepath):
         """Create a site from a python source file.
+
+        The module file has to have a dict named dasha_site
+        which get passed to :meth:`from_dict`.
 
         Parameters
         ----------
@@ -287,7 +265,10 @@ class Site(Namespace):
                 obj = getobj(arg)
         else:
             obj = arg
-        return cls.from_dict(dict_from_object(obj))
+        if not hasattr(obj, DASHA_SITE_VAR_NAME):
+            raise ValueError(
+                f"Object {obj} does not define a DASHA_SITE variable")
+        return cls.from_dict(obj.DASHA_SITE)
 
     @classmethod
     def from_any(cls, arg):

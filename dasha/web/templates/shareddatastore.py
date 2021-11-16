@@ -1,15 +1,14 @@
 #! /usr/bin/env python
 
-import dash_core_components as dcc
-from dash.dependencies import Input, State, Output, ClientsideFunction
+from dash import dcc, Input, State, Output, ClientsideFunction
 from collections import UserList
 from tollan.utils import mapsum
 
-from . import ComponentTemplate
+from dash_component_template import ComponentTemplate
 
 
 class _DepList(UserList):
-    # this is used to allow we identify the ensured list
+    # this is used to allow identifying the ensured list
     # so that we know when to automatically wrap the result
     pass
 
@@ -25,7 +24,8 @@ class SharedDataStore(ComponentTemplate):
     are created internally at the time `setup_layout` is called.
     """
 
-    _component_cls = dcc.Store
+    class Meta:
+        component_cls = dcc.Store
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,12 +42,12 @@ class SharedDataStore(ComponentTemplate):
                         outputs, inputs, states, callback=func)
             return decorator
 
-        def _ensure_list(l):
-            if l is None:
+        def _ensure_list(lst):
+            if lst is None:
                 return list()
-            if isinstance(l, (Input, Output, State, str)):
-                return _DepList([l])
-            return list(l)
+            if isinstance(lst, (Input, Output, State, str)):
+                return _DepList([lst])
+            return list(lst)
 
         self._callbacks.append(tuple(
             map(_ensure_list, (outputs, inputs, states))) + (callback, ))
@@ -124,7 +124,7 @@ class SharedDataStore(ComponentTemplate):
             state_args = [_state_args[i] for i in idx_s]
             key_args = [_key_args[i] for i in idx_o]
 
-            # dipatch call args
+            # dispatch call args
             call_args = list()
             for ii, (o, i, s, c) in enumerate(self._callbacks):
                 call_args.append(
@@ -146,7 +146,3 @@ class SharedDataStore(ComponentTemplate):
                 for kk, v in zip(k, r):
                     result[kk] = v
             return result
-
-    @property
-    def layout(self):
-        return super().layout

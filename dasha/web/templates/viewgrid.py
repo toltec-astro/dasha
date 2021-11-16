@@ -1,25 +1,27 @@
 #! /usr/bin/env python
-from . import ComponentTemplate
-import dash_html_components as html
+
 import dash_bootstrap_components as dbc
-from schema import Schema
+from dash_component_template import ComponentTemplate
+from . import resolve_template
 
 
 class ViewGrid(ComponentTemplate):
     """This is a simple wrapper around multiple views."""
 
-    _component_cls = html.Div
-    _component_schema = Schema({
-            'views': [dict, ]
-            })
+    class Meta:
+        component_cls = dbc.Container
+
+    def __init__(self, views, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.views = views
 
     def setup_layout(self, app):
         row = self.child(dbc.Row)
         for view in self.views:
             # has to use the class level from_dict because we
             # need to construct arbitrary templates
-            view = ComponentTemplate.from_dict(view)
-            if view._component_cls is dbc.Col:
+            view = resolve_template(view)
+            if view.component_info.type is dbc.Col:
                 row.child(view)
             else:
                 row.child(dbc.Col, lg=6).child(view)

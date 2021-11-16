@@ -1,49 +1,50 @@
 #! /usr/bin/env python
 
 
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output, State
-from schema import Schema, Optional
+from dash_component_template import ComponentTemplate
+
+import copy
 from astropy.utils.console import human_time
 
-from . import ComponentTemplate
 from .collapsecontent import CollapseContent
 
 
 class IntervalTimer(ComponentTemplate):
 
-    _component_cls = html.Div
-    # the intervals are in milliseconds.
-    _component_schema = Schema({
-        Optional('interval_options', default=list): [int],
-        Optional('interval_option_value', default=-1): int,
-        })
+    class Meta:
+        component_cls = html.Div
 
     _INTERVAL_PAUSE = -1
+    min_interval = 500
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+            self, *args,
+            interval_options=None, interval_option_value=None, **kwargs):
+        # the intervals are in milliseconds.
         super().__init__(*args, **kwargs)
 
-        self.min_interval = 500
-        if len(self.interval_options) == 0:
-            self.interval_options = [self.min_interval]
-        if self.interval_option_value < 0:  # default
-            self.interval_option_value = self.interval_options[0]
-        if self.interval_option_value not in self.interval_options:
+        if len(interval_options) == 0:
+            interval_options = [self.min_interval]
+        if interval_option_value is None:  # default
+            interval_option_value = interval_options[0]
+        if interval_option_value not in interval_options:
             raise ValueError('invalid interval option value')
         # if self.min_interval < 100:
         #     raise ValueError(
         #             'min interval should not be less than 500 ms.'
         #             )
-        if self.min_interval > min(self.interval_options):
+        if self.min_interval > min(interval_options):
             raise ValueError(
-                    'interval options cannot be less than min interval')
-        for v in self.interval_options:
+                    f'interval options cannot be less than '
+                    f'min interval {self.min_interval}')
+        for v in interval_options:
             if v % self.min_interval != 0:
                 raise ValueError(
                     "interval options has to be multiples of min interval")
+        self.interval_option_value = interval_option_value
+        self.interval_options = copy.copy(interval_options)
         # add pause option
         self.interval_options.append(self._INTERVAL_PAUSE)
 
@@ -56,7 +57,7 @@ class IntervalTimer(ComponentTemplate):
 
         def make_interval_label(v):
             if v == self._INTERVAL_PAUSE:
-                return f'∞'
+                return '∞'
             if v >= 1000:
                 return human_time(v / 1000)
             return f"{v / 1000.:.1f}s"
@@ -74,17 +75,18 @@ class IntervalTimer(ComponentTemplate):
                     )
                 )
         controls_form_container = controls_form_collapse.content
-        controls_form_collapse._button.style = {
-                # 'color': '#555'
-                }
+        # controls_form_collapse._button.style = {
+        #         # 'color': '#555'
+        #         }
         controls_form_container,  interval_progress_container = \
             controls_form_collapse.content.grid(2, 1)
         controls_form = controls_form_container.child(
-                dbc.Form, inline=True,)
+                dbc.Form)
         # controls_form = controls_form_container
         # controls_form.className = 'd-flex'
         # controls_form_container.parent = controls_container
-        interval_select_container = controls_form
+        interval_select_container = controls_form.child(
+            dbc.Row)
         # interval_select_container, interval_progress_container = \
         #     controls_form.grid(2, 1)
         interval_progress = interval_progress_container.child(

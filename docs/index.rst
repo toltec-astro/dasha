@@ -1,48 +1,14 @@
-####################
-DashA Documentation
-####################
-
-The `dasha` package is a `Dash` app boilerplate that allows creating complex
-and reusable pages.
-
-
-=============
-Reference/API
+Documentation
 =============
 
-.. automodapi:: dasha.core
+This is the documentation for DashA.
 
-.. automodapi:: dasha.cli
+.. toctree::
+  :maxdepth: 2
 
-.. automodapi:: dasha.web
-    :include-all-objects:
+  dasha/index.rst
 
-.. automodapi:: dasha.web.extensions.cache
-    :include-all-objects:
-
-.. automodapi:: dasha.web.extensions.celery
-    :include-all-objects:
-
-.. automodapi:: dasha.web.extensions.dasha
-    :include-all-objects:
-
-.. automodapi:: dasha.web.extensions.db
-    :include-all-objects:
-
-.. automodapi:: dasha.web.extensions.ipc
-    :include-all-objects:
-
-.. automodapi:: dasha.web.extensions.ipc_backends.rejson
-
-.. automodapi:: dasha.web.templates
-
-.. automodapi:: dasha.web.templates.utils
-
-
-=====
-Index
-=====
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. note:: The layout of this directory is simply a suggestion.  To follow
+          traditional practice, do *not* edit this page, but instead place
+          all documentation for the package inside ``dasha/``.
+          You can follow this practice or choose your own layout.

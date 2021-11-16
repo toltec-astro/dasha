@@ -25,7 +25,7 @@ else:
 
 site = ObjectProxy(None)
 """
-A proxy to the `~dasha.core.Site` instance, which is made available after
+A proxy to a global `~dasha.core.Site` instance, which is made available after
 `~dasha.web.create_site` is called.
 """
 
@@ -40,7 +40,7 @@ functions.
 def create_site():
     """DashA entry point.
 
-    Call this function to make available the `~dasha.web.site` context.
+    Call this function to make available the `~dasha.web.site`.
 
     Returns
     -------
@@ -62,7 +62,7 @@ def create_site():
     logger.info(f"registered env vars:\n{pformat_yaml(env_registry)}")
 
     site.__wrapped__ = Site.from_any(env_registry.get('DASHA_SITE'))
-    site.SECRET_KEY = env_registry.get('SECRET_KEY')
+    site.server_config.update(SECRET_KEY=env_registry.get('SECRET_KEY'))
     return site
 
 
@@ -75,7 +75,7 @@ def create_app():
 
     site = create_site()
 
-    logger.info(f"init dasha site:\n{pformat_yaml(site.to_dict())}")
+    logger.info(f"init dasha site:\n{pformat_yaml(site.__dict__)}")
     server = site.init_app()
     # logger.info(f"flask config:\n{pformat_yaml(server.config)}")
     # reconfigure the logger

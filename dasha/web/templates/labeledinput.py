@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 
-from . import ComponentTemplate
+from dash_component_template import ComponentTemplate
 import dash_bootstrap_components as dbc
-from schema import Schema, Optional
 
 
 __all__ = ['LabeledInput', ]
@@ -12,19 +11,16 @@ class LabeledInput(ComponentTemplate):
     """A labeled input widget.
 
     """
+    class Meta:
+        component_cls = dbc.InputGroup
 
-    _component_cls = dbc.InputGroup
-    _component_schema = Schema({
-        'label_text': str,
-        Optional('input_props', default=dict): dict,
-        })
-
-    def __init__(self, *args, **kwargs):
-        size = kwargs.pop('size', 'md')
+    def __init__(self, label_text, *args, input_props=None, **kwargs):
         super().__init__(*args, **kwargs)
-        container = self.child(dbc.InputGroup, size=size)
-        container.child(
-                dbc.InputGroupAddon(self.label_text, addon_type='prepend'))
+        self.label_text = label_text
+        self.input_props = input_props or dict()
+
+        container = self
+        container.child(dbc.InputGroupText(self.label_text))
         self._input = container.child(dbc.Input, **self.input_props)
         self._feedback = self.child(dbc.FormFeedback)
 

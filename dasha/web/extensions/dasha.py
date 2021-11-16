@@ -3,14 +3,17 @@
 from wrapt import ObjectProxy
 import inspect
 from dash import Dash
+import dash_bootstrap_components as dbc
 from tollan.utils.log import timeit, get_logger
 from tollan.utils.fmt import pformat_yaml
-from ..templates import Template
 from tollan.utils import rupdate, ensure_prefix
 import copy
+from ..templates import resolve_template
 
 
-__all__ = ['DashA', 'dasha', 'dash_app', 'resolve_url', 'get_url_stem']
+__all__ = [
+    'DashA', 'dasha', 'dash_app', 'resolve_url', 'get_url_stem',
+    'CSS']
 
 
 dash_app = ObjectProxy(None)
@@ -19,6 +22,15 @@ dash_app = ObjectProxy(None)
 
 dasha = ObjectProxy(None)
 """A proxy to the `~dasha.web.extensions.dasha.DashA` instance."""
+
+
+class CSS(object):
+    """A set of commonly used CSS."""
+
+    themes = dbc.themes
+    fa = (
+        'https://cdnjs.cloudflare.com/ajax/libs/'
+        'font-awesome/6.0.0-beta2/css/all.min.css')
 
 
 class DashA(object):
@@ -55,27 +67,45 @@ class DashA(object):
             }
 
     def __init__(self, config):
-        self.config = copy.copy(self._dash_config_default)
+        self.config = copy.deepcopy(self._dash_config_default)
         rupdate(self.config, config)
-        # This is needed to preserve any pre-registered templates
-        self._template_registry = copy.copy(Template._template_registry)
         self.dash_app = None
 
     def init_app(self, server):
 
-        def extract_dash_args(config):
-            dash_args = set(inspect.getfullargspec(Dash.__init__).args[1:])
+        def extract_args(config, args):
             result = dict()
-            for name in dash_args:
+            for name in args:
                 key = name.upper()
                 if key in config:
                     result[name] = config.pop(key)
             return result, config
 
-        dash_config, config = extract_dash_args(copy.deepcopy(self.config))
+        def extract_dash_args(config):
+            return extract_args(
+                config,
+                set(inspect.getfullargspec(Dash.__init__).args[1:]))
 
-        self.logger.debug(f"Dash config:\n{pformat_yaml(dash_config)}")
-        self.logger.debug(f"DashA config:\n{pformat_yaml(config)}")
+        def extract_dasha_args(config):
+            return extract_args(
+                config,
+                {'DEBUG', 'NO_DEFAULT_STYLESHEETS', 'THEME'})
+
+        dash_config, config = extract_dash_args(copy.deepcopy(self.config))
+        dasha_config, template_config = extract_dasha_args(config)
+
+        # handle default stylesheets and theme
+        css_theme = dasha_config.get('THEME', dbc.themes.BOOTSTRAP)
+        if dasha_config.get('NO_DEFAULT_STYLESHEETS', False):
+            css = list()
+        else:
+            css = [CSS.fa, css_theme]
+        css.extend(dash_config.get('external_stylesheets', list()))
+        dash_config['external_stylesheets'] = css
+
+        self.logger.info(f"Dash config:\n{pformat_yaml(dash_config)}")
+        self.logger.info(f"DashA config:\n{pformat_yaml(dasha_config)}")
+        self.logger.info(f"Template:\n{pformat_yaml(template_config)}")
 
         app = dash_app.__wrapped__ = Dash(
             name=__package__,
@@ -89,16 +119,16 @@ class DashA(object):
         app.css.config.serve_locally = serve_locally
 
         # dev tools
-        # app.enable_dev_tools(debug=True),
+        if dasha_config.get('DEBUG', False):
+            app.enable_dev_tools(debug=True),
 
         with server.app_context():
-            Template._template_registry = copy.copy(self._template_registry)
-            template = Template.from_dict(config)
+            template = resolve_template(config)
             with timeit("setup layout"):
                 template.setup_layout(app)
                 # try infer a title if title is not set
                 if app.title is None:
-                    app.title = getattr(template, 'title_text', None)
+                    app.title = getattr(template, 'title_text', 'Dash App')
             with timeit('serve layout'):
                 app.layout = template.layout
         return server

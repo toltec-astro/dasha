@@ -1,28 +1,32 @@
 #! /usr/bin/env python
 
 
-from dasha.web.templates import ComponentTemplate
-import dash_html_components as html
-import dash_core_components as dcc
-from dasha.web.templates.timer import IntervalTimer
-from schema import Schema
+from dash_component_template import ComponentTemplate
+import dash_bootstrap_components as dbc
+from dash import dcc
 from copy import copy
+
+from .timer import IntervalTimer
 
 
 class LiveUpdateSection(ComponentTemplate):
-    _component_cls = html.Div
-    _component_schema = Schema({
-        'title_component': object,
-        'interval_options': [int],
-        'interval_option_value': int,
-        })
 
-    def __init__(self, *args, **kwargs):
+    class Meta:
+        component_cls = dbc.Container
+
+    def __init__(self,
+                 title_component, interval_options, interval_option_value,
+                 *args, **kwargs):
+        kwargs.setdefault('fluid', True)
         super().__init__(*args, **kwargs)
+        self.title_component = title_component
+        self.interval_options = interval_options
+        self.interval_option_value = interval_option_value
+
         container, banner_container = self.grid(2, 1)
         container.className = 'd-flex align-items-bottom'
         title = copy(self.title_component)
-        title.className = 'mr-2 my-0'
+        title.className = 'me-2 my-0'
         container.child(title)
         self._timer = container.child(
                 IntervalTimer(
@@ -31,7 +35,7 @@ class LiveUpdateSection(ComponentTemplate):
                     ))
         self._loading = container.child(
                 dcc.Loading,
-                parent_className='ml-4')
+                parent_className='ms-4')
         banner_container.className = 'd-flex'
         self._banner = banner_container
 

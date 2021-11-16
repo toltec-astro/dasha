@@ -1,30 +1,53 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 
-"""
-This is the default DashA site returned by
+from dash_component_template import ComponentTemplate
+from dash import html, dcc
+import dash_bootstrap_components as dbc
+from dasha.web.templates.jumbotron import Jumbotron
 
-.. code-block:: bash
 
-    $ dasha
+class DashIntro(ComponentTemplate):
 
-"""
+    class Meta:
+        component_cls = dbc.Container
 
-# The server can be ignored which is to use the default flask server.
-# server is expected to be a callable, and it may optionally accept
-# a namespace object containing ALLCAPS attributes defined in this module
-# as the sole argument.
-# ALLCAP keys go in to default server config
-ENV = 'development'
+    def __init__(self, title_text, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.title_text = title_text
 
-extensions = [
+    def setup_layout(self, app):
+        title = self.title_text
+
+        self.child(dbc.Row).child(dbc.Col).child(Jumbotron(
+            title_text=f'Greetings from {title}!',
+            body_text='DashA makes reusable pages.'
+            ))
+        body = self.child(dbc.Row).child(dbc.Col)
+        footer = self.child(dbc.Row).child(dbc.Col)
+
+        footer.children = [
+                html.Hr(),
+                dcc.Markdown(
+                    'https://github.com/toltec-astro/dasha',
+                    )
+                ]
+
+        for i in range(5):
+            row = body.child(dbc.Row)
+            row.children = tuple(
+                    dbc.Col(dbc.Alert(f"Cell {i}, {j}")) for j in range(5))
+        super().setup_layout(app)
+
+
+DASHA_SITE = {
+    'extensions': [
         {
             'module': 'dasha.web.extensions.dasha',
             'config': {
-                'template': 'dasha.web.templates.dasha_intro',
+                'template': DashIntro,
                 'title_text': 'DashA Intro',
-                # ALLCAPS keys go into the Dash app config
-                'TITLE': 'DashA Site'
                 }
             }
         ]
+    }

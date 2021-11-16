@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 
-from . import ComponentTemplate
+from dash_component_template import ComponentTemplate
 import dash_bootstrap_components as dbc
-from schema import Schema, Optional
 
 
 __all__ = ['LabeledDropdown', 'LabeledChecklist']
@@ -13,15 +12,15 @@ class LabeledDropdown(ComponentTemplate):
 
     """
 
-    _component_cls = dbc.InputGroup
-    _component_schema = Schema({
-        'label_text': str,
-        Optional('dropdown_props', default=dict): dict,
-        })
+    class Meta:
+        component_cls = dbc.InputGroup
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, label_text, *args, dropdown_props=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.child(dbc.InputGroupAddon(self.label_text, addon_type='prepend'))
+        self.label_text = label_text
+        self.dropdown_props = dropdown_props or dict()
+
+        self.child(dbc.InputGroupText(self.label_text))
         self._dropdown = self.child(dbc.Select, **self.dropdown_props)
 
     @property
@@ -34,23 +33,23 @@ class LabeledChecklist(ComponentTemplate):
     """A labeled checklist widget.
 
     """
+    class Meta:
+        component_cls = dbc.Row
 
-    _component_cls = dbc.FormGroup
-    check = True
-    inline = True
-    _component_schema = Schema({
-        'label_text': str,
-        Optional('checklist_props', default=dict): dict,
-        Optional('multi', default=True): bool,
-        })
-
-    def __init__(self, *args, **kwargs):
+    def __init__(
+            self, label_text, *args,
+            checklist_props=None, multi=True, **kwargs):
+        kwargs.setdefault('className', 'g-2')
         super().__init__(*args, **kwargs)
+        self.label_text = label_text
+        self.checklist_props = checklist_props or dict()
+        self.multi = multi
+
         label_text = self.label_text
         if not label_text.endswith(':'):
             label_text += ':'
         self.child(dbc.Label(
-            label_text, className='mt-2',
+            label_text, className='mt-2', width='auto',
             style={
                 'color': '#495057',
                 'font-size': '.875rem',
@@ -70,7 +69,8 @@ class LabeledChecklist(ComponentTemplate):
             select_cls = dbc.Checklist
         else:
             select_cls = dbc.RadioItems
-        self._checklist = self.child(select_cls, **checklist_props)
+        self._checklist = self.child(dbc.Col).child(
+            select_cls, **checklist_props)
 
     @property
     def checklist(self):

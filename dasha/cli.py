@@ -177,7 +177,7 @@ def run_demo():
 @click.pass_context
 def run_flask(ctx, args):
     """Run DashA site."""
-    # this is just a wrapper to an argumentparser.
+    # this is just a wrapper to an ArgumentParser.
 
     if len(args) > 0:
         cmd_self = sys.argv[1:sys.argv.index(args[0])]

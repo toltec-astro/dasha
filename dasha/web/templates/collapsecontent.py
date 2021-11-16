@@ -1,10 +1,8 @@
 #! /usr/bin/env python
 
-from . import ComponentTemplate
-from dash.dependencies import Output, Input, State, ClientsideFunction
-import dash_html_components as html
+from dash_component_template import ComponentTemplate
+from dash import html, Output, Input, State, ClientsideFunction
 import dash_bootstrap_components as dbc
-from schema import Schema
 
 
 __all__ = ['CollapseContent', ]
@@ -12,13 +10,12 @@ __all__ = ['CollapseContent', ]
 
 class CollapseContent(ComponentTemplate):
 
-    _component_cls = html.Div
-    _component_schema = Schema({
-        'button_text': object,
-        })
+    class Meta:
+        component_cls = html.Div
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, button_text, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.button_text = button_text
         self._button = self.child(
                 dbc.Button, self.button_text,
                 color="link",
@@ -35,12 +32,19 @@ class CollapseContent(ComponentTemplate):
                     namespace='ui',
                     function_name='toggleWithClick',
                     ),
-                Output(self._content.id, 'is_open'),
-                [Input(self._button.id, "n_clicks")],
-                [State(self._content.id, 'is_open')],
+                output=Output(self._content.id, 'is_open'),
+                inputs=[
+                    Input(self._button.id, "n_clicks"),
+                    State(self._content.id, 'is_open')
+                    ],
                 )
 
     @property
     def content(self):
         """The content component."""
         return self._content
+
+    @property
+    def button(self):
+        """The button component."""
+        return self._button

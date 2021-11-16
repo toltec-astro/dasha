@@ -1,19 +1,18 @@
 #! /usr/bin/env python
 
-from dash.dependencies import Output, Input, State, ALL
-import dash_html_components as html
-import dash_core_components as dcc
-import dash_bootstrap_components as dbc
-from schema import Schema
 import dash
+from dash import html, dcc, Output, Input, State, ALL
+import dash_bootstrap_components as dbc
 
-from . import ComponentTemplate
+from dash_component_template import ComponentTemplate
+
 from .utils import parse_triggered_prop_ids
 from .collapsecontent import CollapseContent
 from .shareddatastore import SharedDataStore
 
 from tollan.utils.fmt import pformat_yaml
 from tollan.utils import to_typed
+from tollan.utils.log import get_logger
 
 
 __all__ = ['ButtonListPager', ]
@@ -35,28 +34,29 @@ def _get_n_pages(n_items_per_page, n_items):
 
 
 class ButtonListPager(ComponentTemplate):
+    class Meta:
+        component_cls = dbc.Container
 
-    _component_cls = html.Div
-    _component_schema = Schema({
-        'title_text': str,
-        'n_items_per_page_options': [object, ]
-        })
+    logger = get_logger()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, title_text, n_items_per_page_options, *args, **kwargs):
+        kwargs.setdefault('fluid', True)
         super().__init__(*args, **kwargs)
+        self.title_text = title_text
+        self.n_items_per_page_options = n_items_per_page_options
 
         settings_container, btns_container = self.grid(2, 1)
         settings_container.child(dbc.Label(
             self.title_text))
         settings_container_form = settings_container.child(
-                dbc.Form, inline=True)
+                dbc.Form)
 
         settings_container_fgrp = settings_container_form.child(
-                dbc.FormGroup, className='d-flex')
+                dbc.Row, className='g-2')
         # settings_container_fgrp.child(dbc.Label(
         #     self.title_text, className='mr-2'))
         n_items_per_page_select_igrp = settings_container_fgrp.child(
-                    dbc.InputGroup, size='sm', className='w-auto mr-2')
+                    dbc.InputGroup, size='sm', className='w-auto me-2')
         n_items_per_page_drp = n_items_per_page_select_igrp.child(
                 dbc.Select,
                 options=[
@@ -70,8 +70,7 @@ class ButtonListPager(ComponentTemplate):
                 value=self.n_items_per_page_options[0],
                 )
         n_items_per_page_select_igrp.child(
-                dbc.InputGroupAddon(
-                    "items per page", addon_type="append"))
+                dbc.InputGroupText("items per page"))
         self._ctx = {
                 'n_items_per_page_drp': n_items_per_page_drp,
                 'settings_container': settings_container,
@@ -180,7 +179,7 @@ class ButtonListPager(ComponentTemplate):
                     ]
                 )
         def update_current_page(n_clicks_values, settings):
-            print(f"settings: {settings}")
+            self.logger.debug(f"settings: {settings}")
             if settings is None:
                 raise dash.exceptions.PreventUpdate
             d = parse_triggered_prop_ids()[0]

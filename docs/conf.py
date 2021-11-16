@@ -52,23 +52,8 @@ highlight_language = 'python3'
 #needs_sphinx = '1.2'
 
 # To perform a Sphinx version check that needs to be more specific than
-# major.minor, call `check_sphinx_version("x.y.z")` here.
+# major.minor, call `check_sphinx_version("X.Y.Z")` here.
 # check_sphinx_version("1.2.1")
-
-intersphinx_mapping['pandas'] = (
-        'https://pandas.pydata.org/pandas-docs/stable/', None)
-intersphinx_mapping['anytree'] = (
-        'https://anytree.readthedocs.io/en/latest/', None)
-intersphinx_mapping['sqlalchemy'] = (
-        'https://docs.sqlalchemy.org/en/13/', None)
-intersphinx_mapping['flask_sqlalchemy'] = (
-        'https://flask-sqlalchemy.palletsprojects.com/en/2.x/', None)
-intersphinx_mapping['celery'] = (
-        'https://docs.celeryproject.org/en/stable/', None)
-intersphinx_mapping['flask_caching'] = (
-        'https://pythonhosted.org/Flask-Caching/', None)
-intersphinx_mapping['tollan'] = (
-        'https://toltec-astro.github.io/tollan/', None)
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -150,6 +135,9 @@ html_title = '{0} v{1}'.format(project, release)
 # Output file base name for HTML help builder.
 htmlhelp_basename = project + 'doc'
 
+# Prefixes that are ignored for sorting the Python module index
+modindex_common_prefix = ["dasha."]
+
 
 # -- Options for LaTeX output -------------------------------------------------
 
@@ -174,13 +162,22 @@ if setup_cfg.get('edit_on_github').lower() == 'true':
     extensions += ['sphinx_astropy.ext.edit_on_github']
 
     edit_on_github_project = setup_cfg['github_project']
-    edit_on_github_branch = "master"
+    edit_on_github_branch = "main"
 
     edit_on_github_source_root = ""
     edit_on_github_doc_root = "docs"
 
 # -- Resolving issue number to links in changelog -----------------------------
 github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
+
+
+# -- Options for linkcheck output -------------------------------------------
+linkcheck_retry = 5
+linkcheck_ignore = [
+    r'https://github\.com/toltec-astro/dasha/(?:issues|pull)/\d+',
+]
+linkcheck_timeout = 180
+linkcheck_anchors = False
 
 # -- Turn on nitpicky mode for sphinx (to warn about references not found) ----
 #
