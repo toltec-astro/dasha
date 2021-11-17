@@ -2,8 +2,7 @@
 
 
 from dash_component_template import ComponentTemplate
-import dash_bootstrap_components as dbc
-from dash import dcc
+from dash import dcc, html
 from copy import copy
 
 from .timer import IntervalTimer
@@ -12,12 +11,11 @@ from .timer import IntervalTimer
 class LiveUpdateSection(ComponentTemplate):
 
     class Meta:
-        component_cls = dbc.Container
+        component_cls = html.Div
 
     def __init__(self,
                  title_component, interval_options, interval_option_value,
                  *args, **kwargs):
-        kwargs.setdefault('fluid', True)
         super().__init__(*args, **kwargs)
         self.title_component = title_component
         self.interval_options = interval_options

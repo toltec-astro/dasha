@@ -76,7 +76,7 @@ class IntervalTimer(ComponentTemplate):
                 )
         controls_form_container = controls_form_collapse.content
         # controls_form_collapse._button.style = {
-        #         # 'color': '#555'
+        #         'color': '#555'
         #         }
         controls_form_container,  interval_progress_container = \
             controls_form_collapse.content.grid(2, 1)
@@ -110,11 +110,12 @@ class IntervalTimer(ComponentTemplate):
                 # inline=True,
                 persistence=True,
                 labelClassName=(
-                    'btn btn-sm btn-light form-check-label rounded-0'),
+                    'bs4-compat btn btn-sm btn-light '
+                    'form-check-label rounded-0 py-0'),
                 labelCheckedClassName='active',
                 labelStyle={
-                    'height': '1.7em',
-                    'margin-top': '0.3em'
+                    'height': '1.5em',
+                    'margin-top': '0.5em'
                     },
                 custom=False,
                 inputClassName='d-none',

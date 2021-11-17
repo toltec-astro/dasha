@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
-import dash_bootstrap_components as dbc
 from dash_component_template import ComponentTemplate
+from dash import html
+import dash_bootstrap_components as dbc
 from . import resolve_template
 
 
@@ -9,7 +10,7 @@ class ViewGrid(ComponentTemplate):
     """This is a simple wrapper around multiple views."""
 
     class Meta:
-        component_cls = dbc.Container
+        component_cls = html.Div
 
     def __init__(self, views, *args, **kwargs):
         super().__init__(*args, **kwargs)

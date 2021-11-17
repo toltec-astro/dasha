@@ -19,7 +19,7 @@ class CollapseContent(ComponentTemplate):
         self._button = self.child(
                 dbc.Button, self.button_text,
                 color="link",
-                className='mr-2 my-0 px-2 shadow-none'
+                className='me-2 my-0 px-2 shadow-none'
                 )
         self._content = self.child(dbc.Collapse)
 

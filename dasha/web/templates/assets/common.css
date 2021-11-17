@@ -1,7 +1,7 @@
 /* Default link colours */
-a {color: #0275d8 !important}
+/* a {color: #0275d8 !important} */
 
-a:hover {color: #014c8c !important}
+/* a:hover {color: #014c8c !important} */
 
 .viewport-height * .dash-spreadsheet-container
 {
@@ -75,11 +75,89 @@ a:hover {color: #014c8c !important}
 
 /* form inline media */
 .form-check-compact > .form-check {
-    padding-left: 0 !important
+    padding-left: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 /* input */
 input:invalid {
   border-color: red;
   outline: none!important;
+}
+
+
+/* bs5 jumbotron */
+.jumbotron {
+  padding: 2rem 1rem;
+  margin-bottom: 2rem;
+  border-radius: 0.3rem;
+}
+
+@media (min-width: 576px) {
+  .jumbotron {
+    padding: 4rem 2rem;
+  }
+}
+
+.jumbotron-fluid {
+  padding-right: 0;
+  padding-left: 0;
+  border-radius: 0;
+}
+
+
+/* button light bs4 compat */
+
+.bs4-compat.btn-light {
+  color: #212529;
+  background-color: #f8f9fa;
+  border-color: #f8f9fa;
+}
+
+.bs4-compat.btn-light:hover {
+  color: #212529;
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
+}
+
+.bs4-compat.btn-light:focus, .bs4-compat.btn-light.focus {
+  color: #212529;
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
+  box-shadow: 0 0 0 0.2rem rgba(216, 217, 219, 0.5);
+}
+
+.bs4-compat.btn-light.disabled, .bs4-compat.btn-light:disabled {
+  color: #212529;
+  background-color: #f8f9fa;
+  border-color: #f8f9fa;
+}
+
+.bs4-compat.btn-light:not(:disabled):not(.disabled):active, .bs4-compat.btn-light:not(:disabled):not(.disabled).active,
+.show > .bs4-compat.btn-light.dropdown-toggle {
+  color: #212529;
+  background-color: #dae0e5;
+  border-color: #d3d9df;
+}
+
+.bs4-compat.btn-light:not(:disabled):not(.disabled):active:focus, .bs4-compat.btn-light:not(:disabled):not(.disabled).active:focus,
+.show > .bs4-compat.btn-light.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem rgba(216, 217, 219, 0.5);
+}
+
+.btn-link {
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.btn-link:focus, .btn-link.focus {
+  text-decoration: underline;
+}
+
+
+.btn-outline-primary:hover {
+    color: #f9f8f7 !important
 }

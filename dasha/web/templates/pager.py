@@ -35,12 +35,11 @@ def _get_n_pages(n_items_per_page, n_items):
 
 class ButtonListPager(ComponentTemplate):
     class Meta:
-        component_cls = dbc.Container
+        component_cls = html.Div
 
     logger = get_logger()
 
     def __init__(self, title_text, n_items_per_page_options, *args, **kwargs):
-        kwargs.setdefault('fluid', True)
         super().__init__(*args, **kwargs)
         self.title_text = title_text
         self.n_items_per_page_options = n_items_per_page_options
@@ -54,7 +53,7 @@ class ButtonListPager(ComponentTemplate):
         settings_container_fgrp = settings_container_form.child(
                 dbc.Row, className='g-2')
         # settings_container_fgrp.child(dbc.Label(
-        #     self.title_text, className='mr-2'))
+        #     self.title_text, className='me-2'))
         n_items_per_page_select_igrp = settings_container_fgrp.child(
                     dbc.InputGroup, size='sm', className='w-auto me-2')
         n_items_per_page_drp = n_items_per_page_select_igrp.child(
@@ -164,7 +163,7 @@ class ButtonListPager(ComponentTemplate):
                         get_page_btn_text(i),
                         id=get_page_btn_id(i),
                         color='link',
-                        className='mr-1', size='sm')
+                        className='me-1', size='sm')
                     for i in range(n_pages)
                     ]
             return btns, html.Pre(pformat_yaml(d))

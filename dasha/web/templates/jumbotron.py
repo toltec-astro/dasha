@@ -23,22 +23,18 @@ class Jumbotron(ComponentTemplate):
         self.subtitle_text = subtitle_text
         self.body_text = body_text
         self.button_text = button_text
-        self.className = 'p-3 bg-light rounded-3'
+        self.className = 'jumbotron bg-light'
 
     def setup_layout(self, app):
-        container = self.child(dbc.Container, fluid=True, className='py-3')
-        make_hr = False
+        container = self
         if self.title_text is not None:
             container.child(html.H1(self.title_text, className='display-3'))
-            make_hr = True
         if self.subtitle_text is not None:
             container.child(html.P(self.subtitle_text, className='lead'))
-            make_hr = True
-        if make_hr:
+        if self.body_text is not None or self.button_text is not None:
             container.child(html.Hr(className='my-2'))
         if self.body_text is not None:
             container.child(html.P(self.body_text))
-
         if self.button_text is not None:
             button = container.child(html.P, className='lead').child(
                 dbc.Button, self.button_text, color='primary')

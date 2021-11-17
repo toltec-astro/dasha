@@ -27,15 +27,14 @@ class Nat(ComponentTemplate):
         self.child(dbc.Row).child(dbc.Col).child(
             Jumbotron(
                 title_text=f'{title}',
-                body_text='This page is a test',
+                subtitle_text='This page is a test',
                 ))
-        body = self.child(dbc.Row).child(
-            dbc.Col, style={'margin-left': '2.5rem'})
+        body = self.child(dbc.Row).child(dbc.Col)
 
         timer = body.child(dcc.Interval, interval=1000)
         ticker_container = body.child(html.Div, className='d-flex')
         ticker_container.child(
-                dbc.Label("n_intervals:", className='mr-2'))
+                dbc.Label("n_intervals:", className='me-2'))
         ticker = ticker_container.child(html.Div, 'N/A')
 
         factor = body.child(

@@ -34,31 +34,34 @@ class LabeledChecklist(ComponentTemplate):
 
     """
     class Meta:
-        component_cls = dbc.Row
+        component_cls = dbc.InputGroup
 
     def __init__(
             self, label_text, *args,
             checklist_props=None, multi=True, **kwargs):
-        kwargs.setdefault('className', 'g-2')
         super().__init__(*args, **kwargs)
         self.label_text = label_text
         self.checklist_props = checklist_props or dict()
         self.multi = multi
 
+        container = self
         label_text = self.label_text
         if not label_text.endswith(':'):
             label_text += ':'
-        self.child(dbc.Label(
-            label_text, className='mt-2', width='auto',
-            style={
-                'color': '#495057',
-                'font-size': '.875rem',
-                'padding': '.25rem .5rem',
-                }
-            ))
+        # container.child(dbc.Label(
+        #     label_text, className='mt-2', width='auto',
+        #     style={
+        #         'color': '#495057',
+        #         'font-size': '.875rem',
+        #         'padding': '.25rem .5rem',
+        #         }
+        #     ))
+        container.child(dbc.InputGroupText(label_text, style={
+            'background-color': '#fff', 'border': 'none'}))
         checklist_props = dict(
                 labelClassName=(
-                    'btn btn-sm btn-link form-check-label rounded-0'),
+                    'bs4-compat btn btn-sm btn-link'
+                    ' form-check-label rounded-0'),
                 labelCheckedClassName='active btn-outline-primary',
                 custom=False,
                 inputClassName='d-none',
@@ -69,8 +72,9 @@ class LabeledChecklist(ComponentTemplate):
             select_cls = dbc.Checklist
         else:
             select_cls = dbc.RadioItems
-        self._checklist = self.child(dbc.Col).child(
-            select_cls, **checklist_props)
+        # self._checklist = container.child(dbc.Col).child(
+        #     select_cls, **checklist_props)
+        self._checklist = container.child(select_cls, **checklist_props)
 
     @property
     def checklist(self):

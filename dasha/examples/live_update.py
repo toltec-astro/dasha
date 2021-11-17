@@ -20,7 +20,11 @@ from tollan.utils.fmt import pformat_yaml
 class LiveUpdateExample(ComponentTemplate):
 
     class Meta:
-        component_cls = html.Div
+        component_cls = dbc.Container
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('fluid', True)
+        super().__init__(*args, **kwargs)
 
     logger = get_logger()
 
@@ -49,15 +53,17 @@ class LiveUpdateExample(ComponentTemplate):
         # add some input widgets, which is wrapped in
         # a form, for better formatting
         controls_form = controls_container.child(
-                dbc.Form, inline=True, className='my-4')
+                dbc.Form, className='my-4')
+        controls_form_container = controls_form.child(
+            dbc.Row, className='gx-2 gy-2')
 
-        example_select = controls_form.child(
+        example_select = controls_form_container.child(
                 LabeledDropdown(
                     label_text='A dropdown',
                     # these are bootstrap classes that
                     # specify the margin and width of the
                     # widget
-                    className='w-auto mr-3',
+                    className='w-auto',
                     size='sm',
                     )).dropdown
         # add the options and values
@@ -69,10 +75,10 @@ class LiveUpdateExample(ComponentTemplate):
                 for i in range(4)]
         example_select.value = 0
 
-        example_input = controls_form.child(
+        example_input = controls_form_container.child(
                 LabeledInput(
                     label_text='A input',
-                    className='w-auto mr-3',
+                    className='w-auto',
                     size='sm',
                     input_props={
                         # these are the dbc.Input kwargs
@@ -82,10 +88,11 @@ class LiveUpdateExample(ComponentTemplate):
                         }
                     )).input
 
-        example_checklist = controls_form.child(
+        example_checklist = controls_form_container.child(
                 LabeledChecklist(
                     label_text='A checklist',
                     className='w-auto',
+                    size='sm',
                     # set to true to allow multiple check
                     multi=False
                     )).checklist

@@ -95,16 +95,15 @@ class Page(ComponentTemplate):
 
     @staticmethod
     def _get_404_layout(route, reason):
-        return dbc.Container([
+        return html.Div([
                         html.H1(
                             "404: Not found",
                             className="text-danger"),
-                        html.Hr(),
                         html.P(
                             f"Failed to load {route}. "
                             f"Reason: {reason}."
                             ),
-                        ])
+                        ], className='jumbotron bg-light')
 
 
 class PageTree(object):
