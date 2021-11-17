@@ -25,7 +25,7 @@ class AnExamplePage(ComponentTemplate):
     logger = get_logger()
 
     def setup_layout(self, app):
-        container = self
+        container = self.child(dbc.Container, fluid=True)
         # create 2 row x 1 col layout
         header_container, body = container.grid(2, 1)
 
@@ -158,5 +158,16 @@ class AnExamplePage(ComponentTemplate):
                     Input(example_checklist.id, 'value'),
                     ],
                 )
-        def update_view(n_calls, select_value, input_value, checklist_value):
+        def update_view_details(n_calls, select_value, input_value, checklist_value):
             return html.Pre(pformat_yaml(locals()))
+
+
+extensions = [
+    {
+        'module': 'dasha.web.extensions.dasha',
+        'config': {
+            'template': AnExamplePage,
+            'TITLE': 'live update'
+            }
+        }
+    ]
