@@ -1,0 +1,117 @@
+
+.slapdash-root {
+    padding-left: 0;
+    padding-right: 0;
+    min-width: 320px;
+}
+
+.slapdash-sidebar {
+    padding-right: var(--bs-gutter-x, 0.75rem);
+    padding-left: var(--bs-gutter-x, 0.75rem);
+    display: inherit;
+}
+
+.slapdash-sidebar-toggler {
+    display: none;
+}
+
+.slapdash-navbar-toggler {
+    border-color: rgba(255,255,255,0) !important;
+}
+
+.slapdash-sidebar-scrollable {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+
+.slapdash-sidebar-scrollable::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.slapdash-sidebar-section-header > button:hover {
+  background-color: #444a50 !important;
+}
+
+.slapdash-content {
+    padding: 2rem 1rem;
+}
+
+@media (min-width: 992px) {
+
+  .slapdash-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 16rem;
+    text-align: left;
+    transition: margin 0.3s ease-in-out, padding 0.3s ease-in-out;
+  }
+
+  .slapdash-sidebar-section {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    align-items: inherit;
+  }
+
+  .slapdash-sidebar > *:not(:first-child) {
+    transition: margin 0.3s ease-in-out, padding 0.3s ease-in-out;
+  }
+
+  .slapdash-sidebar-toggler {
+    display: inline-block;
+    position: relative;
+    top: 0;
+    transition: top 0.3s ease-in-out;
+    border-color: rgba(255,255,255,0) !important;
+  }
+
+  /* add negative margin to sidebar to achieve the collapse */
+  .slapdash-sidebar.collapsed {
+    margin-left: -11.5rem;
+    padding-right: 0.5rem;
+  }
+
+  /* move the sidebar toggle up to the top left corner */
+  .slapdash-sidebar.collapsed .slapdash-sidebar-toggler {
+    top: -0.5rem;
+  }
+
+  /* also adjust margin of page content */
+  .slapdash-sidebar.collapsed ~ .slapdash-content {
+    margin-left: 5.5rem;
+  }
+
+  /* move all contents of navbar other than header (containing toggle) further
+     off-screen */
+  .slapdash-sidebar.collapsed > *:not(:first-child) {
+    margin-left: -6rem;
+    margin-right: 6rem;
+  }
+
+  .slapdash-navbar-toggler {
+    display: none;
+  }
+
+  .slapdash-nav-collapse {
+    display: block !important;
+  }
+
+  .slapdash-nav-collapse > .navbar-nav {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .slapdash-sidebar-section-header button {
+    border-color: rgba(255,255,255,0) !important;
+  }
+
+  .slapdash-content {
+    margin-left: 17rem;
+    margin-right: 2rem;
+    transition: margin-left 0.3s ease-in-out;
+  }
+
+}

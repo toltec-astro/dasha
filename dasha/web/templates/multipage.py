@@ -11,7 +11,7 @@ from dash_component_template import ComponentTemplate
 
 from ..extensions.dasha import resolve_url
 from . import resolve_template
-from .utils import fa
+from .utils import fa, PatternMatchingId
 
 
 __all__ = ['Page', 'PageTree']
@@ -23,12 +23,6 @@ class Page(ComponentTemplate):
 
     class Meta:
         component_cls = html.Div
-
-    _icon_style = {
-        'padding': '0.5rem 1rem',
-        'width': '50px',
-        'text-align': 'center'
-        }
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self.title_text})'
@@ -62,18 +56,23 @@ class Page(ComponentTemplate):
         return resolve_url(self._route_name)
 
     def make_navlink(self, navlist):
-        """This is the used as the navlist child"""
-        title = [fa(self.title_icon, style=self._icon_style), self.title_text]
+        """This is used as the navlist child"""
+        title = [
+            fa(self.title_icon, className='pe-3'),
+            self.title_text
+            ]
         return navlist.child(
                 dbc.NavLink,
                 children=title,
                 active=False,
                 href=self.route_name,
-                className='pr-2',
+                className='px-3',
                 style={
                     'white-space': 'nowrap',
                     'overflow': 'hidden',
-                    'text-overflow': 'ellipsis'
+                    'text-overflow': 'ellipsis',
+                    # 'max-width': '100%',
+                    # 'min-height': '2.5rem',
                     }
                 )
 
@@ -187,23 +186,13 @@ class PageTree(object):
             self, app, container, make_navlist, make_sub_container,
             location, clientside_state):
         """Setup a tree of nav lists for the page tree."""
-        # we use patten matching ids for all created navlist, which have
-        _container_id = container.id
 
-        def _iter_index():
-            h = 0
-            while True:
-                yield h
-                h += 1
-        iter_index = _iter_index()
+        pmid = PatternMatchingId(
+            container_id=container.id,
+            type=''
+            )
 
-        def _make_id(type, match_index=False):
-            return {
-                'container_id': _container_id,
-                'type': type,
-                'index': MATCH if match_index else next(iter_index)}
-
-        navlist = make_navlist(container=container, id=_make_id('navlist'))
+        navlist = make_navlist(container=container, id=pmid(type='navlist'))
 
         def _make_navlink_for_node(node, navlist):
             for node in node.children:
@@ -215,15 +204,15 @@ class PageTree(object):
                     sub_container = make_sub_container(
                         navlist,
                         title_text=node.page,
-                        id=_make_id('sub_container'))
+                        id=pmid(type='sub_container'))
                     sub_navlist = make_navlist(
                         container=sub_container,
-                        id=_make_id('navlist'))
+                        id=pmid(type='navlist'))
                     _make_navlink_for_node(node, sub_navlist)
         _make_navlink_for_node(self._root, navlist)
 
         # make pattern matching ids
-        navlist_id = _make_id('navlist', match_index=True)
+        navlist_id = pmid(type='navlist', index=MATCH)
 
         # update clientside_state for default navlink
         clientside_state.data['navlink_default'] = next(

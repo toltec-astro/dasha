@@ -73,12 +73,13 @@ class DBCSidebar(ComponentTemplate):
     def setup_layout(self, app):
         container = self
 
-        location = self.child(dcc.Location, refresh=False)
-        clientside_state = self.child(dcc.Store, data=dict())
+        location = container.child(dcc.Location, refresh=False)
+        clientside_state = container.child(dcc.Store, data=dict())
 
         self._setup_sidebar(app, container, location, clientside_state)
 
-        content_container = self.child(html.Div, style=self._content_style)
+        content_container = container.child(
+            html.Div, style=self._content_style)
 
         self.page_tree.setup_page_layouts(app, location, content_container)
 

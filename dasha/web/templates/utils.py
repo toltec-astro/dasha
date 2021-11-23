@@ -2,14 +2,91 @@
 
 import json
 import dash
+import copy
 from dash import html, Output, Input, State
 from plotly.subplots import make_subplots as _make_subplots
 
 
-def fa(className, **kwargs):
+__all__ = [
+    'PatternMatchingId',
+    'update_class_name', 'remove_class_name',
+    'fa', 'to_dependency', 'parse_prop_id', 'parse_triggered_prop_ids',
+    'make_subplots']
+
+
+class PatternMatchingId(object):
+    """A helper class to create pattern matching ids."""
+
+    def __init__(self, **base):
+        id = {'index': -1}
+        if base is not None:
+            id.update(base)
+        self._id = id
+        self._iter_index_inst = self._iter_index()
+
+    def __call__(self, **kwargs):
+        # make sure kwargs only contains keys in base
+        k1 = set(kwargs.keys())
+        k0 = self._id.keys()
+        if k1 > k0:
+            raise ValueError(f"invalid keys {k1 - k0}")
+        id = copy.copy(self._id)
+        id.update(kwargs)
+        if 'index' not in kwargs:
+            id['index'] = next(self._iter_index_inst)
+        return id
+
+    @staticmethod
+    def _iter_index():
+        h = 0
+        while True:
+            yield h
+            h += 1
+
+
+class ClassName(object):
+    """A helper class to manage the ``className`` property."""
+    def __init__(self, className):
+        if isinstance(className, ClassName):
+            self._data = copy.copy(className._data)
+        elif not className:
+            self._data = set()
+        else:
+            self._data = set(className.split(' '))
+
+    def update(self, other):
+        other = self.__class__(other)
+        self._data.update(other._data)
+
+    def remove(self, other):
+        other = self.__class__(other)
+        self._data -= other._data
+
+    def __str__(self):
+        return ' '.join(self._data)
+
+
+def update_class_name(className, *args):
+    """Add classes to `className`."""
+    cn = ClassName(className)
+    for arg in args:
+        cn.update(arg)
+    return str(cn)
+
+
+def remove_class_name(className, *args):
+    """Remove classes from `className`."""
+    cn = ClassName(className)
+    for arg in args:
+        cn.remove(arg)
+    return str(cn)
+
+
+def fa(icon, **kwargs):
     """Return a font-awesome icon.
 
     """
+    className = update_class_name(icon, kwargs.pop('className', None))
     return html.I(className=className, **kwargs)
 
 

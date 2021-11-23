@@ -6,6 +6,10 @@ import dash_bootstrap_components as dbc
 from . import resolve_template
 
 
+# consumed by resolve_template
+_resolve_template = 'ViewGrid'
+
+
 class ViewGrid(ComponentTemplate):
     """This is a simple wrapper around multiple views."""
 
@@ -19,10 +23,8 @@ class ViewGrid(ComponentTemplate):
     def setup_layout(self, app):
         row = self.child(dbc.Row)
         for view in self.views:
-            # has to use the class level from_dict because we
-            # need to construct arbitrary templates
             view = resolve_template(view)
-            if view.component_info.type is dbc.Col:
+            if view.dash_component_info.type is dbc.Col:
                 row.child(view)
             else:
                 row.child(dbc.Col, lg=6).child(view)
