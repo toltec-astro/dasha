@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from dasha.web.extensions.dasha import CSS
+# from dasha.web.extensions.dasha import CSS
 
 """
 This file defines an example site that makes use of
@@ -12,7 +12,8 @@ DASHA_SITE = {
         {
             'module': 'dasha.web.extensions.dasha',
             'config': {
-                'THEME': CSS.themes.LUMEN,
+                # 'DEBUG': True,
+                # 'THEME': CSS.themes.JOURNAL,
                 'template': 'dasha.web.templates.slapdash',
                 'title_text': 'MySite',
                 'pages': [

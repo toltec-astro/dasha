@@ -8,7 +8,7 @@
 .slapdash-sidebar {
     padding-right: var(--bs-gutter-x, 0.75rem);
     padding-left: var(--bs-gutter-x, 0.75rem);
-    display: inherit;
+    /* display: inherit; */
 }
 
 .slapdash-sidebar-toggler {
@@ -32,6 +32,11 @@
 .slapdash-sidebar-section-header > button:hover {
   background-color: #444a50 !important;
 }
+
+.slapdash-sidebar-section {
+    display: block;
+}
+
 
 .slapdash-content {
     padding: 2rem 1rem;

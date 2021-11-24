@@ -115,6 +115,21 @@ window.dash_clientside.ui = {
         return [options, options.slice(
             0, params['n_auto_select']).map(o => o['value'])];
     },
+    toggleCollapseWithButtonChevron: function(n, is_open) {
+        console.log(n)
+        console.log(is_open)
+        if (n == null) {
+            is_open = true
+        } else {
+            is_open = !is_open
+        }
+        if (is_open) {
+            classname = 'fas fa-angle-down ps-2'
+        } else {
+            classname = 'fas fa-angle-right ps-2'
+        }
+        return [is_open, classname]
+    }
     // itemsToSet: function(items, params) {
     //     var options = new Set();
     //     items.forEach(function(e) {

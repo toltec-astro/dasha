@@ -33,8 +33,12 @@ class PatternMatchingId(object):
         id = copy.copy(self._id)
         id.update(kwargs)
         if 'index' not in kwargs:
-            id['index'] = next(self._iter_index_inst)
+            id['index'] = self.make_id()
         return id
+
+    def make_id(self):
+        """Return an unique id."""
+        return next(self._iter_index_inst)
 
     @staticmethod
     def _iter_index():
