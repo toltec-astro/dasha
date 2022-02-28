@@ -17,12 +17,17 @@ __all__ = [
 class PatternMatchingId(object):
     """A helper class to create pattern matching ids."""
 
-    def __init__(self, **base):
-        id = {'index': -1}
+    def __init__(self, auto_index=True, **base):
+        id = dict()
+        if auto_index:
+            id.update({'index': -1})
         if base is not None:
             id.update(base)
         self._id = id
         self._iter_index_inst = self._iter_index()
+        # when auto index is false, the pmid does not return index
+        # in the id.
+        self._auto_index = auto_index
 
     def __call__(self, **kwargs):
         # make sure kwargs only contains keys in base
@@ -33,7 +38,8 @@ class PatternMatchingId(object):
         id = copy.copy(self._id)
         id.update(kwargs)
         if 'index' not in kwargs:
-            id['index'] = self.make_id()
+            if self._auto_index:
+                id['index'] = self.make_id()
         return id
 
     def make_id(self):

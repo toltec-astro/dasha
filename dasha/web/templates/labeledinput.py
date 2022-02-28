@@ -14,14 +14,18 @@ class LabeledInput(ComponentTemplate):
     class Meta:
         component_cls = dbc.InputGroup
 
-    def __init__(self, label_text, *args, input_props=None, **kwargs):
+    def __init__(
+            self, label_text, *args, input_props=None, suffix_text=None,
+            **kwargs):
         super().__init__(*args, **kwargs)
         self.label_text = label_text
-        self.input_props = input_props or dict()
+        input_props = input_props or dict()
 
         container = self
         container.child(dbc.InputGroupText(self.label_text))
-        self._input = container.child(dbc.Input, **self.input_props)
+        self._input = container.child(dbc.Input, **input_props)
+        if suffix_text is not None:
+            container.child(dbc.InputGroupText(suffix_text))
         self._feedback = self.child(dbc.FormFeedback)
 
     @property

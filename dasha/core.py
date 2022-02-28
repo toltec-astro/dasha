@@ -268,7 +268,10 @@ class Site(object):
         if not hasattr(obj, DASHA_SITE_VAR_NAME):
             raise ValueError(
                 f"Object {obj} does not define a DASHA_SITE variable")
-        return cls.from_dict(obj.DASHA_SITE)
+        DASHA_SITE = obj.DASHA_SITE
+        if callable(DASHA_SITE):
+            DASHA_SITE = DASHA_SITE()
+        return cls.from_dict(DASHA_SITE)
 
     @classmethod
     def from_any(cls, arg):

@@ -81,7 +81,7 @@ def create_app():
     # reconfigure the logger
     logfile = env_registry.get('DASHA_LOGFILE')
     loglevel = env_registry.get('DASHA_LOGLEVEL')
-    logger.debug(f"reset logger: loglevel={loglevel} logfile={logfile}")
+    logger.info(f"reset logger: loglevel={loglevel} logfile={logfile}")
     # python logging level is upper case.
     init_log(level=loglevel.upper(), file_=logfile)
     return server

@@ -63,6 +63,14 @@ class LabeledChecklist(ComponentTemplate):
                     'bs4-compat btn btn-sm btn-link'
                     ' form-check-label rounded-0'),
                 labelCheckedClassName='active btn-outline-primary',
+                labelStyle={
+                    'text-transform': 'none',
+                    'border-style': 'none',
+                    },
+                labelCheckedStyle={
+                    'text-transform': 'none',
+                    'border-style': 'none',
+                    },
                 custom=False,
                 inputClassName='d-none',
                 className='d-flex flex-wrap form-check-compact',

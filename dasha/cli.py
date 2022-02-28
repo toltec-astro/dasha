@@ -131,14 +131,14 @@ def _add_ext_arg(parser):
     return parser, handle_ext_args
 
 
-def run_site():
+def run_site(args=None):
     """A helper utility to run DashA site."""
 
     parser = argparse.ArgumentParser(
             description='Run DashA site.')
     parser, handle_site_env_args = _add_site_env_arg(parser)
     parser, handle_ext_args = _add_ext_arg(parser)
-    args = parser.parse_args()
+    args = parser.parse_args(args=args)
     handle_site_env_args(args)
     handle_ext_args(args)
 
