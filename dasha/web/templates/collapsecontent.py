@@ -1,8 +1,9 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
 
 from dash_component_template import ComponentTemplate
 from dash import html, Output, Input, State, ClientsideFunction
 import dash_bootstrap_components as dbc
+from tollan.utils import rupdate
 
 
 __all__ = ['CollapseContent', ]
@@ -13,18 +14,22 @@ class CollapseContent(ComponentTemplate):
     class Meta:
         component_cls = html.Div
 
-    def __init__(self, button_text, *args, **kwargs):
+    def __init__(self, button_text, button_props=None, content=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.button_text = button_text
+        _button_props = {
+            "className": 'me-2 my-0 px-2 shadow-none',
+            'color': 'link',
+            'style': {
+                'border-bottom-width': '0px',
+                }
+            }
+        rupdate(_button_props, button_props or dict())
         self._button = self.child(
                 dbc.Button, self.button_text,
-                color="link",
-                className='me-2 my-0 px-2 shadow-none',
-                style={
-                    'border-bottom-width': '0px',
-                    }
+                **_button_props
                 )
-        self._content = self.child(dbc.Collapse)
+        self._content = content or self.child(dbc.Collapse)
 
     def setup_layout(self, app):
 
