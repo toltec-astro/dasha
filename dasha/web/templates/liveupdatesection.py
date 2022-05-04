@@ -22,7 +22,7 @@ class LiveUpdateSection(ComponentTemplate):
         self.interval_option_value = interval_option_value
 
         container, banner_container = self.grid(2, 1)
-        container.className = 'd-flex align-items-bottom'
+        container.className = 'd-flex align-items-center'
         title = copy(self.title_component)
         title.className = 'me-2 my-0'
         container.child(title)
