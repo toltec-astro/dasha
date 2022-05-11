@@ -241,7 +241,7 @@ class PlotPanel(ComponentTemplate):
         header_container, body = container.grid(2, 1)
 
         data_source = self._data_source
-        if self._data_items_by_type['title']:
+        if self._data_items_by_type.get('title', None):
             title_item = self._data_items_by_type['title'][0]
         else:
             title_item = TitleItemConfig()
@@ -265,9 +265,10 @@ class PlotPanel(ComponentTemplate):
         def update_plot(n_calls):
             # literal items
             literal_children = list()
-            for literal_item in self._data_items_by_type['literal']:
-                literal_children.append(
-                    literal_item.make_component(data_source))
+            if 'literal' in self._data_items_by_type:
+                for literal_item in self._data_items_by_type['literal']:
+                    literal_children.append(
+                        literal_item.make_component(data_source))
 
             traces = list()
             for trace_item in self._data_items_by_type['trace']:
