@@ -20,7 +20,6 @@ slurm_api = ObjectProxy(None)
 
 class SlurmAPI(object):
     """A base class that defines a common interface for SLURM integration."""
-    
     pass
 
 
@@ -31,7 +30,7 @@ class SlurmRestAPI(SlurmAPI):
         self._base_url = base_url
         self._username = username
         self._token = token
-        
+
     def _make_auth_header(self):
         return {
             'X-SLURM-USER-NAME': self._username,
@@ -128,77 +127,142 @@ class SlurmOnSSH(object):
     def __init__(self, remote_host, partition=None, chdir=None):
         self._remote_host = remote_host
         self._partition = partition
-        self._chdir = Path(chdir) if chdir is not None else None
-    
-    @functools.lru_cache(maxsize=10)
-    def get_or_create_connection(self, key=None):
+        self._chdir = chdir
+
+    def create_connection(self, open=True):
+        """Return a new connection to the remote."""
         conn = Connection(self._remote_host)
+        if open:
+            conn.open()
         return conn
-    
-    def get_hostname(self):
-        conn = self.get_or_create_connection()
-        return conn.run('hostname')
-    
-    def get_info(self):
-        conn = self.get_or_create_connection()       
+
+    @functools.lru_cache(maxsize=None)
+    def get_or_create_connection(self, key=None):
+        """Return a connection to the remote, cached using `key`."""
+        # the key is required to manage the connection cache
+        # so that different functions are getting a unique connection
+        # cached by the _conn_key argument
+        # this is to work around the issue with calling the function in
+        # multithread that makes the connection unhappy.
+        return self.create_connection(open=True)
+
+    @functools.lru_cache(maxsize=None)
+    def _get_or_create_chdir(self, _conn_key='_get_or_create_chdir'):
+        """Return a working directory for the jobs."""
+        chdir = self._chdir
+        if chdir is None:
+            # this resolves to the home directory on the remote
+            return '.'
+        conn = self.get_or_create_connection(key=_conn_key)
+        check_dir_exists = conn.run(f"test -d {chdir}", warn=True, hide=True)
+        if check_dir_exists.ok:
+            return chdir
+        create_dir = conn.run(f"mkdir -p {chdir}", warn=True, hide=True)
+        if create_dir.ok:
+            return chdir
+        raise ValueError(f'unable to locate chdir on the remote: {chdir}')
+
+    def _find_chdir_files(
+            self, pattern, _conn_key='find_job_output_files'):
+        chdir = self._get_or_create_chdir(_conn_key=_conn_key)
+        conn = self.get_or_create_connection(key=_conn_key)
+        result = conn.run(
+            f"find {chdir} -maxdepth 1 -name '{pattern}'",
+            warn=True, hide=True)
+        if not result.ok:
+            raise ValueError(f"No sbatch output files found in chdir {chdir}")
+        filepaths = result.stdout.strip('\n').split("\n")
+        return filepaths
+
+    def get_cluster_info(self, _conn_key='get_cluster_info'):
+        """Return the cluster info table."""
+        conn = self.get_or_create_connection(key=_conn_key)
         partition = self._partition
         cmd = 'sinfo -N -o %all'
         if partition is not None:
             cmd += f' -p {partition}'
-        result = conn.run(cmd)
+        result = conn.run(cmd, hide=True)
         stdout = result.stdout
         # load the table as csv
         df = pd.read_csv(StringIO(stdout), sep='|')
         return df
 
-    def get_job_list(self):
-        conn = self.get_or_create_connection()       
-        username = conn.user
-        cmd = f'squeue -u {username} -o %all'
-        result = conn.run(cmd)
+    def get_queue_info(self, _conn_key='get_queue_info'):
+        """Return the queue info table."""
+        conn = self.get_or_create_connection(key=_conn_key)
+        cmd = 'squeue --me -o %all'
+        result = conn.run(cmd, hide=True)
         stdout = result.stdout
         # load the table as csv
         df = pd.read_csv(StringIO(stdout), sep='|')
         return df
 
-    def get_job_info(self, job_id):
-        conn = self.get_or_create_connection()       
+    def get_job_info(self, job_id, show_steps=True, _conn_key='get_job_info'):
+        """Return the job info table."""
+        conn = self.get_or_create_connection(key=_conn_key)
         cmd = f'sacct --parsable -o %all -j {job_id}'
-        result = conn.run(cmd)
+        if not show_steps:
+            cmd += '-X'
+        result = conn.run(cmd, hide=True)
         stdout = result.stdout
         # load the table as csv
         df = pd.read_csv(StringIO(stdout), sep='|')
-        return df
+        if show_steps:
+            return df
+        # return the record for the job as dict
+        return next(iter(df.to_records()))
 
-    def run_sbatch(self, script, conn_key='sbatch'):
-        conn = self.get_or_create_connection(key=conn_key)       
+    def run_sbatch(self, script, _conn_key='run_sbatch'):
+        """Run sbatch with `script`."""
+        # the stdin may get stuck for some reason.
+        # we invalidate the cache every time to alwasys create a new
+        # connection
+        chdir = self._get_or_create_chdir(_conn_key=_conn_key)
         stdin = StringIO(script)
-        chdir = self._chdir
-        cmd = f'sbatch'
+        cmd = 'sbatch'
         if chdir is not None:
             cmd += f' --chdir={chdir}'
         partition = self._partition
         if partition is not None:
-            cmd += f' --parition={partition}'
-        result = conn.run(cmd, in_stream=stdin)
-        job_id = result.stdout.strip('\n').strip()
+            cmd += f' --partition={partition}'
+        conn = self.get_or_create_connection(key=_conn_key)
+        result = conn.run(cmd, in_stream=stdin, hide=True)
+        job_id = int(result.stdout.strip('\n').strip())
         return job_id
-        
-    def get_sbatch_live_output(
-            self, job_id, n_lines=10, conn_key='sbatch_live_output'):
-        chdir = self._chdir or '.'
-        conn = self.get_or_create_connection(key=conn_key)              
-        try:
-            result = conn.run(
-                f"find {chdir} -maxdepth 1 -name '{job_id}-*.out'")
-        except Exception as e:
-            raise ValueError(f"unable to find output for job_id={job_id}: {e}")
-        if not result.ok:
-            raise ValueError("No sbatch output file found for job_id={job_id}")
-        # TODO revisit this assumption
-        filepath = result.stdout.strip('\n').split("\n")[-1]
-        result = conn.run(f"tail -n {n_lines} {filepath}")
+
+    def get_sbatch_job_output(
+            self, job_id, n_lines=10,
+            _conn_key='get_sbatch_job_output'):
+        """Return the output content of job created with `run_sbatch`."""
+        conn = self.get_or_create_connection(key=_conn_key)
+        job_output_files = self._find_chdir_files(
+            f'{job_id}-*.out', _conn_key=_conn_key)
+        if not job_output_files:
+            raise ValueError(f'No output file found for job_id={job_id}')
+        filepath = job_output_files[-1]
+        result = conn.run(f"tail -n {n_lines} {filepath}", hide=True)
         return result.stdout
+
+    def cancel_job(
+            self, job_id, _conn_key='cancel_job'):
+        """Cancel job of `job_id`."""
+        conn = self.get_or_create_connection(key=_conn_key)
+        result = conn.run(f"scancel {job_id}", hide=True)
+        return result
+
+    def get_sbatch_job_ids(self, _conn_key='get_sbatch_job_ids'):
+        """Return the list of job ids found in chdir."""
+        job_output_files = self._find_chdir_files(
+            '[1-9]*.out', _conn_key=_conn_key)
+        job_ids = list()
+        for f in job_output_files:
+            try:
+                job_id = int(Path(f).name.split('-', 1)[0])
+            except ValueError:
+                continue
+            job_ids.append(job_id)
+        job_ids = sorted(job_ids)
+        return job_ids
 
 
 def _get_api_cls(api_type):
@@ -221,6 +285,5 @@ def init_ext(config):
 
 def init_app(server, config):
     """Setup `~dasha.web.extensions.slurm.slurm_api` for `server`.
-    
     """
     pass
