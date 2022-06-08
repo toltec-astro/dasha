@@ -8,6 +8,7 @@ import pandas as pd
 from pathlib import Path
 from io import StringIO
 from fabric import Connection
+import uuid
 
 __all__ = [
         'slurm_api',
@@ -212,14 +213,15 @@ class SlurmOnSSH(object):
         # return the record for the job as dict
         return next(iter(df.to_records()))
 
-    def run_sbatch(self, script, _conn_key='run_sbatch'):
+    def run_sbatch(self, script, job_name=None, _conn_key='run_sbatch'):
         """Run sbatch with `script`."""
         # the stdin may get stuck for some reason.
         # we invalidate the cache every time to alwasys create a new
         # connection
         chdir = self._get_or_create_chdir(_conn_key=_conn_key)
         stdin = StringIO(script)
-        cmd = 'sbatch'
+        job_name = job_name or f'job_{uuid.uuid1()}'
+        cmd = f'sbatch -J {job_name}'
         if chdir is not None:
             cmd += f' --chdir={chdir}'
         partition = self._partition
@@ -250,10 +252,17 @@ class SlurmOnSSH(object):
         result = conn.run(f"scancel {job_id}", hide=True)
         return result
 
-    def get_sbatch_job_ids(self, _conn_key='get_sbatch_job_ids'):
+    def get_sbatch_job_ids(
+            self, _conn_key='get_sbatch_job_ids', job_name_pattern=None):
         """Return the list of job ids found in chdir."""
+        if job_name_pattern is None:
+            output_file_pattern = f'[1-9]*.out'
+        else:
+            if any(c in job_name_pattern for c in '/\|@~'): 
+                raise ValueError("invalid job name pattern.")
+            output_file_pattern = f'[1-9]*{job_name_pattern}*.out'
         job_output_files = self._find_chdir_files(
-            '[1-9]*.out', _conn_key=_conn_key)
+            output_file_pattern, _conn_key=_conn_key)
         job_ids = list()
         for f in job_output_files:
             try:
@@ -263,6 +272,11 @@ class SlurmOnSSH(object):
             job_ids.append(job_id)
         job_ids = sorted(job_ids)
         return job_ids
+    
+    def get_sbatch_script(self, job_id, _conn_key='get_sbatch_script'):
+        conn = self.get_or_create_connection(key=_conn_key)
+        result = conn.run(f"scontrol write batch_script {job_id} -", hide=True)
+        return result.stdout
 
 
 def _get_api_cls(api_type):

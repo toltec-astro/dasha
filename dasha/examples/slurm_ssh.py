@@ -504,7 +504,8 @@ def get_slurm_config():
         }
 
 
-DASHA_SITE = {
+def DASHA_SITE():
+    return {
     'extensions': [
         {
             'module': 'dasha.web.extensions.slurm',
