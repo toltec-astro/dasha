@@ -38,14 +38,14 @@ def get_github_user_info():
 
 
 def get_flask_route():
-    return os.environ.get("DASH_ROUTES_PATHNAME_PREFIX", '/').rstrip('/')
+    return os.environ.get("DASH_ROUTES_PATHNAME_PREFIX", '/')
 
 
 def get_auth_route(sub_route=None):
     route = get_flask_route() + '/auth/'
     if sub_route is not None:
         route += sub_route
-    route = route.replace('//', '/').rstrip('/')
+    route = route.replace('//', '/')
     return route
 
 
@@ -78,7 +78,7 @@ def init_ext(config):
     def logout():
         if is_authorized():
             del github_auth.token
-        return redirect(url_for("/"))
+        return redirect(url_for(get_flask_route()))
 
     return auth
 
