@@ -84,6 +84,8 @@ def create_app():
     logger.info(f"reset logger: loglevel={loglevel} logfile={logfile}")
     # python logging level is upper case.
     init_log(level=loglevel.upper(), file_=logfile)
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    server.wsgi_app = ProxyFix(server.wsgi_app, x_proto=1, x_host=1)
     return server
 
 
