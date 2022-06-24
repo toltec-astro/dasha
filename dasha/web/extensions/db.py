@@ -131,7 +131,8 @@ def dataframe_from_db(query, bind=None, session=None, **kwargs):
             ] + kwargs.pop('parse_dates', list())
     return pd.read_sql_query(
             query,
-            con=session.get_bind(),
+            # con=session.get_bind(),
+            con=session.bind,
             parse_dates=parse_dates,
             **kwargs
             )
