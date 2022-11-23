@@ -104,22 +104,21 @@ def _add_ext_arg(parser):
             app = create_app()
             # get port
             port = os.environ.get("FLASK_RUN_PORT", None)
+            host = os.environ.get("FLASK_RUN_HOST", '127.0.0.1')
             try:
                 port = int(port)
             except Exception:
                 port = 8050
             import flask.cli
             # hook the server banner to include a splash screen with dasha info
-            # note that the development server should be
-            # running on 127.0.0.1 always
             with hookit(flask.cli, 'show_server_banner') as hk:
 
                 def dasha_splash_screen(*args, **kwargs):
                     click.echo(f'''
-~~~~ dasha is running: http://127.0.0.1:{port} ~~~~~
+~~~~ dasha is running: http://{host}:{port} ~~~~~
 ''')
                 hk.set_post_func(dasha_splash_screen)
-                app.run(debug=True, port=port)
+                app.run(host=host, debug=True, port=port)
         elif args.extension in ['celery', 'beat', 'flower']:
             e = args.extension
             dispatch_cmd = {
