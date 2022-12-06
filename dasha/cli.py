@@ -202,3 +202,7 @@ def run_flask(ctx, args):
         port = 8050
     from flask.cli import run_command
     ctx.parent.invoke(run_command, reload=True, port=port)
+
+
+if __name__ == "__main__":
+    run_site()
