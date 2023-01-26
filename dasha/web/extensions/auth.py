@@ -19,6 +19,9 @@ github_auth = ObjectProxy(None)
 """The blueprint for GitHub auth."""
 
 
+DASHA_AUTH_DB_BIND = 'dasha_auth'
+
+
 def get_github_login_url():
     """Return the GitHub login URL."""
     return url_for("auth.github.login")
@@ -87,6 +90,13 @@ def init_app(server, config):
     """Setup `auth` for `server`."""
     server.config.update(
         SQLALCHEMY_TRACK_MODIFICATIONS=False)
+    # check db_binds
+    db_binds = server.config.get('SQLALCHEMY_BINDS', dict())
+    bind_key = DASHA_AUTH_DB_BIND
+    if bind_key not in db_binds:
+        raise ValueError(
+            f"dasha auth requires '{bind_key}' bind"
+            f" in SQLALCHEMY_DATABASE_BINDS")
 
     from flask_sqlalchemy import SQLAlchemy
     from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
@@ -94,6 +104,7 @@ def init_app(server, config):
     db = SQLAlchemy()
 
     class OAuth(OAuthConsumerMixin, db.Model):
+        __bind_key__ = bind_key
         pass
 
     from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
@@ -103,4 +114,4 @@ def init_app(server, config):
 
     db.init_app(server)
     with server.app_context():
-        db.create_all()
+        db.create_all(bind_key=bind_key)
